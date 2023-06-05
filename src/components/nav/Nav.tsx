@@ -60,7 +60,7 @@ const AvatarAndMenu = () => {
                     type="button"
                     key={menuItem.label}
                     onClick={menuItem.action}
-                    className="flex items-center gap-2 rounded p-2 hover:bg-slate-400 hover:text-white">
+                    className="flex items-center gap-2 rounded p-2 text-slate-600 hover:bg-slate-400 hover:text-white">
                     {menuItem.icon}
                     {menuItem.label}
                   </button>
