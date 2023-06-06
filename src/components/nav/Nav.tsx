@@ -7,7 +7,7 @@ import { FaHourglassStart, FaSlidersH, FaSignOutAlt } from "react-icons/fa";
 
 const Nav = () => {
   return (
-    <div className="flex items-center justify-between bg-slate-600 px-4 py-2">
+    <nav className="fixed left-0 right-0 top-0 flex h-16 items-center justify-between bg-slate-600 px-4 py-2">
       <Link href="/">
         <h3 className="flex items-center gap-2 font-bold text-white">
           <FaHourglassStart />
@@ -15,7 +15,7 @@ const Nav = () => {
         </h3>
       </Link>
       <AvatarAndMenu />
-    </div>
+    </nav>
   );
 };
 
@@ -39,7 +39,10 @@ const AvatarAndMenu = () => {
 
   return (
     <>
-      <button id="avatar-button" onClick={handleAvatarMenuToggle}>
+      <div
+        id="avatar-button"
+        className="cursor-pointer"
+        onClick={handleAvatarMenuToggle}>
         {sessionData?.user.image && (
           <div className="relative">
             <Image
@@ -69,7 +72,7 @@ const AvatarAndMenu = () => {
             </div>
           </div>
         )}
-      </button>
+      </div>
       <div
         id="avatar-backdrop"
         onClick={handleAvatarMenuToggle}
