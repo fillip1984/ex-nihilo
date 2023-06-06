@@ -3,7 +3,7 @@ import { type Session } from "next-auth";
 import { signIn, useSession } from "next-auth/react";
 import Head from "next/head";
 import { FaHourglassStart } from "react-icons/fa";
-import Timeline from "~/components/Timeline";
+import Timeline from "~/components/timeline/Timeline";
 import Nav from "~/components/nav/Nav";
 
 const Home: NextPage = () => {
