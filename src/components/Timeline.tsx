@@ -1,3 +1,4 @@
+import autoAnimate from "@formkit/auto-animate";
 import {
   addMinutes,
   format,
@@ -5,12 +6,17 @@ import {
   parseISO,
   type Duration,
 } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BsSunrise, BsSunset } from "react-icons/bs";
 import { FaBed, FaRunning } from "react-icons/fa";
 import { MdOutlineCleaningServices } from "react-icons/md";
 
 const Timeline = () => {
+  const parent = useRef(null);
+  useEffect(() => {
+    parent.current && autoAnimate(parent.current);
+  }, [parent]);
+
   const [events, setEvents] = useState([
     {
       id: "1",
@@ -50,6 +56,7 @@ const Timeline = () => {
         event.id === id ? { ...event, complete: !event.complete } : event
       )
     );
+    setEvents(events.filter((event) => event.id !== id));
   };
 
   return (
@@ -58,17 +65,16 @@ const Timeline = () => {
         <span className="text-gray-200/30">Timeline for</span>
         {format(new Date(), "MM-dd-yyyy")}
       </h4>
-      <div id="timeline-grid" className="flex w-full flex-col gap-3">
-        {/* <SunInfoCard mode="sunrise" /> */}
+      <div
+        id="timeline-grid"
+        className="flex w-full flex-col gap-3"
+        ref={parent}>
+        <SunInfoCard mode="sunrise" />
         {events.map((event) => (
           <div
             key={event.id}
             onClick={() => handleComplete(event.id)}
-            className={`flex w-full items-center gap-3 rounded-lg bg-white/10 p-2 transition duration-300 ease-in-out hover:bg-white/20 ${
-              event.complete
-                ? "translate-x-[800px] opacity-10 transition duration-500 ease-in-out"
-                : ""
-            }`}>
+            className="flex w-full items-center gap-3 rounded-lg bg-white/10 p-2 transition duration-300 ease-in-out hover:bg-white/20">
             <span
               className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl ${event.color}`}>
               {event.icon}
@@ -82,7 +88,7 @@ const Timeline = () => {
             </div>
           </div>
         ))}
-        {/* <SunInfoCard mode="sunset" /> */}
+        <SunInfoCard mode="sunset" />
       </div>
     </div>
   );
