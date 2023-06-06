@@ -12,7 +12,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <SessionProvider session={session}>
       <Nav />
-      <main className="mt-16 min-h-screen bg-gradient-to-t from-slate-800 to-slate-900 text-white">
+      <main className="mt-16 min-h-screen bg-gradient-to-t from-slate-800 to-slate-900 pb-48 text-white">
         <Component {...pageProps} />
       </main>
     </SessionProvider>
