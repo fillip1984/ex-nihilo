@@ -1,4 +1,4 @@
-import autoAnimate from "@formkit/auto-animate";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import {
   addMinutes,
   format,
@@ -6,16 +6,13 @@ import {
   parseISO,
   type Duration,
 } from "date-fns";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { BsSunrise, BsSunset } from "react-icons/bs";
 import { FaBed, FaRunning } from "react-icons/fa";
 import { MdOutlineCleaningServices } from "react-icons/md";
 
 const Timeline = () => {
-  const parent = useRef(null);
-  useEffect(() => {
-    parent.current && autoAnimate(parent.current);
-  }, [parent]);
+  const [parent] = useAutoAnimate();
 
   const [events, setEvents] = useState([
     {
