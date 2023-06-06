@@ -5,57 +5,70 @@ import {
   parseISO,
   type Duration,
 } from "date-fns";
-import { useEffect } from "react";
-import { BsSunrise } from "react-icons/bs";
+import { useEffect, useState } from "react";
+import { BsSunrise, BsSunset } from "react-icons/bs";
 import { FaBed, FaRunning } from "react-icons/fa";
 import { MdOutlineCleaningServices } from "react-icons/md";
 
 const Timeline = () => {
-  const events = [
+  const [events, setEvents] = useState([
     {
-      topic: "Time based event",
-      icon: <BsSunrise />,
-      description: "Sunrise",
-      color: "bg-yellow-300/60 text-yellow-200",
-      start: new Date(),
-      end: addMinutes(new Date(), 30),
-    },
-    {
+      id: "1",
       topic: "Routine",
       icon: <FaBed />,
       description: "Wake up",
       color: "bg-orange-300/60 text-orange-200",
       start: new Date(),
       end: addMinutes(new Date(), 30),
+      complete: false,
     },
     {
+      id: "2",
       topic: "Health & Fitness",
       icon: <FaRunning />,
       description: "Go for a run",
       color: "bg-green-300/60 text-green-200",
       start: new Date(),
       end: addMinutes(new Date(), 30),
+      complete: false,
     },
     {
+      id: "3",
       topic: "Home chore",
       icon: <MdOutlineCleaningServices />,
       description: "Unload dishwasher",
       color: "bg-red-400/60 text-red-300",
       start: new Date(),
       end: addMinutes(new Date(), 30),
+      complete: false,
     },
-  ];
+  ]);
+
+  const handleComplete = (id: string) => {
+    setEvents(
+      events.map((event) =>
+        event.id === id ? { ...event, complete: !event.complete } : event
+      )
+    );
+  };
+
   return (
-    <div className="mx-auto my-4 flex w-full flex-col px-4 md:w-2/3 lg:w-1/3">
+    <div className="mx-auto my-4 flex w-full select-none flex-col overflow-hidden px-4 md:w-2/3 lg:w-1/3">
       <h4 className="mb-4 flex flex-col text-center">
         <span className="text-gray-200/30">Timeline for</span>
         {format(new Date(), "MM-dd-yyyy")}
       </h4>
       <div id="timeline-grid" className="flex w-full flex-col gap-3">
+        {/* <SunInfoCard mode="sunrise" /> */}
         {events.map((event) => (
           <div
-            key={event.description}
-            className="flex w-full items-center gap-3 rounded-lg bg-white/10 p-2 transition duration-300 ease-in-out hover:bg-white/20">
+            key={event.id}
+            onClick={() => handleComplete(event.id)}
+            className={`flex w-full items-center gap-3 rounded-lg bg-white/10 p-2 transition duration-300 ease-in-out hover:bg-white/20 ${
+              event.complete
+                ? "translate-x-[800px] opacity-10 transition duration-500 ease-in-out"
+                : ""
+            }`}>
             <span
               className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl ${event.color}`}>
               {event.icon}
@@ -69,12 +82,13 @@ const Timeline = () => {
             </div>
           </div>
         ))}
+        {/* <SunInfoCard mode="sunset" /> */}
       </div>
     </div>
   );
 };
 
-const sunInfo = () => {
+const SunInfoCard = ({ mode }: { mode: string }) => {
   type SunriseSunsetRaw = {
     results: {
       sunrise: string;
@@ -96,7 +110,7 @@ const sunInfo = () => {
     dayLength: Duration;
   };
 
-  const sunLightApi = async () => {
+  const fetchSunLightApi = async () => {
     // provided by: https://sunrise-sunset.org/api
     // changing formatted to 1 changes response values!
     const lat = 38.18519;
@@ -133,20 +147,67 @@ const sunInfo = () => {
       end: sunriseSunSetRaw.results.day_length * 1000,
     });
 
-    const sunriseSunSet: SunriseSunset = {
+    const sunriseSunset: SunriseSunset = {
       sunrise,
       sunset,
       dayLength,
     };
 
-    return sunriseSunSet;
+    return sunriseSunset;
   };
 
-  const sunInfoForToday = sunLightApi();
+  const [sunriseInfo, setSunriseInfo] = useState<SunriseSunset | null>(null);
 
-  // return (
-  // <span>{sunInfoForToday.s</span>
-  // )
+  useEffect(() => {
+    async function initSunriseInfo() {
+      setSunriseInfo(await fetchSunLightApi());
+    }
+
+    void initSunriseInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <>
+      {mode === "sunrise" && sunriseInfo && (
+        <div className="flex w-full items-center gap-3 rounded-lg bg-white/10 p-2 transition duration-300 ease-in-out hover:bg-white/20">
+          <span
+            className={`flex h-12 w-12 items-center justify-center rounded-full bg-yellow-300/60 text-2xl text-yellow-200`}>
+            <BsSunrise />
+          </span>
+          <div className="flex flex-col">
+            <div className="font-bold">Sunrise</div>
+            <div className="text-sm text-gray-300">
+              {format(sunriseInfo?.sunrise, "HH:mm")}
+            </div>
+          </div>
+          <div className="flex flex-1 justify-end p-4">
+            Sunset at {format(sunriseInfo.sunset, "HH:mm")}, length of day:{" "}
+            {sunriseInfo.dayLength.hours} h {sunriseInfo.dayLength.minutes} min
+          </div>
+        </div>
+      )}
+
+      {mode === "sunset" && sunriseInfo && (
+        <div className="flex w-full items-center gap-3 rounded-lg bg-white/10 p-2 transition duration-300 ease-in-out hover:bg-white/20">
+          <span
+            className={`flex h-12 w-12 items-center justify-center rounded-full bg-yellow-300/60 text-2xl text-yellow-200`}>
+            <BsSunset />
+          </span>
+          <div className="flex flex-col">
+            <div className="font-bold">Sunset</div>
+            <div className="text-sm text-gray-300">
+              {format(sunriseInfo?.sunset, "HH:mm")}
+            </div>
+          </div>
+          <div className="flex flex-1 justify-end p-4">
+            Length of day: {sunriseInfo.dayLength.hours} h{" "}
+            {sunriseInfo.dayLength.minutes} min
+          </div>
+        </div>
+      )}
+    </>
+  );
 };
 
 export default Timeline;
