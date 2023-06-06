@@ -69,3 +69,39 @@ model TimelineEvent {
     end         DateTime?
     complete    Boolean
 }
+
+model Routine {
+    id             String          @id @default(cuid())
+    createdAt      DateTime        @default(now())
+    updatedAt      DateTime        @updatedAt
+    summary        String
+    details        String
+    occurrenceType OccurrenceType
+    daysOfWeek     DaySelector[]
+    dayOfMonth     DayOfMonthType?
+    startDateTime  DateTime
+    endDateTime    DateTime?
+}
+
+model DaySelector {
+    id               String   @id @default(cuid())
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @updatedAt
+    label            String
+    abbreviatedLabel String
+    selected         Boolean
+    routine          Routine? @relation(fields: [routineId], references: [id])
+    routineId        String?
+}
+
+enum OccurrenceType {
+    DAY_OF_WEEK
+    DAY_OF_MONTH
+    SPECIFIC_DAY
+}
+
+enum DayOfMonthType {
+    FIRST
+    MIDDLE
+    LAST
+}

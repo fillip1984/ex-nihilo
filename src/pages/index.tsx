@@ -15,13 +15,12 @@ const Home: NextPage = () => {
         <meta name="description" content="Agenda and time tracker" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="min-h-screen bg-gradient-to-t from-slate-800 to-slate-900 text-white">
-        {sessionData ? (
-          <SignedInView sessionData={sessionData} />
-        ) : (
-          <NotSignedInView />
-        )}
-      </main>
+
+      {sessionData ? (
+        <SignedInView sessionData={sessionData} />
+      ) : (
+        <NotSignedInView />
+      )}
     </>
   );
 };
@@ -29,8 +28,7 @@ const Home: NextPage = () => {
 const SignedInView = ({ sessionData }: { sessionData: Session }) => {
   return (
     <>
-      <Nav />
-      <div className="mt-16 flex flex-col items-center">
+      <div className="flex flex-col items-center">
         <h3 className="mt-4 font-bold">
           Hello {sessionData.user.name as string}
         </h3>

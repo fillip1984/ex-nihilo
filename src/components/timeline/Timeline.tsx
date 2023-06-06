@@ -1,12 +1,14 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { format } from "date-fns";
+import Link from "next/link";
+import { FaPlus } from "react-icons/fa";
 import { api } from "~/utils/api";
 import TimelineEventCard from "./TimelineEventCard";
 
 const TimelinePage = () => {
   const [parent] = useAutoAnimate();
 
-  const { data: timelinePoints } = api.timelineRouter.readAll.useQuery();
+  const { data: timelinePoints } = api.timeline.readAll.useQuery();
 
   const handleComplete = (id: string) => {
     // setEvents(
@@ -37,6 +39,11 @@ const TimelinePage = () => {
           </div>
         ))}
       </div>
+      <Link
+        href="/routines/new"
+        className="absolute bottom-8 right-8 flex h-16 w-16 items-center justify-center rounded-full bg-slate-300 text-4xl text-slate-800">
+        <FaPlus />
+      </Link>
     </div>
   );
 };

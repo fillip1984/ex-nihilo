@@ -22,4 +22,22 @@
   h5 {
     @apply text-xl;
   }
+
+  [type="text"],
+  [type="email"],
+  [type="url"],
+  [type="password"],
+  [type="number"],
+  [type="date"],
+  [type="datetime-local"],
+  [type="month"],
+  [type="search"],
+  [type="tel"],
+  [type="time"],
+  [type="week"],
+  [multiple],
+  textarea,
+  select {
+    @apply w-full rounded py-3 text-black focus:border-slate-300 focus:ring-slate-500;
+  }
 }

@@ -3,7 +3,7 @@ import { BsSunrise, BsSunset } from "react-icons/bs";
 import { api } from "~/utils/api";
 
 const SunInfoCard = ({ mode }: { mode: string }) => {
-  const { data: sunInfo } = api.sunInfoRouter.read.useQuery({
+  const { data: sunInfo } = api.sunInfo.read.useQuery({
     date: new Date(),
   });
 
