@@ -1,6 +1,6 @@
-import { exampleRouter } from "~/server/api/routers/example";
 import { createTRPCRouter } from "~/server/api/trpc";
 import { SunInfoRouter } from "./routers/SunInfoRouter";
+import { TimelineRouter } from "./routers/TimelineRouter";
 
 /**
  * This is the primary router for your server.
@@ -8,8 +8,8 @@ import { SunInfoRouter } from "./routers/SunInfoRouter";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  example: exampleRouter,
   sunInfoRouter: SunInfoRouter,
+  timelineRouter: TimelineRouter,
 });
 
 // export type definition of API
