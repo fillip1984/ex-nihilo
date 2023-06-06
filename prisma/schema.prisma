@@ -56,3 +56,16 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
+
+model TimelineEvent {
+    id          String    @id @default(cuid())
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    topic       String
+    icon        String
+    description String
+    color       String
+    start       DateTime
+    end         DateTime?
+    complete    Boolean
+}
