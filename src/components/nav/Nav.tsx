@@ -54,7 +54,7 @@ const AvatarAndMenu = () => {
             />
             <div
               id="avatar-menu"
-              className={`absolute right-0 top-16 z-[999] w-36 rounded bg-white/80 transition duration-300 ease-in-out ${
+              className={`bg- absolute right-0 top-16 z-[999] w-36 rounded bg-white/70 backdrop-blur transition duration-300 ease-in-out ${
                 avatarMenuOpen ? "" : "hidden"
               }`}>
               <div className="flex flex-col p-2">
@@ -76,7 +76,7 @@ const AvatarAndMenu = () => {
       <div
         id="avatar-backdrop"
         onClick={handleAvatarMenuToggle}
-        className={`absolute bottom-0 left-0 right-0 top-0 z-[998] ${
+        className={`fixed bottom-0 left-0 right-0 top-0 z-[998] ${
           avatarMenuOpen ? "" : "hidden"
         }`}
       />
