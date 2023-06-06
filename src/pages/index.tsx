@@ -3,8 +3,8 @@ import { type Session } from "next-auth";
 import { signIn, useSession } from "next-auth/react";
 import Head from "next/head";
 import { FaHourglassStart } from "react-icons/fa";
-import Timeline from "~/components/timeline/Timeline";
 import Nav from "~/components/nav/Nav";
+import TimelinePage from "~/components/timeline/Timeline";
 
 const Home: NextPage = () => {
   const { data: sessionData } = useSession();
@@ -35,7 +35,7 @@ const SignedInView = ({ sessionData }: { sessionData: Session }) => {
           Hello {sessionData.user.name as string}
         </h3>
       </div>
-      <Timeline />
+      <TimelinePage />
     </>
   );
 };

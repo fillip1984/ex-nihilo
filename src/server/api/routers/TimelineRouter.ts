@@ -1,7 +1,7 @@
 import { type TimelineEvent } from "@prisma/client";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { api } from "~/utils/api";
 import { addMinutes } from "date-fns";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { fetchSunInfo } from "./SunInfoRouter";
 
 // export type TimelineEvent = {
 //   id: string;
@@ -20,7 +20,7 @@ export type TimelinePoint = {
 };
 
 export const TimelineRouter = createTRPCRouter({
-  readAll: protectedProcedure.query(({ ctx }) => {
+  readAll: protectedProcedure.query(async ({ ctx }) => {
     // const events = await ctx.prisma.timelineEvent.findMany({
     //   orderBy: {
     //     start: "desc",
@@ -66,29 +66,37 @@ export const TimelineRouter = createTRPCRouter({
       },
     ];
 
-    // let sunrise: Partial<TimelineEvent>;
-    // let sunset: Partial<TimelineEvent>;
-    // const { data: sunInfo } = api.sunInfoRouter.read.useQuery({
-    //   date: new Date(),
-    // });
-    // if (sunInfo) {
-    //   sunrise = {
-    //     topic: "Sunrise",
-    //     description: "Length of day123: ",
-    //     start: sunInfo.sunrise,
-    //     color: "bg-yellow-300/60 text-yellow-200",
-    //     icon: "<BsSunrise />",
-    //   };
-    // }
-    // if (sunInfo) {
-    //   sunset = {
-    //     topic: "Sunset",
-    //     description: "Length of day456: ",
-    //     start: sunInfo.sunset,
-    //     color: "bg-yellow-300/60 text-yellow-200",
-    //     icon: "<BsSunset />",
-    //   };
-    // }
+    let sunrise: TimelineEvent;
+    let sunset: TimelineEvent;
+    const sunInfo = await fetchSunInfo(new Date());
+    if (sunInfo) {
+      sunrise = {
+        topic: "Nature",
+        description: "Sunrise",
+        start: sunInfo.sunrise,
+        color: "bg-yellow-300/60 text-yellow-200",
+        icon: "<BsSunrise />",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        id: (Math.random() * new Date().getTime()).toString(),
+        complete: false,
+        end: null,
+      };
+    }
+    if (sunInfo) {
+      sunset = {
+        topic: "Nature",
+        description: "Sunset",
+        start: sunInfo.sunset,
+        color: "bg-blue-300/60 text-blue-200",
+        icon: "<BsSunset />",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        id: (Math.random() * new Date().getTime()).toString(),
+        complete: false,
+        end: null,
+      };
+    }
 
     // fold in the cheese
     const timeline: TimelinePoint[] = [];
@@ -122,6 +130,8 @@ export const TimelineRouter = createTRPCRouter({
           timelinePoint.events.push(event);
         });
 
+      timelinePoint.events.push(sunrise);
+      timelinePoint.events.push(sunset);
       timeline.push(timelinePoint);
     });
 

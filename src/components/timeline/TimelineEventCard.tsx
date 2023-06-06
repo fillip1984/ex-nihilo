@@ -1,8 +1,9 @@
 import { type TimelineEvent } from "@prisma/client";
 import { format } from "date-fns";
+import { BsSunrise, BsSunset } from "react-icons/bs";
 import { FaBed, FaRunning } from "react-icons/fa";
-import { MdOutlineCleaningServices } from "react-icons/md";
 import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
+import { MdOutlineCleaningServices } from "react-icons/md";
 
 const TimelineEventCard = ({
   event,
@@ -17,6 +18,10 @@ const TimelineEventCard = ({
         return <FaBed />;
       case "<FaRunning />":
         return <FaRunning />;
+      case "<BsSunrise />":
+        return <BsSunrise />;
+      case "<BsSunset />":
+        return <BsSunset />;
       case "<MdOutlineCleaningServices />":
         return <MdOutlineCleaningServices />;
       default:

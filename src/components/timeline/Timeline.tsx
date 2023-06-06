@@ -1,11 +1,9 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { addMinutes, format } from "date-fns";
+import { format } from "date-fns";
 import { api } from "~/utils/api";
-import SunInfoCard from "./SunInfoCard";
 import TimelineEventCard from "./TimelineEventCard";
-import { type TimelineEvent } from "@prisma/client";
 
-const Timeline = () => {
+const TimelinePage = () => {
   const [parent] = useAutoAnimate();
 
   const { data: timelinePoints } = api.timelineRouter.readAll.useQuery();
@@ -21,12 +19,8 @@ const Timeline = () => {
 
   return (
     <div className="mx-auto my-4 flex w-full select-none flex-col overflow-hidden px-4 md:w-2/3 lg:w-1/3">
-      <h4 className="mb-4 flex flex-col text-center">
-        <span className="text-gray-200/30">Timeline for</span>
-        {format(new Date(), "MM-dd-yyyy")}
-      </h4>
+      <h4 className="mb-4 flex flex-col text-center"></h4>
       <div id="timeline-grid" className="flex w-full flex-col gap-3">
-        {/* <SunInfoCard mode="sunrise" /> */}
         {timelinePoints?.map((timelinePoint) => (
           <div
             key={timelinePoint.date.getTime()}
@@ -42,10 +36,9 @@ const Timeline = () => {
             ))}
           </div>
         ))}
-        {/* <SunInfoCard mode="sunset" /> */}
       </div>
     </div>
   );
 };
 
-export default Timeline;
+export default TimelinePage;
