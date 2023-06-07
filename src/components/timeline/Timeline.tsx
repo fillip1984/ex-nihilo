@@ -1,12 +1,15 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { format } from "date-fns";
 import Link from "next/link";
+import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { api } from "~/utils/api";
 import TimelineEventCard from "./TimelineEventCard";
 
 const TimelinePage = () => {
   const [parent] = useAutoAnimate();
+  const [fabAnimations] = useAutoAnimate();
+  const [fabOpen, setFabOpen] = useState(false);
 
   const { data: timelinePoints } = api.timeline.readAll.useQuery();
 
@@ -39,11 +42,29 @@ const TimelinePage = () => {
           </div>
         ))}
       </div>
-      <Link
-        href="/routines/new"
-        className="fixed bottom-8 right-8 flex h-16 w-16 items-center justify-center rounded-full bg-slate-300 text-4xl text-slate-800 transition-colors duration-300 ease-in-out hover:bg-slate-400">
+
+      <div ref={fabAnimations}>
+        {/* href="/routines/new" */}
+        {fabOpen && (
+          <div className="fixed bottom-0 left-1/2 right-0 top-2/3 z-[998] rounded-l bg-slate-200/20 backdrop-blur-sm md:left-3/4">
+            <div className="flex flex-col items-end gap-6 p-8 text-xl font-bold">
+              <Link href="/routines">Edit Routines</Link>
+              <Link href="/routines/new">Add Routine</Link>
+            </div>
+          </div>
+        )}
+      </div>
+      <button
+        onClick={() => setFabOpen((prev) => !prev)}
+        className="fixed bottom-8 right-8 z-[999] flex h-16 w-16 items-center justify-center rounded-full bg-slate-300 text-4xl text-slate-800 transition-colors duration-300 ease-in-out hover:bg-slate-400">
         <FaPlus />
-      </Link>
+      </button>
+      <div
+        id="fab-backdrop"
+        onClick={() => setFabOpen((prev) => !prev)}
+        className={`absolute bottom-0 left-0 right-0 top-0 z-[997] ${
+          fabOpen ? "" : "hidden"
+        }`}></div>
     </div>
   );
 };

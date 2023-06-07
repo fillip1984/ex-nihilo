@@ -108,7 +108,7 @@ const NewRoutine = () => {
       monthlyDaySelectorOptions: monthlyDaySelectorOptions,
     };
     reset(newRoutine);
-  }, []);
+  }, [reset]);
 
   const months = [
     { name: "January", shortName: "Jan", number: 1 },

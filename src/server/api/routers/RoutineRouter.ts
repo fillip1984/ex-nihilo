@@ -1,7 +1,7 @@
+import { parse } from "date-fns";
 import { z } from "zod";
 import { routineFormSchema } from "~/pages/routines/new";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
-import { parse, parseISO } from "date-fns";
 
 export const RoutineRouter = createTRPCRouter({
   create: publicProcedure
