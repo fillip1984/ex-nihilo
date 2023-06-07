@@ -71,26 +71,36 @@ model TimelineEvent {
 }
 
 model Routine {
-    id             String         @id @default(cuid())
-    createdAt      DateTime       @default(now())
-    updatedAt      DateTime       @updatedAt
-    summary        String
-    details        String
-    occurrenceType OccurrenceType
-    daysOfWeek     DaySelector[]
-    startDateTime  DateTime
-    endDateTime    DateTime?
+    id               String         @id @default(cuid())
+    createdAt        DateTime       @default(now())
+    updatedAt        DateTime       @updatedAt
+    summary          String
+    details          String
+    occurrenceType   OccurrenceType
+    dailyEveryValue  Int?
+    yearlyMonthValue Int?
+    yearlyDayValue   Int?
+    startDate        DateTime       @db.Date
+    fromTime         DateTime       @db.Time(4)
+    toTime           DateTime       @db.Time(4)
+    endDate          DateTime?      @db.Date
+    neverEnds        Boolean?
+
+    weeklyDaysSelected  DaySelector[] @relation("WeeklyDaysSelected")
+    monthlyDaysSelected DaySelector[] @relation("MonthlyDaysSelected")
 }
 
 model DaySelector {
-    id               String   @id @default(cuid())
-    createdAt        DateTime @default(now())
-    updatedAt        DateTime @updatedAt
-    label            String
-    abbreviatedLabel String
-    selected         Boolean
-    routine          Routine? @relation(fields: [routineId], references: [id])
-    routineId        String?
+    id                    String   @id @default(cuid())
+    createdAt             DateTime @default(now())
+    updatedAt             DateTime @updatedAt
+    label                 String
+    abbreviatedLabel      String
+    selected              Boolean
+    weeklyDaysSelected    Routine? @relation("WeeklyDaysSelected", fields: [weeklyDaysSelectedId], references: [id])
+    weeklyDaysSelectedId  String?
+    monthlyDaysSelected   Routine? @relation("MonthlyDaysSelected", fields: [monthlyDaysSelectedId], references: [id])
+    monthlyDaysSelectedId String?
 }
 
 enum OccurrenceType {

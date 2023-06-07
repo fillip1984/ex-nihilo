@@ -1,18 +1,12 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OccurrenceType } from "@prisma/client";
-import {
-  eachDayOfInterval,
-  getDaysInMonth,
-  lastDayOfMonth,
-  startOfMonth,
-} from "date-fns";
+import { getDaysInMonth } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm, useWatch, type SubmitHandler } from "react-hook-form";
 import {
-  BsArrowRight,
   BsBodyText,
   BsChevronDown,
   BsClock,
@@ -20,21 +14,30 @@ import {
   BsRepeat,
 } from "react-icons/bs";
 import { z } from "zod";
+import { api } from "~/utils/api";
 
-const routineFormSchema = z.object({
-  routine: z.object({
-    details: z.string().min(1),
-    summary: z.string().min(1),
-    occurrenceType: z.nativeEnum(OccurrenceType),
-    dailyEveryValue: z.number().nullish(),
-    yearlyMonthValue: z.number().nullish(),
-    yearlyDayValue: z.number().nullish(),
-    startDate: z.string().min(1),
-    fromTime: z.string().min(1),
-    toTime: z.string().nullish(),
-    endDate: z.string().nullish(),
-    neverEnds: z.boolean(),
-  }),
+export const routineFormSchema = z.object({
+  routine: z
+    .object({
+      summary: z.string().min(1),
+      details: z.string().min(1),
+      occurrenceType: z.nativeEnum(OccurrenceType),
+      dailyEveryValue: z.number().nullish(),
+      yearlyMonthValue: z.number().nullish(),
+      yearlyDayValue: z.number().nullish(),
+      startDate: z.string().min(1),
+      fromTime: z.string().min(1),
+      toTime: z.string().min(1),
+      endDate: z.string().nullish(),
+      neverEnds: z.boolean(),
+    })
+    .refine(
+      (data) => data.neverEnds || (data.endDate && data.endDate?.length > 0),
+      {
+        message: "Either select an end date or select the never ends option",
+        path: ["endDate"],
+      }
+    ),
   weeklyDaySelectorOptions: z.array(
     z.object({
       label: z.string(),
@@ -130,8 +133,17 @@ const NewRoutine = () => {
     name: "routine.yearlyMonthValue",
   });
 
+  const utils = api.useContext();
+  const createRoutine = api.routines.create.useMutation({
+    onSuccess: async () => {
+      await utils.routines.invalidate();
+      void router.push("/");
+    },
+  });
+
   const onSubmit: SubmitHandler<RoutineFormSchemaType> = (formData) => {
     console.log("formData", formData);
+    createRoutine.mutate({ ...formData });
   };
 
   useEffect(() => {
@@ -166,10 +178,10 @@ const NewRoutine = () => {
         <div
           ref={occurrenceAnimation}
           className="form-card-field-set space-y-1 px-2">
-          <div className="grid grid-cols-3 items-center gap-2">
-            <label className="col-span-1">Frequency</label>
+          <div className="grid grid-cols-5 items-center gap-2">
+            <label>Frequency</label>
             <select
-              className="col-span-2"
+              className="col-span-2 col-start-4"
               {...register("routine.occurrenceType")}>
               <option value="NEVER">Never</option>
               <option value="DAILY">Daily</option>
@@ -180,14 +192,18 @@ const NewRoutine = () => {
           </div>
           {occurrenceTypeWatch === "DAILY" && (
             <div className="grid grid-cols-3 items-center gap-2">
-              <label className="col-span-1">Every</label>
+              <label>Every</label>
               {occurrenceTypeWatch === "DAILY" && (
                 <select
-                  className="col-span-2"
-                  {...register("routine.dailyEveryValue")}>
+                  className="col-start-3"
+                  {...register("routine.dailyEveryValue", {
+                    valueAsNumber: true,
+                  })}>
                   <option value={1}>Day</option>
                   {Array.from(Array(30).keys()).map((counter) => (
-                    <option key={counter + 2}>{counter + 2} days</option>
+                    <option key={counter + 2} value={counter + 2}>
+                      {counter + 2} days
+                    </option>
                   ))}
                 </select>
               )}
@@ -288,11 +304,13 @@ const NewRoutine = () => {
 
           {occurrenceTypeWatch === "YEARLY" && (
             <div className="flex flex-col gap-1">
-              <div className="grid grid-cols-3 items-center gap-2">
-                <label className="col-span-1">Month</label>
+              <div className="grid grid-cols-5 items-center gap-2">
+                <label>Month</label>
                 <select
-                  className="col-span-2"
-                  {...register("routine.yearlyMonthValue")}>
+                  className="col-span-2 col-start-4"
+                  {...register("routine.yearlyMonthValue", {
+                    valueAsNumber: true,
+                  })}>
                   {months.map((month) => (
                     <option key={month.number} value={month.number}>
                       {month.name}
@@ -300,46 +318,25 @@ const NewRoutine = () => {
                   ))}
                 </select>
               </div>
-              <div className="grid grid-cols-3 items-center gap-2">
-                <label className="col-span-1">Day</label>
+
+              <div className="grid grid-cols-6 items-center gap-2">
+                <label>Day</label>
                 <select
-                  className="col-span-2"
-                  {...register("routine.yearlyDayValue")}>
-                  {Array.from(Array(31).keys()).map((counter) => {
-                    if (counter + 1 > 28) {
-                      return (
-                        <option key={`yearlyDayValue${counter + 1}`}>
-                          {counter + 1}*
-                        </option>
-                      );
-                    }
-                    return <option key={counter + 1}>{counter + 1}</option>;
-                  })}
-                  {/* {eachDayOfInterval({
-                    start: startOfMonth(yearlyMonthValueWatch ?? 1),
-                    end: lastDayOfMonth(yearlyMonthValueWatch ?? 1),
-                  }).map((day) => (
-                    <option key={day.getDate()} value={day.getDate()}>
-                      {day.getDate()}
+                  className="col-span-2 col-start-5"
+                  {...register("routine.yearlyDayValue", {
+                    valueAsNumber: true,
+                  })}>
+                  {Array.from(
+                    Array(
+                      getDaysInMonth(
+                        new Date(2023, (yearlyMonthValueWatch ?? 1) - 1)
+                      )
+                    ).keys()
+                  ).map((dayCounter) => (
+                    <option key={dayCounter + 1} value={dayCounter + 1}>
+                      {dayCounter + 1}
                     </option>
-                  ))} */}
-                  {/* {eachDayOfInterval({
-                    start: startOfMonth(
-                      getValues("routine.yearlyMonthValue") ?? 1
-                    ),
-                    end: lastDayOfMonth(
-                      getValues("routine.yearlyMonthValue") ?? 1
-                    ),
-                  }).map((day) => (
-                    <option key={day.getDate()} value={day.getDate()}>
-                      {day.getDate()}
-                    </option>
-                  ))} */}
-                  {/* {.months.map((month) => (
-                    <option key={month.number} value={month.number}>
-                      {month.name}
-                    </option>
-                  ))} */}
+                  ))}
                 </select>
               </div>
             </div>
@@ -391,8 +388,14 @@ const NewRoutine = () => {
               <input
                 type="date"
                 className="col-span-2 col-start-4"
+                {...register("routine.endDate")}
                 disabled={neverEndsWatch}
               />
+              {errors.routine?.endDate && (
+                <span className="col-span-5 text-red-400">
+                  {errors.routine.endDate.message}
+                </span>
+              )}
             </div>
           )}
         </div>
