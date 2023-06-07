@@ -1,10 +1,12 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { OccurrenceType, type DaySelector, type Routine } from "@prisma/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { OccurrenceType } from "@prisma/client";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { type SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, type SubmitHandler } from "react-hook-form";
 import {
+  BsArrowRight,
   BsBodyText,
   BsChevronDown,
   BsClock,
@@ -12,7 +14,6 @@ import {
   BsRepeat,
 } from "react-icons/bs";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 const routineFormSchema = z.object({
   routine: z.object({
@@ -44,8 +45,9 @@ const routineFormSchema = z.object({
 type RoutineFormSchemaType = z.infer<typeof routineFormSchema>;
 
 const NewRoutine = () => {
-  const [specificLocationAnimation] = useAutoAnimate();
   const [occurrenceAnimation] = useAutoAnimate();
+  const [whenAnimation] = useAutoAnimate();
+  const [specificLocationAnimation] = useAutoAnimate();
   const [specificLocation, setSpecificLocation] = useState(false);
 
   const router = useRouter();
@@ -76,7 +78,7 @@ const NewRoutine = () => {
         details: "test",
         startDate: "2023-06-07",
         startTime: "06:00",
-        occurrenceType: "NEVER",
+        occurrenceType: OccurrenceType.NEVER,
       },
       weeklyDaySelectorOptions: [
         { label: "Sunday", abbreviatedLabel: "Sun", selected: false },
@@ -241,25 +243,35 @@ const NewRoutine = () => {
           <BsClock />
           <span className="uppercase">WHEN</span>
         </div>
-        <div className="form-card-field-set space-y-1 px-2">
+        <div ref={whenAnimation} className="form-card-field-set space-y-1 px-2">
           <div className="grid grid-cols-5 items-center gap-2">
             <label>Starts</label>
             <input
               type="date"
-              className="col-span-2"
+              className="col-span-2 col-start-4"
               {...register("routine.startDate")}
-            />
-            <input
-              type="time"
-              className="col-span-2"
-              {...register("routine.startTime")}
             />
           </div>
           <div className="grid grid-cols-5 items-center gap-2">
-            <label>Ends</label>
-            <input type="date" className="col-span-2" />
-            <input type="time" className="col-span-2" />
+            <label>From</label>
+            <input type="time" {...register("routine.startTime")} />
+            <span className="mx-auto text-2xl">
+              <BsArrowRight />
+            </span>
+            <input type="time" {...register("routine.endTime")} />
           </div>
+          {occurrenceTypeWatch !== "NEVER" && (
+            <div className="grid grid-cols-5 items-center gap-2">
+              <label>Ends</label>
+              <div className="flex items-center gap-1">
+                <input type="checkbox" id="never" className="rounded" />
+                <label htmlFor="never" className="font-mono text-sm">
+                  Never
+                </label>
+              </div>
+              <input type="date" className="col-span-2 col-start-4" />
+            </div>
+          )}
         </div>
       </div>
 
