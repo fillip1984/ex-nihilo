@@ -40,4 +40,12 @@
   select {
     @apply w-full rounded py-3 text-black focus:border-slate-300 focus:ring-slate-500;
   }
+
+  [type="checkbox"] {
+    @apply h-6 w-6 rounded text-slate-300 checked:bg-slate-600 hover:checked:bg-slate-500;
+  }
+
+  input:disabled {
+    @apply cursor-not-allowed opacity-25 transition-opacity duration-300 ease-in-out;
+  }
 }
