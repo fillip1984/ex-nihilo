@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { routineFormSchema } from "~/pages/routines/new";
-import { createTRPCRouter, publicProcedure } from "../trpc";
-import { parse } from "date-fns";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { parse, parseISO } from "date-fns";
 
 export const RoutineRouter = createTRPCRouter({
   create: publicProcedure
@@ -130,6 +130,10 @@ export const RoutineRouter = createTRPCRouter({
 
       return result;
     }),
+  readAll: protectedProcedure.query(async ({ ctx }) => {
+    const result = await ctx.prisma.routine.findMany();
+    return result;
+  }),
   readOne: publicProcedure
     .input(z.object({ id: z.string().cuid() }))
     .query(({ ctx, input }) => {

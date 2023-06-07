@@ -21,6 +21,20 @@ export type TimelinePoint = {
 
 export const TimelineRouter = createTRPCRouter({
   readAll: protectedProcedure.query(async ({ ctx }) => {
+    const routines = await ctx.prisma.routine.findMany({
+      // orderBy: {
+      //   startDate: "desc",
+      //   fromTime: "desc",
+      // },
+      where: {
+        startDate: {
+          equals: new Date(),
+        },
+      },
+    });
+
+    routines.forEach((routine) => console.log("routine", routine));
+
     // const events = await ctx.prisma.timelineEvent.findMany({
     //   orderBy: {
     //     start: "desc",
