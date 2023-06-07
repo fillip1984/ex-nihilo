@@ -7,7 +7,7 @@ import { FaHourglassStart, FaSlidersH, FaSignOutAlt } from "react-icons/fa";
 
 const Nav = () => {
   return (
-    <nav className="fixed left-0 right-0 top-0 flex h-16 items-center justify-between bg-slate-600 px-4 py-2">
+    <nav className="fixed left-0 right-0 top-0 z-[997] flex h-16 items-center justify-between bg-slate-600 px-4 py-2">
       <Link href="/">
         <h3 className="flex items-center gap-2 font-bold text-white">
           <FaHourglassStart />
