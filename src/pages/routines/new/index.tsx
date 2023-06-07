@@ -1,6 +1,12 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OccurrenceType } from "@prisma/client";
+import {
+  eachDayOfInterval,
+  getDaysInMonth,
+  lastDayOfMonth,
+  startOfMonth,
+} from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -20,11 +26,14 @@ const routineFormSchema = z.object({
     details: z.string().min(1),
     summary: z.string().min(1),
     occurrenceType: z.nativeEnum(OccurrenceType),
-    dailyOccurrenceValue: z.number().nullish(),
+    dailyEveryValue: z.number().nullish(),
+    yearlyMonthValue: z.number().nullish(),
+    yearlyDayValue: z.number().nullish(),
     startDate: z.string().min(1),
-    startTime: z.string().min(1),
+    fromTime: z.string().min(1),
+    toTime: z.string().nullish(),
     endDate: z.string().nullish(),
-    endTime: z.string().nullish(),
+    neverEnds: z.boolean(),
   }),
   weeklyDaySelectorOptions: z.array(
     z.object({
@@ -72,6 +81,16 @@ const NewRoutine = () => {
       })
     );
 
+    const weeklyDaySelectorOptions = [
+      { label: "Sunday", abbreviatedLabel: "Sun", selected: false },
+      { label: "Monday", abbreviatedLabel: "Mon", selected: false },
+      { label: "Tuesday", abbreviatedLabel: "Tue", selected: false },
+      { label: "Wednesday", abbreviatedLabel: "Wed", selected: false },
+      { label: "Thursday", abbreviatedLabel: "Thurs", selected: false },
+      { label: "Friday", abbreviatedLabel: "Fri", selected: false },
+      { label: "Saturday", abbreviatedLabel: "Sat", selected: false },
+    ];
+
     const newRoutine = {
       routine: {
         summary: "test",
@@ -80,23 +99,35 @@ const NewRoutine = () => {
         startTime: "06:00",
         occurrenceType: OccurrenceType.NEVER,
       },
-      weeklyDaySelectorOptions: [
-        { label: "Sunday", abbreviatedLabel: "Sun", selected: false },
-        { label: "Monday", abbreviatedLabel: "Mon", selected: false },
-        { label: "Tuesday", abbreviatedLabel: "Tue", selected: false },
-        { label: "Wednesday", abbreviatedLabel: "Wed", selected: false },
-        { label: "Thursday", abbreviatedLabel: "Thurs", selected: false },
-        { label: "Friday", abbreviatedLabel: "Fri", selected: false },
-        { label: "Saturday", abbreviatedLabel: "Sat", selected: false },
-      ],
+      weeklyDaySelectorOptions: weeklyDaySelectorOptions,
       monthlyDaySelectorOptions: monthlyDaySelectorOptions,
     };
     reset(newRoutine);
   }, []);
 
+  const months = [
+    { name: "January", shortName: "Jan", number: 1 },
+    { name: "February", shortName: "Feb", number: 2 },
+    { name: "March", shortName: "Mar", number: 3 },
+    { name: "April", shortName: "Apr", number: 4 },
+    { name: "May", shortName: "May", number: 5 },
+    { name: "June", shortName: "June", number: 6 },
+    { name: "July", shortName: "July", number: 7 },
+    { name: "August", shortName: "Aug", number: 8 },
+    { name: "September", shortName: "Sept", number: 9 },
+    { name: "October", shortName: "Oct", number: 10 },
+    { name: "November", shortName: "Nov", number: 11 },
+    { name: "December", shortName: "Dec", number: 12 },
+  ];
+
   const occurrenceTypeWatch = useWatch({
     control,
     name: "routine.occurrenceType",
+  });
+  const neverEndsWatch = useWatch({ control, name: "routine.neverEnds" });
+  const yearlyMonthValueWatch = useWatch({
+    control,
+    name: "routine.yearlyMonthValue",
   });
 
   const onSubmit: SubmitHandler<RoutineFormSchemaType> = (formData) => {
@@ -153,8 +184,8 @@ const NewRoutine = () => {
               {occurrenceTypeWatch === "DAILY" && (
                 <select
                   className="col-span-2"
-                  {...register("routine.dailyOccurrenceValue")}>
-                  <option value={1}>day</option>
+                  {...register("routine.dailyEveryValue")}>
+                  <option value={1}>Day</option>
                   {Array.from(Array(30).keys()).map((counter) => (
                     <option key={counter + 2}>{counter + 2} days</option>
                   ))}
@@ -173,24 +204,24 @@ const NewRoutine = () => {
                       className="peer hidden"
                       id={`daysOfWeek.${index}.selected`}
                       {...register(
-                        `weeklyDaySelectorOptions.${index}.selected`,
-                        {
-                          validate: {
-                            isAtLeastOneDaySelected: () => {
-                              return (
-                                occurrenceTypeWatch === "WEEKLY" &&
-                                getValues("weeklyDaySelectorOptions")?.some(
-                                  (day) => day.selected
-                                )
-                              );
-                            },
-                          },
-                        }
+                        `weeklyDaySelectorOptions.${index}.selected`
+                        // {
+                        //   validate: {
+                        //     isAtLeastOneDaySelected: () => {
+                        //       return (
+                        //         occurrenceTypeWatch === "WEEKLY" &&
+                        //         getValues("weeklyDaySelectorOptions")?.some(
+                        //           (day) => day.selected
+                        //         )
+                        //       );
+                        //     },
+                        //   },
+                        // }
                       )}
                     />
                     <label
                       htmlFor={`daysOfWeek.${index}.selected`}
-                      className="flex h-12 w-12 cursor-pointer select-none items-center justify-center rounded-full bg-white text-black peer-checked:bg-black peer-checked:text-white">
+                      className="flex h-12 w-12 cursor-pointer select-none items-center justify-center rounded-full bg-white text-slate-700 transition-colors duration-300 ease-in-out peer-checked:bg-slate-500 peer-checked:text-white">
                       {day.abbreviatedLabel}
                     </label>
                   </div>
@@ -222,16 +253,94 @@ const NewRoutine = () => {
             </div>
           )}
           {occurrenceTypeWatch === "MONTHLY" && (
-            <div>
-              <label>On (please select one or more)</label>
-              <div className="grid grid-cols-7">
-                {Array.from(Array(31).keys()).map((counter) => (
+            <div className="flex flex-col items-center">
+              <label className="my-2">On (please select one or more)</label>
+              <div className="grid w-full grid-cols-7">
+                {getValues("monthlyDaySelectorOptions")?.map((day, index) => (
                   <div
-                    key={counter + 1}
-                    className="border border-slate-400 text-center">
-                    {counter + 1}
+                    key={day.label}
+                    className="flex h-8 border border-slate-400 text-center">
+                    <input
+                      type="checkbox"
+                      className="peer hidden"
+                      id={`daysOfMonth.${index}.selected`}
+                      {...register(
+                        `monthlyDaySelectorOptions.${index}.selected`
+                      )}
+                    />
+                    <label
+                      htmlFor={`daysOfMonth.${index}.selected`}
+                      className="flex h-full w-full cursor-pointer select-none items-center justify-center bg-white text-slate-700 transition-colors duration-300 ease-in-out peer-checked:bg-slate-500 peer-checked:text-white">
+                      {day.abbreviatedLabel} {day.abbreviatedLabel > 28 && "*"}
+                    </label>
                   </div>
                 ))}
+              </div>
+              <div className="my-2 flex gap-1 text-sm text-slate-500">
+                <span className="font-bold">*</span>
+                <span>
+                  Days selected that don&apos;t exist in a month will fall on
+                  the last day of shorter months
+                </span>
+              </div>
+            </div>
+          )}
+
+          {occurrenceTypeWatch === "YEARLY" && (
+            <div className="flex flex-col gap-1">
+              <div className="grid grid-cols-3 items-center gap-2">
+                <label className="col-span-1">Month</label>
+                <select
+                  className="col-span-2"
+                  {...register("routine.yearlyMonthValue")}>
+                  {months.map((month) => (
+                    <option key={month.number} value={month.number}>
+                      {month.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-3 items-center gap-2">
+                <label className="col-span-1">Day</label>
+                <select
+                  className="col-span-2"
+                  {...register("routine.yearlyDayValue")}>
+                  {Array.from(Array(31).keys()).map((counter) => {
+                    if (counter + 1 > 28) {
+                      return (
+                        <option key={`yearlyDayValue${counter + 1}`}>
+                          {counter + 1}*
+                        </option>
+                      );
+                    }
+                    return <option key={counter + 1}>{counter + 1}</option>;
+                  })}
+                  {/* {eachDayOfInterval({
+                    start: startOfMonth(yearlyMonthValueWatch ?? 1),
+                    end: lastDayOfMonth(yearlyMonthValueWatch ?? 1),
+                  }).map((day) => (
+                    <option key={day.getDate()} value={day.getDate()}>
+                      {day.getDate()}
+                    </option>
+                  ))} */}
+                  {/* {eachDayOfInterval({
+                    start: startOfMonth(
+                      getValues("routine.yearlyMonthValue") ?? 1
+                    ),
+                    end: lastDayOfMonth(
+                      getValues("routine.yearlyMonthValue") ?? 1
+                    ),
+                  }).map((day) => (
+                    <option key={day.getDate()} value={day.getDate()}>
+                      {day.getDate()}
+                    </option>
+                  ))} */}
+                  {/* {.months.map((month) => (
+                    <option key={month.number} value={month.number}>
+                      {month.name}
+                    </option>
+                  ))} */}
+                </select>
               </div>
             </div>
           )}
@@ -252,24 +361,38 @@ const NewRoutine = () => {
               {...register("routine.startDate")}
             />
           </div>
-          <div className="grid grid-cols-5 items-center gap-2">
+          <div className="grid grid-cols-6 items-center gap-2">
             <label>From</label>
-            <input type="time" {...register("routine.startTime")} />
-            <span className="mx-auto text-2xl">
-              <BsArrowRight />
-            </span>
-            <input type="time" {...register("routine.endTime")} />
+            <input
+              type="time"
+              {...register("routine.fromTime")}
+              className="col-span-2"
+            />
+            <label>To</label>
+            <input
+              type="time"
+              {...register("routine.toTime")}
+              className="col-span-2"
+            />
           </div>
           {occurrenceTypeWatch !== "NEVER" && (
             <div className="grid grid-cols-5 items-center gap-2">
               <label>Ends</label>
               <div className="flex items-center gap-1">
-                <input type="checkbox" id="never" className="rounded" />
-                <label htmlFor="never" className="font-mono text-sm">
+                <input
+                  type="checkbox"
+                  id="neverEnds"
+                  {...register("routine.neverEnds")}
+                />
+                <label htmlFor="neverEnds" className="font-mono text-sm">
                   Never
                 </label>
               </div>
-              <input type="date" className="col-span-2 col-start-4" />
+              <input
+                type="date"
+                className="col-span-2 col-start-4"
+                disabled={neverEndsWatch}
+              />
             </div>
           )}
         </div>
