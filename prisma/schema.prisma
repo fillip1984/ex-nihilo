@@ -71,14 +71,13 @@ model TimelineEvent {
 }
 
 model Routine {
-    id             String          @id @default(cuid())
-    createdAt      DateTime        @default(now())
-    updatedAt      DateTime        @updatedAt
+    id             String         @id @default(cuid())
+    createdAt      DateTime       @default(now())
+    updatedAt      DateTime       @updatedAt
     summary        String
     details        String
     occurrenceType OccurrenceType
     daysOfWeek     DaySelector[]
-    dayOfMonth     DayOfMonthType?
     startDateTime  DateTime
     endDateTime    DateTime?
 }
@@ -95,13 +94,14 @@ model DaySelector {
 }
 
 enum OccurrenceType {
-    DAY_OF_WEEK
-    DAY_OF_MONTH
-    SPECIFIC_DAY
+    DAILY
+    WEEKLY
+    MONTHLY
+    // YEARLY
 }
 
-enum DayOfMonthType {
-    FIRST
-    MIDDLE
-    LAST
-}
+// enum DayOfMonthType {
+//     FIRST
+//     MIDDLE
+//     LAST
+// }

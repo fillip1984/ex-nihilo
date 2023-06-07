@@ -41,7 +41,7 @@ const TimelinePage = () => {
       </div>
       <Link
         href="/routines/new"
-        className="fixed bottom-8 right-8 flex h-16 w-16 items-center justify-center rounded-full bg-slate-300 text-4xl text-slate-800">
+        className="fixed bottom-8 right-8 flex h-16 w-16 items-center justify-center rounded-full bg-slate-300 text-4xl text-slate-800 transition-colors duration-300 ease-in-out hover:bg-slate-400">
         <FaPlus />
       </Link>
     </div>
