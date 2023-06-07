@@ -25,24 +25,20 @@ const routineFormSchema = z.object({
     endDate: z.string().nullish(),
     endTime: z.string().nullish(),
   }),
-  weeklyDaySelectorOptions: z
-    .array(
-      z.object({
-        label: z.string(),
-        abbreviatedLabel: z.string(),
-        selected: z.boolean(),
-      })
-    )
-    .nullable(),
-  monthlyDaySelectorOptions: z
-    .array(
-      z.object({
-        label: z.number(),
-        abbreviatedLabel: z.number(),
-        selected: z.boolean(),
-      })
-    )
-    .nullable(),
+  weeklyDaySelectorOptions: z.array(
+    z.object({
+      label: z.string(),
+      abbreviatedLabel: z.string(),
+      selected: z.boolean(),
+    })
+  ),
+  monthlyDaySelectorOptions: z.array(
+    z.object({
+      label: z.number(),
+      abbreviatedLabel: z.number(),
+      selected: z.boolean(),
+    })
+  ),
 });
 
 type RoutineFormSchemaType = z.infer<typeof routineFormSchema>;
@@ -80,7 +76,7 @@ const NewRoutine = () => {
         details: "test",
         startDate: "2023-06-07",
         startTime: "06:00",
-        occurrenceType: undefined,
+        occurrenceType: "NEVER",
       },
       weeklyDaySelectorOptions: [
         { label: "Sunday", abbreviatedLabel: "Sun", selected: false },
@@ -129,33 +125,6 @@ const NewRoutine = () => {
       </div>
 
       <div className="form-card rounded-lg bg-slate-300 p-2 text-slate-700">
-        <div className="form-card-title flex items-center gap-2 py-2 text-2xl">
-          <BsClock />
-          <span className="uppercase">WHEN</span>
-        </div>
-        <div className="form-card-field-set space-y-1 px-2">
-          <div className="grid grid-cols-5 items-center gap-2">
-            <label>Starts</label>
-            <input
-              type="date"
-              className="col-span-2"
-              {...register("routine.startDate")}
-            />
-            <input
-              type="time"
-              className="col-span-2"
-              {...register("routine.startTime")}
-            />
-          </div>
-          <div className="grid grid-cols-5 items-center gap-2">
-            <label>Ends</label>
-            <input type="date" className="col-span-2" />
-            <input type="time" className="col-span-2" />
-          </div>
-        </div>
-      </div>
-
-      <div className="form-card rounded-lg bg-slate-300 p-2 text-slate-700">
         <div className="form-card-title flex cursor-pointer items-center gap-2 py-2 text-2xl">
           <BsRepeat />
           <span className="uppercase">REPEAT</span>
@@ -169,7 +138,7 @@ const NewRoutine = () => {
             <select
               className="col-span-2"
               {...register("routine.occurrenceType")}>
-              <option value="">Never</option>
+              <option value="NEVER">Never</option>
               <option value="DAILY">Daily</option>
               <option value="WEEKLY">Weekly</option>
               <option value="MONTHLY">Monthly</option>
@@ -264,6 +233,33 @@ const NewRoutine = () => {
               </div>
             </div>
           )}
+        </div>
+      </div>
+
+      <div className="form-card rounded-lg bg-slate-300 p-2 text-slate-700">
+        <div className="form-card-title flex items-center gap-2 py-2 text-2xl">
+          <BsClock />
+          <span className="uppercase">WHEN</span>
+        </div>
+        <div className="form-card-field-set space-y-1 px-2">
+          <div className="grid grid-cols-5 items-center gap-2">
+            <label>Starts</label>
+            <input
+              type="date"
+              className="col-span-2"
+              {...register("routine.startDate")}
+            />
+            <input
+              type="time"
+              className="col-span-2"
+              {...register("routine.startTime")}
+            />
+          </div>
+          <div className="grid grid-cols-5 items-center gap-2">
+            <label>Ends</label>
+            <input type="date" className="col-span-2" />
+            <input type="time" className="col-span-2" />
+          </div>
         </div>
       </div>
 

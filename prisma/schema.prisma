@@ -94,10 +94,11 @@ model DaySelector {
 }
 
 enum OccurrenceType {
+    NEVER
     DAILY
     WEEKLY
     MONTHLY
-    // YEARLY
+    YEARLY
 }
 
 // enum DayOfMonthType {
