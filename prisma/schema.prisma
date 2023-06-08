@@ -81,8 +81,8 @@ model Routine {
     yearlyMonthValue Int?
     yearlyDayValue   Int?
     startDate        DateTime       @db.Date
-    fromTime         DateTime       @db.Time(4)
-    toTime           DateTime       @db.Time(4)
+    fromTime         DateTime //daylight savings time didn't work: @db.Time
+    toTime           DateTime //daylight savings time didn't work: @db.Time@db.Time
     endDate          DateTime?      @db.Date
     neverEnds        Boolean?
 
