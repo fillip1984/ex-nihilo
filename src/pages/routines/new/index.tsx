@@ -95,15 +95,15 @@ const NewRoutine = () => {
     ];
 
     const newRoutine = {
-      routine: {
-        summary: "test",
-        details: "test",
-        startDate: "2023-06-07",
-        fromTime: "17:00",
-        toTime: "18:00",
-        neverEnds: true,
-        occurrenceType: OccurrenceType.NEVER,
-      },
+      // routine: {
+      // summary: "test",
+      // details: "test",
+      // startDate: "2023-06-07",
+      // fromTime: "17:00",
+      // toTime: "18:00",
+      // neverEnds: true,
+      // occurrenceType: OccurrenceType.NEVER,
+      // },
       weeklyDaySelectorOptions: weeklyDaySelectorOptions,
       monthlyDaySelectorOptions: monthlyDaySelectorOptions,
     };
@@ -139,7 +139,7 @@ const NewRoutine = () => {
   const createRoutine = api.routines.create.useMutation({
     onSuccess: async () => {
       await utils.routines.invalidate();
-      void router.push("/");
+      void router.push("/routines");
     },
   });
 
