@@ -11,9 +11,11 @@ const TimelinePage = () => {
   const [fabAnimations] = useAutoAnimate();
   const [fabOpen, setFabOpen] = useState(false);
 
-  const { data: timelinePoints } = api.timeline.readAll.useQuery();
+  const { data: routines } = api.timeline.readAll.useQuery();
 
   const handleComplete = (id: string) => {
+    console.log("consider it done", id);
+
     // setEvents(
     //   events.map((event) =>
     //     event.id === id ? { ...event, complete: !event.complete } : event
@@ -25,21 +27,16 @@ const TimelinePage = () => {
   return (
     <div className="mx-auto my-4 flex w-full select-none flex-col overflow-hidden px-4 md:w-2/3 lg:w-1/3">
       <h4 className="mb-4 flex flex-col text-center"></h4>
-      <div id="timeline-grid" className="flex w-full flex-col gap-3">
-        {timelinePoints?.map((timelinePoint) => (
-          <div
-            key={timelinePoint.date.getTime()}
-            ref={parent}
-            className="flex flex-col gap-3">
-            <h3>{format(timelinePoint.date, "MM-dd-yyyy")}</h3>
-            {timelinePoint.events.map((event) => (
-              <TimelineEventCard
-                key={event.id}
-                event={event}
-                handleComplete={handleComplete}
-              />
-            ))}
-          </div>
+      <div
+        id="timeline-grid"
+        ref={parent}
+        className="flex w-full flex-col gap-3">
+        {routines?.map((routine) => (
+          <TimelineEventCard
+            key={routine.id}
+            routine={routine}
+            handleComplete={handleComplete}
+          />
         ))}
       </div>
 

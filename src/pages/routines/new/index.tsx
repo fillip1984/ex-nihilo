@@ -144,13 +144,14 @@ const NewRoutine = () => {
   });
 
   const onSubmit: SubmitHandler<RoutineFormSchemaType> = (formData) => {
-    console.log("formData", formData);
     createRoutine.mutate({ ...formData });
   };
 
+  // TODO: useful but should be removed once we've worked out the zod schema and validation
   useEffect(() => {
     console.log("Errors", errors);
   }, [errors]);
+
   return (
     <form
       // eslint-disable-next-line @typescript-eslint/no-misused-promises

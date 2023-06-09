@@ -13,6 +13,7 @@
     "@formkit/auto-animate": "^1.0.0-beta.6",
     "@hookform/resolvers": "^3.1.0",
     "@next-auth/prisma-adapter": "^1.0.5",
+    "@paralleldrive/cuid2": "^2.2.1",
     "@prisma/client": "^4.14.0",
     "@t3-oss/env-nextjs": "^0.3.1",
     "@tanstack/react-query": "^4.29.7",
