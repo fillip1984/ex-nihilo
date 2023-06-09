@@ -1,6 +1,7 @@
 import { parse } from "date-fns";
 import { z } from "zod";
-import { routineFormSchema } from "~/pages/routines/new";
+
+import { routineFormSchema } from "~/types";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const RoutineRouter = createTRPCRouter({
@@ -9,8 +10,8 @@ export const RoutineRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const result = await ctx.prisma.routine.create({
         data: {
-          summary: input.routine.summary,
-          details: input.routine.details,
+          name: input.routine.name,
+          description: input.routine.description,
           occurrenceType: input.routine.occurrenceType,
           startDate: new Date(input.routine.startDate),
           fromTime: parse(input.routine.fromTime, "HH:mm", new Date()),
@@ -22,6 +23,7 @@ export const RoutineRouter = createTRPCRouter({
           dailyEveryValue: input.routine.dailyEveryValue,
           yearlyMonthValue: input.routine.yearlyMonthValue,
           yearlyDayValue: input.routine.yearlyDayValue,
+          topicId: input.routine.topicId,
         },
       });
 

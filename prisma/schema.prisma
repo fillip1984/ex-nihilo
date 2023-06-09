@@ -31,6 +31,7 @@ model Account {
     @@unique([provider, providerAccountId])
 }
 
+// Necessary for Next auth
 model Session {
     id           String   @id @default(cuid())
     sessionToken String   @unique
@@ -39,6 +40,7 @@ model Session {
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// Necessary for Next auth
 model User {
     id            String    @id @default(cuid())
     name          String?
@@ -49,6 +51,7 @@ model User {
     sessions      Session[]
 }
 
+// Necessary for Next auth
 model VerificationToken {
     identifier String
     token      String   @unique
@@ -57,25 +60,13 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
-model TimelineEvent {
-    id          String    @id @default(cuid())
-    createdAt   DateTime  @default(now())
-    updatedAt   DateTime  @updatedAt
-    topic       String
-    icon        String
-    description String
-    color       String
-    start       DateTime
-    end         DateTime?
-    complete    Boolean
-}
-
+// build routines to generate activities which feed your timeline to get stuff done!
 model Routine {
     id               String         @id @default(cuid())
     createdAt        DateTime       @default(now())
     updatedAt        DateTime       @updatedAt
-    summary          String
-    details          String
+    name             String
+    description      String
     occurrenceType   OccurrenceType
     dailyEveryValue  Int?
     yearlyMonthValue Int?
@@ -88,8 +79,13 @@ model Routine {
 
     weeklyDaysSelected  DaySelector[] @relation("WeeklyDaysSelected")
     monthlyDaysSelected DaySelector[] @relation("MonthlyDaysSelected")
+    Activity            Activity[]
+
+    Topic   Topic  @relation(fields: [topicId], references: [id])
+    topicId String
 }
 
+// for repeated routines, we use day selector to indicate which days of week or days of month something repeats
 model DaySelector {
     id                    String   @id @default(cuid())
     createdAt             DateTime @default(now())
@@ -103,6 +99,7 @@ model DaySelector {
     monthlyDaysSelectedId String?
 }
 
+// how often something repeats
 enum OccurrenceType {
     NEVER
     DAILY
@@ -111,8 +108,48 @@ enum OccurrenceType {
     YEARLY
 }
 
+// alternate method of allowing user to select behavior instead of selecting specific days
 // enum DayOfMonthType {
 //     FIRST
 //     MIDDLE
 //     LAST
+// }
+
+// groups together routines
+model Topic {
+    id          String    @id @default(cuid())
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    name        String
+    description String
+    icon        String
+    color       String
+    routines    Routine[]
+}
+
+// feeds timeline so you can complete/skip them (track progress)
+model Activity {
+    id          String    @id @default(cuid())
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    routine     Routine   @relation(fields: [routineId], references: [id])
+    routineId   String
+    start       DateTime
+    end         DateTime
+    complete    Boolean   @default(false)
+    completedAt DateTime?
+    skip        Boolean   @default(false)
+}
+
+// model TimelineEvent {
+//     id          String    @id @default(cuid())
+//     createdAt   DateTime  @default(now())
+//     updatedAt   DateTime  @updatedAt
+//     topic       String
+//     icon        String
+//     description String
+//     color       String
+//     start       DateTime
+//     end         DateTime?
+//     complete    Boolean
 // }

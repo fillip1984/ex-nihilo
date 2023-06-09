@@ -1,5 +1,4 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { format } from "date-fns";
 import Link from "next/link";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
@@ -43,10 +42,18 @@ const TimelinePage = () => {
       <div ref={fabAnimations}>
         {/* href="/routines/new" */}
         {fabOpen && (
-          <div className="fixed bottom-0 left-1/2 right-0 top-2/3 z-[998] rounded-l bg-slate-200/20 backdrop-blur-sm md:left-3/4">
+          <div className="fixed bottom-0 left-1/2 right-0 top-2/3 z-[998]">
             <div className="flex flex-col items-end gap-6 p-8 text-xl font-bold">
-              <Link href="/routines">Edit Routines</Link>
-              <Link href="/routines/new">Add Routine</Link>
+              <Link
+                href="/routines"
+                className="rounded-lg bg-slate-200/20 p-2 backdrop-blur-sm md:left-3/4">
+                Manage Routines
+              </Link>
+              <Link
+                href="/topics/new"
+                className="rounded-lg bg-slate-200/20 p-2 backdrop-blur-sm md:left-3/4">
+                Manage Topics
+              </Link>
             </div>
           </div>
         )}

@@ -1,33 +1,33 @@
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
 
-const RoutinePage = () => {
+const TopicPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const utils = api.useContext();
 
-  const { data: routine } = api.routines.readOne.useQuery(
+  const { data: topic } = api.topics.readOne.useQuery(
     {
       id: id as string,
     },
     { enabled: !!id }
   );
 
-  const deleteRoutine = api.routines.delete.useMutation({
+  const deleteTopic = api.topics.delete.useMutation({
     onSuccess: async () => {
-      await utils.routines.invalidate();
-      void router.push("/routines");
+      await utils.topics.invalidate();
+      void router.push("/topics");
     },
   });
 
   const handleDelete = () => {
-    deleteRoutine.mutate({ id: id as string });
+    deleteTopic.mutate({ id: id as string });
   };
 
   return (
     <div>
-      <h2>{routine?.name}</h2>
-      <p>{routine?.description}</p>
+      <h2>{topic?.name}</h2>
+      <p>{topic?.description}</p>
       <button
         type="button"
         onClick={handleDelete}
@@ -38,4 +38,4 @@ const RoutinePage = () => {
   );
 };
 
-export default RoutinePage;
+export default TopicPage;

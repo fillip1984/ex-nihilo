@@ -1,6 +1,5 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { OccurrenceType } from "@prisma/client";
 import { getDaysInMonth } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -13,48 +12,9 @@ import {
   BsGeoAlt,
   BsRepeat,
 } from "react-icons/bs";
-import { z } from "zod";
+import { routineFormSchema, type RoutineFormSchemaType } from "~/types";
+
 import { api } from "~/utils/api";
-
-export const routineFormSchema = z.object({
-  routine: z
-    .object({
-      summary: z.string().min(1),
-      details: z.string().min(1),
-      occurrenceType: z.nativeEnum(OccurrenceType),
-      dailyEveryValue: z.number().nullish(),
-      yearlyMonthValue: z.number().nullish(),
-      yearlyDayValue: z.number().nullish(),
-      startDate: z.string().min(1),
-      fromTime: z.string().min(1),
-      toTime: z.string().min(1),
-      endDate: z.string().nullish(),
-      neverEnds: z.boolean(),
-    })
-    .refine(
-      (data) => data.neverEnds || (data.endDate && data.endDate?.length > 0),
-      {
-        message: "Either select an end date or select the never ends option",
-        path: ["endDate"],
-      }
-    ),
-  weeklyDaySelectorOptions: z.array(
-    z.object({
-      label: z.string(),
-      abbreviatedLabel: z.string(),
-      selected: z.boolean(),
-    })
-  ),
-  monthlyDaySelectorOptions: z.array(
-    z.object({
-      label: z.number(),
-      abbreviatedLabel: z.number(),
-      selected: z.boolean(),
-    })
-  ),
-});
-
-type RoutineFormSchemaType = z.infer<typeof routineFormSchema>;
 
 const NewRoutine = () => {
   const [occurrenceAnimation] = useAutoAnimate();
@@ -63,6 +23,8 @@ const NewRoutine = () => {
   const [specificLocation, setSpecificLocation] = useState(false);
 
   const router = useRouter();
+
+  const { data: topics } = api.topics.readAll.useQuery();
 
   const {
     register,
@@ -96,8 +58,9 @@ const NewRoutine = () => {
 
     const newRoutine = {
       // routine: {
-      // summary: "test",
-      // details: "test",
+      // default fields if you can think of a default to keep
+      // name: "test",
+      // description: "test",
       // startDate: "2023-06-07",
       // fromTime: "17:00",
       // toTime: "18:00",
@@ -163,12 +126,24 @@ const NewRoutine = () => {
           <span className="uppercase">INFO</span>
         </div>
         <div className="form-card-field-set space-y-1 px-2">
-          <input
-            type="text"
-            placeholder="Summary"
-            {...register("routine.summary")}
+          <input type="text" placeholder="Name" {...register("routine.name")} />
+          <textarea
+            placeholder="Description"
+            {...register("routine.description")}
           />
-          <textarea placeholder="Details" {...register("routine.details")} />
+        </div>
+        <div className="grid grid-cols-5 items-center gap-2 px-2">
+          <label>Topic</label>
+          <select
+            className="col-span-2 col-start-4"
+            {...register("routine.topicId")}>
+            <option value=""></option>
+            {topics?.map((topic) => (
+              <option key={topic.id} value={topic.id}>
+                {topic.name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -434,7 +409,7 @@ const NewRoutine = () => {
       {/* <div className="mt-4 flex justify-between p-4"> */}
       <div className="fixed bottom-0 left-0 right-0 z-50 flex h-16 border-t-4 border-t-white bg-slate-800">
         <Link
-          href="/"
+          href="/routines"
           className="flex w-full items-center justify-center text-2xl text-slate-300">
           Cancel
         </Link>

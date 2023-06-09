@@ -1,8 +1,8 @@
-import { type Routine, type TimelineEvent } from "@prisma/client";
-import { addMinutes } from "date-fns";
+import { createId } from "@paralleldrive/cuid2";
+
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { fetchSunInfo } from "./SunInfoRouter";
-import { createId } from "@paralleldrive/cuid2";
+import { type Routine } from "@prisma/client";
 // export type TimelineEvent = {
 //   id: string;
 //   topic: string;
@@ -14,10 +14,10 @@ import { createId } from "@paralleldrive/cuid2";
 //   complete: boolean;
 // };
 
-export type TimelinePoint = {
-  date: Date;
-  events: TimelineEvent[];
-};
+// export type TimelinePoint = {
+//   date: Date;
+//   events: TimelineEvent[];
+// };
 
 export const TimelineRouter = createTRPCRouter({
   readAll: protectedProcedure.query(async ({ ctx }) => {
@@ -43,8 +43,8 @@ export const TimelineRouter = createTRPCRouter({
     if (sunInfo) {
       sunrise = {
         id: createId(),
-        summary: "Sunrise",
-        details: "Nature stuf",
+        name: "Sunrise",
+        description: "Nature stuf",
         occurrenceType: "DAILY",
         fromTime: sunInfo.sunrise,
         // color: "bg-yellow-300/60 text-yellow-200",
@@ -54,8 +54,8 @@ export const TimelineRouter = createTRPCRouter({
     if (sunInfo) {
       sunset = {
         id: createId(),
-        summary: "Sunset",
-        details: "Nature stuf",
+        name: "Sunset",
+        description: "Nature stuf",
         occurrenceType: "DAILY",
         fromTime: sunInfo.sunset,
         // color: "bg-blue-300/60 text-blue-200",

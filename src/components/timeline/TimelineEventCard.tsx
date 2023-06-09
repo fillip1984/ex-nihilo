@@ -38,7 +38,7 @@ const TimelineEventCard = ({
         {selectIcon(event.icon)}
       </span> */}
       <div className="flex flex-col">
-        <b>{routine.summary}</b>
+        <b>{routine.name}</b>
         <span className="text-sm text-gray-300">
           {format(routine.fromTime, "HH:mm")}
           {routine.toTime && !isEqual(routine.fromTime, routine.toTime)

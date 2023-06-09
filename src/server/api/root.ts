@@ -1,7 +1,9 @@
 import { createTRPCRouter } from "~/server/api/trpc";
+import { ActivityRouter } from "./routers/ActivityRouter";
+import { RoutineRouter } from "./routers/RoutineRouter";
 import { SunInfoRouter } from "./routers/SunInfoRouter";
 import { TimelineRouter } from "./routers/TimelineRouter";
-import { RoutineRouter } from "./routers/RoutineRouter";
+import { TopicRouter } from "./routers/TopicRouter";
 
 /**
  * This is the primary router for your server.
@@ -9,9 +11,11 @@ import { RoutineRouter } from "./routers/RoutineRouter";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
+  activities: ActivityRouter,
   routines: RoutineRouter,
   sunInfo: SunInfoRouter,
   timeline: TimelineRouter,
+  topics: TopicRouter,
 });
 
 // export type definition of API
