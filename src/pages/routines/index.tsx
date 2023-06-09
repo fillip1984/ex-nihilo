@@ -1,13 +1,27 @@
 import { format } from "date-fns";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { BsBodyText, BsClock, BsRepeat } from "react-icons/bs";
 import { api } from "~/utils/api";
 
 const RoutineList = () => {
+  const router = useRouter();
   const { data: routines } = api.routines.readAll.useQuery();
+  const utils = api.useContext();
+
+  const createActivities = api.activities.create.useMutation({
+    onSuccess: async () => {
+      await utils.activities.invalidate();
+      void router.push("/");
+    },
+  });
 
   const handleRebuildActivities = () => {
     console.log("rebuilding activities");
+    const routineIds = routines?.map((routine) => routine.id);
+    if (routineIds) {
+      createActivities.mutate({ routineIds });
+    }
   };
 
   return (
@@ -57,6 +71,8 @@ const RoutineList = () => {
               {routine.toTime ? " - " + format(routine.toTime, "HH:mm") : ""}
             </div>
             {/* <p className="text-xs text-gray-300">{event.topic}</p> */}
+            {/* // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
+            <span>{routine._count.activities.toString()}</span>
           </div>
         </Link>
       ))}

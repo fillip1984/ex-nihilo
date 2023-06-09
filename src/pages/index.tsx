@@ -1,5 +1,4 @@
 import { type NextPage } from "next";
-import { type Session } from "next-auth";
 import { signIn, useSession } from "next-auth/react";
 import Head from "next/head";
 import { FaHourglassStart } from "react-icons/fa";
@@ -15,26 +14,13 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {sessionData ? (
-        <SignedInView sessionData={sessionData} />
-      ) : (
-        <NotSignedInView />
-      )}
+      {sessionData ? <SignedInView /> : <NotSignedInView />}
     </>
   );
 };
 
-const SignedInView = ({ sessionData }: { sessionData: Session }) => {
-  return (
-    <>
-      <div className="flex flex-col items-center">
-        <h3 className="mt-4 font-bold">
-          Hello {sessionData.user.name as string}
-        </h3>
-      </div>
-      <TimelinePage />
-    </>
-  );
+const SignedInView = () => {
+  return <TimelinePage />;
 };
 
 const NotSignedInView = () => {

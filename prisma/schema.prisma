@@ -71,17 +71,18 @@ model Routine {
     dailyEveryValue  Int?
     yearlyMonthValue Int?
     yearlyDayValue   Int?
-    startDate        DateTime       @db.Date
+    // you can store as @db.Date and @db.Time but problem is that Postgres (or possibly Prisma) assumes everything is stored as UTC and so it applies your timezone offset causing dates/times to change
+    startDate        DateTime //daylight savings time didn't work: @db.Date
     fromTime         DateTime //daylight savings time didn't work: @db.Time
     toTime           DateTime //daylight savings time didn't work: @db.Time@db.Time
-    endDate          DateTime?      @db.Date
+    endDate          DateTime? //daylight savings time didn't work: @db.Date
     neverEnds        Boolean?
 
     weeklyDaysSelected  DaySelector[] @relation("WeeklyDaysSelected")
     monthlyDaysSelected DaySelector[] @relation("MonthlyDaysSelected")
-    Activity            Activity[]
+    activities          Activity[]
 
-    Topic   Topic  @relation(fields: [topicId], references: [id])
+    topic   Topic  @relation(fields: [topicId], references: [id])
     topicId String
 }
 

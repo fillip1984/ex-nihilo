@@ -1,4 +1,4 @@
-import { type Routine } from "@prisma/client";
+import { type Activity, type Routine, type Topic } from "@prisma/client";
 import { format, isEqual } from "date-fns";
 import { BsSunrise, BsSunset } from "react-icons/bs";
 import { FaBed, FaRunning } from "react-icons/fa";
@@ -6,23 +6,29 @@ import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
 import { MdOutlineCleaningServices } from "react-icons/md";
 
 const TimelineEventCard = ({
-  routine,
+  activity,
   handleComplete,
+  handleSkip,
 }: {
-  routine: Routine;
+  activity: Activity & {
+    routine: Routine & {
+      topic: Topic;
+    };
+  };
   handleComplete: (id: string) => void;
+  handleSkip: (id: string) => void;
 }) => {
   const selectIcon = (iconName: string) => {
     switch (iconName) {
-      case "<FaBed />":
+      case "FaBed":
         return <FaBed />;
-      case "<FaRunning />":
+      case "FaRunning":
         return <FaRunning />;
-      case "<BsSunrise />":
+      case "BsSunrise":
         return <BsSunrise />;
-      case "<BsSunset />":
+      case "BsSunset":
         return <BsSunset />;
-      case "<MdOutlineCleaningServices />":
+      case "MdOutlineCleaningServices":
         return <MdOutlineCleaningServices />;
       default:
         return <GiPerspectiveDiceSixFacesRandom />;
@@ -30,22 +36,37 @@ const TimelineEventCard = ({
   };
 
   return (
-    <div
-      onClick={() => handleComplete(routine.id)}
-      className="flex w-full items-center gap-3 rounded-lg bg-white/10 p-2 transition duration-300 ease-in-out hover:bg-white/20">
-      {/* <span
-        className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl ${event.color}`}>
-        {selectIcon(event.icon)}
-      </span> */}
+    <div className="flex w-full gap-3 rounded-lg bg-white/10 p-2 transition duration-300 ease-in-out hover:bg-white/20">
+      <span
+        className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl ${activity.routine.topic.color}`}>
+        {selectIcon(activity.routine.topic.icon)}
+      </span>
       <div className="flex flex-col">
-        <b>{routine.name}</b>
+        <b>{activity.routine.name}</b>
         <span className="text-sm text-gray-300">
-          {format(routine.fromTime, "HH:mm")}
-          {routine.toTime && !isEqual(routine.fromTime, routine.toTime)
-            ? " - " + format(routine.toTime, "HH:mm")
+          {format(activity.routine.fromTime, "HH:mm")}
+          {activity.routine.toTime &&
+          !isEqual(activity.routine.fromTime, activity.routine.toTime)
+            ? " - " + format(activity.routine.toTime, "HH:mm")
             : ""}
         </span>
-        {/* <p className="text-xs text-gray-300">{event.topic}</p> */}
+        <p className="text-xs text-gray-300">{activity.routine.topic.name}</p>
+        <p>{activity.routine.startDate.toLocaleString()}</p>
+        <p>{activity.start.toLocaleString()}</p>
+      </div>
+      <div className="flex flex-1 flex-col">
+        <button
+          type="button"
+          onClick={() => handleComplete(activity.id)}
+          className="flex-1 bg-green-400">
+          Complete
+        </button>
+        <button
+          type="button"
+          onClick={() => handleSkip(activity.id)}
+          className="flex-1 bg-red-400">
+          Skip
+        </button>
       </div>
     </div>
   );

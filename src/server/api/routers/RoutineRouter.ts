@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { routineFormSchema } from "~/types";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createActivitiesFromRoutine } from "./ActivityRouter";
 
 export const RoutineRouter = createTRPCRouter({
   create: protectedProcedure
@@ -13,11 +14,11 @@ export const RoutineRouter = createTRPCRouter({
           name: input.routine.name,
           description: input.routine.description,
           occurrenceType: input.routine.occurrenceType,
-          startDate: new Date(input.routine.startDate),
+          startDate: parse(input.routine.startDate, "yyyy-MM-dd", new Date()),
           fromTime: parse(input.routine.fromTime, "HH:mm", new Date()),
           toTime: parse(input.routine.toTime, "HH:mm", new Date()),
           endDate: input.routine.endDate
-            ? new Date(input.routine.endDate)
+            ? parse(input.routine.endDate, "yyyy-MM-dd", new Date())
             : null,
           neverEnds: input.routine.neverEnds,
           dailyEveryValue: input.routine.dailyEveryValue,
@@ -28,37 +29,55 @@ export const RoutineRouter = createTRPCRouter({
       });
 
       if (input.routine.occurrenceType === "WEEKLY") {
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        input.weeklyDaySelectorOptions.forEach(async (day) => {
-          const dayResult = await ctx.prisma.daySelector.create({
-            data: {
-              label: day.label,
-              abbreviatedLabel: day.abbreviatedLabel,
-              selected: day.selected,
-              weeklyDaysSelectedId: result.id,
-            },
-          });
-          return dayResult;
+        const weeklyDays = input.weeklyDaySelectorOptions.map((day) => {
+          return {
+            label: day.label,
+            abbreviatedLabel: day.abbreviatedLabel,
+            selected: day.selected,
+            weeklyDaysSelectedId: result.id,
+          };
+        });
+        await ctx.prisma.daySelector.createMany({
+          data: weeklyDays,
         });
       } else if (input.routine.occurrenceType === "MONTHLY") {
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        input.monthlyDaySelectorOptions.forEach(async (day) => {
-          const dayResult = await ctx.prisma.daySelector.create({
-            data: {
-              label: day.label.toString(),
-              abbreviatedLabel: day.abbreviatedLabel.toString(),
-              selected: day.selected,
-              monthlyDaysSelectedId: result.id,
-            },
-          });
-          return dayResult;
+        const monthlyDays = input.monthlyDaySelectorOptions.map((day) => {
+          return {
+            label: day.label.toString(),
+            abbreviatedLabel: day.abbreviatedLabel.toString(),
+            selected: day.selected,
+            monthlyDaysSelectedId: result.id,
+          };
         });
+        await ctx.prisma.daySelector.createMany({
+          data: monthlyDays,
+        });
+      }
+
+      //refetch since I can't figure out how to retrieve the results from a createMany
+      const freshRoutine = await ctx.prisma.routine.findUnique({
+        where: {
+          id: result.id,
+        },
+        include: {
+          weeklyDaysSelected: true,
+          monthlyDaysSelected: true,
+        },
+      });
+      if (freshRoutine) {
+        await createActivitiesFromRoutine(freshRoutine);
       }
 
       return result;
     }),
   readAll: protectedProcedure.query(async ({ ctx }) => {
-    const result = await ctx.prisma.routine.findMany();
+    const result = await ctx.prisma.routine.findMany({
+      include: {
+        _count: {
+          select: { activities: true },
+        },
+      },
+    });
     return result;
   }),
   readOne: protectedProcedure
