@@ -1,4 +1,4 @@
-import { format, getYear } from "date-fns";
+import { getYear } from "date-fns";
 
 export const nextNewYears = (date: Date) => {
   const nextNewYears = new Date(getYear(date) + 1, 0, 1);
