@@ -6,6 +6,7 @@ import {
   FaCalendarAlt,
   FaChevronLeft,
   FaChevronRight,
+  FaCircleNotch,
   FaPlus,
 } from "react-icons/fa";
 import { api } from "~/utils/api";
@@ -20,7 +21,7 @@ const TimelinePage = () => {
   const filterOptions = ["Available", "Complete", "Skipped", "All"];
   const [filter, setFilter] = useState(filterOptions[0]);
 
-  const { data: events } = api.timeline.buildAgenda.useQuery({
+  const { data: events, isLoading } = api.timeline.buildAgenda.useQuery({
     date: selectedDate,
     filter,
   });
@@ -84,19 +85,28 @@ const TimelinePage = () => {
           setFilter={setFilter}
         />
       </div>
-      <div
-        id="timeline-grid"
-        ref={timelineAnimations}
-        className="flex w-full flex-col gap-3">
-        {events?.map((event) => (
-          <TimelineEventCard
-            key={event.id}
-            event={event}
-            handleComplete={handleComplete}
-            handleSkip={handleSkip}
-          />
-        ))}
-      </div>
+
+      {isLoading && (
+        <div className="flex items-center justify-center">
+          <FaCircleNotch className="animate-spin text-8xl" />
+        </div>
+      )}
+
+      {!isLoading && (
+        <div
+          id="timeline-grid"
+          ref={timelineAnimations}
+          className="flex w-full flex-col gap-3">
+          {events?.map((event) => (
+            <TimelineEventCard
+              key={event.id}
+              event={event}
+              handleComplete={handleComplete}
+              handleSkip={handleSkip}
+            />
+          ))}
+        </div>
+      )}
 
       <FabSection />
     </div>
