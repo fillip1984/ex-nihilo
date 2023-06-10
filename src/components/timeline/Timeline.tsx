@@ -65,7 +65,7 @@ const TimelinePage = () => {
         </h4>
       </div>
 
-      <div className="my-4">
+      <div className="my-4 text-center">
         <h4>Filters</h4>
         <Filters
           filterOptions={filterOptions}
