@@ -1,5 +1,4 @@
 import { format, isEqual } from "date-fns";
-import Link from "next/link";
 import { BiCategory } from "react-icons/bi";
 import { BsBodyText, BsSunrise, BsSunset } from "react-icons/bs";
 import { FaBed, FaRegClock, FaRunning } from "react-icons/fa";
@@ -89,17 +88,17 @@ const TimelineEventCard = ({
       )}
 
       {event.type === "Suninfo" && event.lengthOfDate && (
-        <div className="flex items-center justify-around rounded-b-lg bg-slate-700 p-2 text-center">
+        <div className="flex items-center justify-between rounded-b-lg bg-slate-700 p-2 text-center">
           <div>
             <span className="text-slate-400">Length of day:</span>{" "}
             {event.lengthOfDate?.hours} hrs {event.lengthOfDate?.minutes} mins
           </div>
-          <span className="rounded bg-gradient-to-l from-slate-400 to-yellow-600 p-1 text-sm">
-            <span className="text-slate-200">Courtesy of: </span>
-            <a href="https://sunrise-sunset.org/api" target="_blank">
-              sunrise-sunset.org
-            </a>
-          </span>
+          <a
+            href="https://sunrise-sunset.org/"
+            target="_blank"
+            className="rounded bg-gradient-to-r from-yellow-600 to-slate-400 px-2 py-1 text-sm">
+            sunrise-sunset.org
+          </a>
         </div>
       )}
     </div>
