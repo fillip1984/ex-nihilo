@@ -42,13 +42,17 @@ model Session {
 
 // Necessary for Next auth
 model User {
-    id            String    @id @default(cuid())
+    id            String        @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?       @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
+    routines      Routine[]
+    daySelectors  DaySelector[]
+    topics        Topic[]
+    activities    Activity[]
 }
 
 // Necessary for Next auth
@@ -65,6 +69,8 @@ model Routine {
     id               String         @id @default(cuid())
     createdAt        DateTime       @default(now())
     updatedAt        DateTime       @updatedAt
+    user             User           @relation(fields: [userId], references: [id])
+    userId           String
     name             String
     description      String
     occurrenceType   OccurrenceType
@@ -91,6 +97,8 @@ model DaySelector {
     id                    String   @id @default(cuid())
     createdAt             DateTime @default(now())
     updatedAt             DateTime @updatedAt
+    user                  User     @relation(fields: [userId], references: [id])
+    userId                String
     label                 String
     abbreviatedLabel      String
     selected              Boolean
@@ -121,6 +129,8 @@ model Topic {
     id          String    @id @default(cuid())
     createdAt   DateTime  @default(now())
     updatedAt   DateTime  @updatedAt
+    user        User      @relation(fields: [userId], references: [id])
+    userId      String
     name        String
     description String
     icon        String
@@ -133,6 +143,8 @@ model Activity {
     id          String    @id @default(cuid())
     createdAt   DateTime  @default(now())
     updatedAt   DateTime  @updatedAt
+    user        User      @relation(fields: [userId], references: [id])
+    userId      String
     routine     Routine   @relation(fields: [routineId], references: [id])
     routineId   String
     start       DateTime
@@ -141,16 +153,3 @@ model Activity {
     completedAt DateTime?
     skip        Boolean   @default(false)
 }
-
-// model TimelineEvent {
-//     id          String    @id @default(cuid())
-//     createdAt   DateTime  @default(now())
-//     updatedAt   DateTime  @updatedAt
-//     topic       String
-//     icon        String
-//     description String
-//     color       String
-//     start       DateTime
-//     end         DateTime?
-//     complete    Boolean
-// }

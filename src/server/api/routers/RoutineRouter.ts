@@ -9,6 +9,8 @@ export const RoutineRouter = createTRPCRouter({
   create: protectedProcedure
     .input(routineFormSchema)
     .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
       const result = await ctx.prisma.routine.create({
         data: {
           name: input.routine.name,
@@ -25,6 +27,7 @@ export const RoutineRouter = createTRPCRouter({
           yearlyMonthValue: input.routine.yearlyMonthValue,
           yearlyDayValue: input.routine.yearlyDayValue,
           topicId: input.routine.topicId,
+          userId,
         },
       });
 
@@ -35,6 +38,7 @@ export const RoutineRouter = createTRPCRouter({
             abbreviatedLabel: day.abbreviatedLabel,
             selected: day.selected,
             weeklyDaysSelectedId: result.id,
+            userId,
           };
         });
         await ctx.prisma.daySelector.createMany({
@@ -47,6 +51,7 @@ export const RoutineRouter = createTRPCRouter({
             abbreviatedLabel: day.abbreviatedLabel.toString(),
             selected: day.selected,
             monthlyDaysSelectedId: result.id,
+            userId,
           };
         });
         await ctx.prisma.daySelector.createMany({
@@ -65,13 +70,17 @@ export const RoutineRouter = createTRPCRouter({
         },
       });
       if (freshRoutine) {
-        await createActivitiesFromRoutine(freshRoutine);
+        await createActivitiesFromRoutine(freshRoutine, userId);
       }
 
       return result;
     }),
   readAll: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
     const result = await ctx.prisma.routine.findMany({
+      where: {
+        userId,
+      },
       include: {
         _count: {
           select: { activities: true },
@@ -84,7 +93,9 @@ export const RoutineRouter = createTRPCRouter({
     .input(z.object({ id: z.string().cuid() }))
     .query(async ({ ctx, input }) => {
       const routine = await ctx.prisma.routine.findUnique({
-        where: { id: input.id },
+        where: {
+          id: input.id,
+        },
       });
 
       return routine;

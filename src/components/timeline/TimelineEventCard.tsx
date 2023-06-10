@@ -89,8 +89,8 @@ const TimelineEventCard = ({
 
       {event.type === "Suninfo" && event.lengthOfDate && (
         <div className="rounded-b-lg bg-slate-700 p-2 text-center">
-          Length of day {event.lengthOfDate?.hours} hrs{" "}
-          {event.lengthOfDate?.minutes} mins
+          <span className="text-slate-400">Length of day:</span>{" "}
+          {event.lengthOfDate?.hours} hrs {event.lengthOfDate?.minutes} mins
         </div>
       )}
     </div>

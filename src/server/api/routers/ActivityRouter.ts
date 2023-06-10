@@ -18,21 +18,22 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 export const createActivitiesFromRoutine = async (
   routine: Routine & {
     weeklyDaysSelected: DaySelector[];
-  }
+  },
+  userId: string
 ) => {
   console.log("creating activities from routine", routine.name);
 
   switch (routine.occurrenceType) {
     case "NEVER":
-      return await createOneTimeActivity(routine);
+      return await createOneTimeActivity(routine, userId);
     case "DAILY":
-      return await createDailyActivities(routine);
+      return await createDailyActivities(routine, userId);
     case "WEEKLY":
-      return await createWeeklyActivities(routine);
+      return await createWeeklyActivities(routine, userId);
   }
 };
 
-const createOneTimeActivity = async (routine: Routine) => {
+const createOneTimeActivity = async (routine: Routine, userId: string) => {
   console.log(
     `creating one time activity for routine: ${
       routine.name
@@ -43,11 +44,12 @@ const createOneTimeActivity = async (routine: Routine) => {
       routineId: routine.id,
       start: routine.startDate,
       end: routine.endDate as Date,
+      userId,
     },
   });
 };
 
-const createDailyActivities = async (routine: Routine) => {
+const createDailyActivities = async (routine: Routine, userId: string) => {
   console.log("creating daily activities for routine", routine.name);
   const activitiesToAdd = [];
   if (!routine.dailyEveryValue) {
@@ -69,6 +71,7 @@ const createDailyActivities = async (routine: Routine) => {
         routineId: routine.id,
         start,
         end: start,
+        userId,
       });
     }
     start = addDays(start, routine.dailyEveryValue);
@@ -83,7 +86,8 @@ const createDailyActivities = async (routine: Routine) => {
 const createWeeklyActivities = async (
   routine: Routine & {
     weeklyDaysSelected: DaySelector[];
-  }
+  },
+  userId: string
 ) => {
   let datesToAdd: Date[] = [];
   let start = routine.startDate;
@@ -128,6 +132,7 @@ const createWeeklyActivities = async (
       routineId: routine.id,
       start: combineDateAndTime(date, routine.fromTime),
       end: combineDateAndTime(date, routine.toTime),
+      userId,
     });
   });
 
@@ -154,11 +159,13 @@ export const ActivityRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
       const routines = await ctx.prisma.routine.findMany({
         where: {
           id: {
             in: input.routineIds,
           },
+          userId,
         },
         include: {
           weeklyDaysSelected: true,
@@ -168,7 +175,7 @@ export const ActivityRouter = createTRPCRouter({
       //clean out previous, build new
       for (const routine of routines) {
         await deleteActivitiesForRoutine(routine);
-        await createActivitiesFromRoutine(routine);
+        await createActivitiesFromRoutine(routine, ctx.session.user.id);
       }
     }),
   readAll: protectedProcedure
@@ -177,8 +184,11 @@ export const ActivityRouter = createTRPCRouter({
       const start = startOfDay(input.date);
       const end = endOfDay(input.date);
 
+      const userId = ctx.session.user.id;
+
       const result = ctx.prisma.activity.findMany({
         where: {
+          userId,
           start: {
             gte: start,
             lte: end,

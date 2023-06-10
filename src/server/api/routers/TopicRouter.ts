@@ -7,19 +7,24 @@ export const TopicRouter = createTRPCRouter({
   create: protectedProcedure
     .input(topicFormSchema)
     .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
       const result = await ctx.prisma.topic.create({
         data: {
           name: input.name,
           description: input.description,
           icon: input.icon,
           color: input.color,
+          userId,
         },
       });
 
       return result;
     }),
   readAll: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
     const result = await ctx.prisma.topic.findMany({
+      where: { userId },
       orderBy: {
         name: "asc",
       },
