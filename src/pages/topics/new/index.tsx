@@ -79,7 +79,7 @@ const NewTopic = () => {
       {/* <div className="mt-4 flex justify-between p-4"> */}
       <div className="fixed bottom-0 left-0 right-0 z-50 flex h-16 border-t-4 border-t-white bg-slate-800">
         <Link
-          href="/routines"
+          href="/topics"
           className="flex w-full items-center justify-center text-2xl text-slate-300">
           Cancel
         </Link>

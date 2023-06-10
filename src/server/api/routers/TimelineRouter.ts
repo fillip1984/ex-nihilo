@@ -19,10 +19,12 @@ export const TimelineRouter = createTRPCRouter({
         events = events.concat(activities);
       }
 
-      const { sunrise, sunset } = await buildSunInfo(input.date);
-      if (sunrise && sunset) {
-        events.unshift(sunrise);
-        events.push(sunset);
+      if (input.filter === "Available" || input.filter === "All") {
+        const { sunrise, sunset } = await buildSunInfo(input.date);
+        if (sunrise && sunset) {
+          events.unshift(sunrise);
+          events.push(sunset);
+        }
       }
 
       events = events.sort((eventA, eventB) => {
