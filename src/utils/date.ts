@@ -15,12 +15,5 @@ export const combineDateAndTime = (datePart: Date, timePart: Date) => {
     timePart.getSeconds()
   );
 
-  console.log(
-    `DatePart: ${format(datePart, "yyyy-MM-dd")}, TimePart: ${format(
-      timePart,
-      "HH:mm:ss"
-    )}, returned: ${format(date, "yyyy-MM-dd HH:mm:ss")}`
-  );
-
   return date;
 };

@@ -14,12 +14,10 @@ export const TimelineRouter = createTRPCRouter({
       let events: TimelineEvent[] = [];
 
       const activities = await buildActivityInfo(input.date, input.filter);
-      console.log("acts", activities.length);
 
       if (activities) {
         events = events.concat(activities);
       }
-      console.log("events", events.length);
 
       const { sunrise, sunset } = await buildSunInfo(input.date);
       if (sunrise && sunset) {
