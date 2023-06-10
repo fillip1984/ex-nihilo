@@ -1,76 +1,134 @@
 import { createId } from "@paralleldrive/cuid2";
-
+import { endOfDay, startOfDay } from "date-fns";
+import { z } from "zod";
+import { prisma } from "~/server/db";
+import { type TimelineEvent } from "~/types";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { fetchSunInfo } from "./SunInfoRouter";
-import { type Routine } from "@prisma/client";
-// export type TimelineEvent = {
-//   id: string;
-//   topic: string;
-//   icon: JSX.Element;
-//   description: string;
-//   color: string;
-//   start: Date;
-//   end?: Date;
-//   complete: boolean;
-// };
-
-// export type TimelinePoint = {
-//   date: Date;
-//   events: TimelineEvent[];
-// };
 
 export const TimelineRouter = createTRPCRouter({
-  readAll: protectedProcedure.query(async ({ ctx }) => {
-    let routines = await ctx.prisma.routine.findMany({
-      orderBy: [
-        {
-          startDate: "asc",
-        },
-        {
-          fromTime: "asc",
-        },
-      ],
-      where: {
-        startDate: {
-          equals: new Date(),
+  buildAgenda: protectedProcedure
+    .input(z.object({ date: z.date(), filter: z.string().nullish() }))
+    .query(async ({ input }) => {
+      // fold in the cheese
+      let events: TimelineEvent[] = [];
+
+      const activities = await buildActivityInfo(input.date, input.filter);
+      console.log("acts", activities.length);
+
+      if (activities) {
+        events = events.concat(activities);
+      }
+      console.log("events", events.length);
+
+      const { sunrise, sunset } = await buildSunInfo(input.date);
+      if (sunrise && sunset) {
+        events.unshift(sunrise);
+        events.push(sunset);
+      }
+
+      events = events.sort((eventA, eventB) => {
+        return eventA.fromTime.getTime() - eventB.fromTime.getTime();
+      });
+
+      return events;
+    }),
+});
+
+const buildActivityInfo = async (
+  date: Date,
+  filter: string | null | undefined
+) => {
+  const start = startOfDay(date);
+  const end = endOfDay(date);
+
+  const result = await prisma.activity.findMany({
+    where: {
+      start: {
+        gte: start,
+        lte: end,
+      },
+      ...(filter === "Available" ? { skip: false, complete: false } : {}),
+      ...(filter === "Complete" ? { complete: true } : {}),
+      ...(filter === "Skipped" ? { skip: true } : {}),
+      // wide open so not necessary ...(input.filter === "All" ? {} : {}),
+    },
+    include: {
+      routine: {
+        include: {
+          topic: true,
         },
       },
-    });
+    },
+  });
 
-    let sunrise;
-    let sunset;
-    const sunInfo = await fetchSunInfo(new Date());
-    if (sunInfo) {
-      sunrise = {
-        id: createId(),
-        name: "Sunrise",
-        description: "Nature stuf",
-        occurrenceType: "DAILY",
-        fromTime: sunInfo.sunrise,
-        // color: "bg-yellow-300/60 text-yellow-200",
-        // icon: "<BsSunrise />",
-      };
-    }
-    if (sunInfo) {
-      sunset = {
-        id: createId(),
-        name: "Sunset",
-        description: "Nature stuf",
-        occurrenceType: "DAILY",
-        fromTime: sunInfo.sunset,
-        // color: "bg-blue-300/60 text-blue-200",
-        // icon: "<BsSunset />",
-      };
-    }
+  const activitiesAsTLEvents = result.map((activity) => {
+    const event: TimelineEvent = {
+      type: "Activity",
+      id: activity.id,
+      name: activity.routine.name,
+      description: activity.routine.description,
+      start: activity.start,
+      end: activity.end,
+      fromTime: activity.routine.fromTime,
+      toTime: activity.routine.toTime,
+      complete: activity.complete,
+      completedAt: activity.completedAt,
+      skip: activity.skip,
+      color: activity.routine.topic.color,
+      icon: activity.routine.topic.icon,
+      activity: activity,
+      lengthOfDate: null,
+    };
+    return event;
+  });
 
-    // fold in the cheese
-    routines.unshift(sunrise as Routine);
-    routines.push(sunset as Routine);
+  return activitiesAsTLEvents;
+};
 
-    routines = routines.sort((routineA, routineB) => {
-      return routineA.fromTime.getTime() - routineB.fromTime.getTime();
-    });
+const buildSunInfo = async (date: Date) => {
+  let sunrise: TimelineEvent | null = null;
+  let sunset: TimelineEvent | null = null;
+  const sunInfo = await fetchSunInfo(date);
+  if (sunInfo) {
+    sunrise = {
+      type: "Suninfo",
+      id: createId(),
+      name: "Sunrise",
+      description: "Nature stuff",
+      start: sunInfo.sunrise,
+      end: sunInfo.sunrise,
+      fromTime: sunInfo.sunrise,
+      toTime: sunInfo.sunrise,
+      complete: null,
+      completedAt: null,
+      skip: null,
+      color: "bg-yellow-300/60 text-yellow-200",
+      icon: "BsSunrise",
+      activity: null,
+      lengthOfDate: sunInfo.dayLength,
+    };
+  }
+  if (sunInfo) {
+    sunset = {
+      type: "Suninfo",
+      id: createId(),
+      name: "Sunset",
+      description: "Nature stuff",
+      start: sunInfo.sunset,
+      end: sunInfo.sunset,
+      fromTime: sunInfo.sunset,
+      toTime: sunInfo.sunset,
+      complete: null,
+      completedAt: null,
+      skip: null,
+      // occurrenceType: "DAILY",
+      color: "bg-blue-300/60 text-blue-200",
+      icon: "BsSunset",
+      activity: null,
+      lengthOfDate: sunInfo.dayLength,
+    };
+  }
 
-    return routines;
-  }),
-});
+  return { sunrise, sunset };
+};

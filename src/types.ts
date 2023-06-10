@@ -1,4 +1,4 @@
-import { OccurrenceType } from "@prisma/client";
+import { type Activity, OccurrenceType } from "@prisma/client";
 import { z } from "zod";
 
 export const routineFormSchema = z.object({
@@ -50,3 +50,25 @@ export const topicFormSchema = z.object({
 });
 
 export type TopicFormSchemaType = z.infer<typeof topicFormSchema>;
+
+export type TimelineEvent = {
+  type: TimelineEventType;
+  id: string;
+  name: string;
+  description: string;
+  start: Date;
+  end: Date;
+  fromTime: Date;
+  toTime: Date;
+  complete: boolean | null;
+  completedAt: Date | null;
+  skip: boolean | null;
+  color: string;
+  icon: string;
+
+  activity: Activity | null;
+
+  lengthOfDate: Duration | null;
+};
+
+export type TimelineEventType = "Suninfo" | "Activity";

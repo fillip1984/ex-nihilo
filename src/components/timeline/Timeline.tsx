@@ -1,14 +1,17 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { format, parse } from "date-fns";
-import { useSession } from "next-auth/react";
+import { addDays, format, parse } from "date-fns";
 import Link from "next/link";
-import { type SetStateAction, useState, type Dispatch } from "react";
-import { FaCalendarAlt, FaPlus } from "react-icons/fa";
+import { useState, type Dispatch, type SetStateAction } from "react";
+import {
+  FaCalendarAlt,
+  FaChevronLeft,
+  FaChevronRight,
+  FaPlus,
+} from "react-icons/fa";
 import { api } from "~/utils/api";
 import TimelineEventCard from "./TimelineEventCard";
 
 const TimelinePage = () => {
-  const { data: sessionData } = useSession();
   const utils = api.useContext();
 
   const [timelineAnimations] = useAutoAnimate();
@@ -19,7 +22,7 @@ const TimelinePage = () => {
   const filterOptions = ["Available", "Complete", "Skipped", "All"];
   const [filter, setFilter] = useState(filterOptions[0]);
 
-  const { data: activities } = api.activities.readAll.useQuery({
+  const { data: events } = api.timeline.buildAgenda.useQuery({
     date: selectedDate,
     filter,
   });
@@ -46,13 +49,12 @@ const TimelinePage = () => {
   return (
     <div className="mx-auto my-4 flex w-full select-none flex-col overflow-hidden px-4 md:w-2/3 lg:w-1/3">
       <div className="my-4 text-center">
-        {sessionData?.user.name && (
+        {/* {sessionData?.user.name && (
           <h3 className="mt-4 font-bold">Hello {sessionData?.user.name}</h3>
-        )}
+        )} */}
         <h4 className="flex items-center justify-center gap-2">
-          {activities?.length}
-          <span className="text-slate-500"> activities for today </span>
-
+          {events?.length}
+          <span className="text-slate-500"> activities for </span>
           <input
             type="date"
             value={format(selectedDate, "yyyy-MM-dd")}
@@ -63,6 +65,18 @@ const TimelinePage = () => {
           />
           <FaCalendarAlt />
         </h4>
+        <div className="mt-4 flex items-center justify-center gap-4 text-2xl">
+          <button
+            onClick={() => setSelectedDate((prev) => addDays(prev, -1))}
+            className="flex items-center">
+            <FaChevronLeft />
+          </button>
+          <button
+            onClick={() => setSelectedDate((prev) => addDays(prev, 1))}
+            className="flex items-center">
+            <FaChevronRight />
+          </button>
+        </div>
       </div>
 
       <div className="mb-4 text-center">
@@ -76,10 +90,10 @@ const TimelinePage = () => {
         id="timeline-grid"
         ref={timelineAnimations}
         className="flex w-full flex-col gap-3">
-        {activities?.map((activity) => (
+        {events?.map((event) => (
           <TimelineEventCard
-            key={activity.id}
-            activity={activity}
+            key={event.id}
+            event={event}
             handleComplete={handleComplete}
             handleSkip={handleSkip}
           />
