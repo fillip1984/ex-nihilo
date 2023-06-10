@@ -21,6 +21,7 @@
     "@trpc/next": "^10.26.0",
     "@trpc/react-query": "^10.26.0",
     "@trpc/server": "^10.26.0",
+    "clsx": "^1.2.1",
     "date-fns": "^2.30.0",
     "decimal.js": "^10.4.3",
     "next": "^13.4.2",

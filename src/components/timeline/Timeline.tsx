@@ -1,16 +1,17 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import clsx from "clsx";
+import { format } from "date-fns";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { api } from "~/utils/api";
 import TimelineEventCard from "./TimelineEventCard";
-import { useSession } from "next-auth/react";
-import { format } from "date-fns";
 
 const TimelinePage = () => {
   const { data: sessionData } = useSession();
 
-  const [parent] = useAutoAnimate();
+  const [timelineAnimations] = useAutoAnimate();
   const [fabAnimations] = useAutoAnimate();
   const [fabOpen, setFabOpen] = useState(false);
 
@@ -55,9 +56,13 @@ const TimelinePage = () => {
           {format(new Date(), "MM/dd/yyyy")}
         </h4>
       </div>
+      <div>
+        <h4>Filters</h4>
+        <Filters />
+      </div>
       <div
         id="timeline-grid"
-        ref={parent}
+        ref={timelineAnimations}
         className="flex w-full flex-col gap-3">
         {activities?.map((activity) => (
           <TimelineEventCard
@@ -100,6 +105,87 @@ const TimelinePage = () => {
           fabOpen ? "" : "hidden"
         }`}></div>
     </div>
+  );
+};
+
+const Filters = () => {
+  // type FilterOptions = "Available" | "Complete" | "Skipped" | "All";
+  const filters = ["Available", "Complete", "Skipped", "All"];
+  const [filter, setFilter] = useState("Available");
+
+  const [app, setApp] = useState<"light" | "dark" | "system">("light");
+  return (
+    <>
+      <div
+        id="filter-container"
+        className="relative mx-2 mt-2 rounded-md bg-slate-700 p-1">
+        <div
+          id="slider-container"
+          className={clsx(
+            "absolute inset-y-0 h-full w-1/3 transform px-4 py-1 transition-transform",
+            {
+              "translate-x-0": app === "light",
+              "translate-x-full": app === "dark",
+              "translate-x-[200%]": app === "system",
+            }
+          )}>
+          <div
+            id="slider"
+            className={clsx(
+              "h-full w-full rounded-md bg-slate-400",
+              {
+                active: app === "light",
+                "bg-gray-600": app === "dark",
+              },
+              {
+                // needs to be separate object otherwise dark/light & system keys overlap resulting in a visual bug
+                ["bg-gray-600"]: app === "system",
+              }
+            )}></div>
+        </div>
+        <div className="relative flex h-full w-full">
+          <button
+            tabIndex={0}
+            onClick={() => setApp("light")}
+            className={clsx(
+              "my-2 ml-2 w-1/3 cursor-pointer select-none py-1 text-sm focus:outline-none",
+              {
+                active: app === "light",
+                "text--gray-900 font-bold": app === "light",
+                "text--gray-600": app !== "light",
+              }
+            )}>
+            Light
+          </button>
+          <button
+            tabIndex={0}
+            onClick={() => setApp("dark")}
+            className={clsx(
+              "my-2 ml-2 w-1/3 cursor-pointer select-none py-1 text-sm focus:outline-none",
+              {
+                active: app === "dark",
+                "font-bold text-white": app === "dark",
+                "text--gray-600": app !== "dark",
+              }
+            )}>
+            Dark
+          </button>
+          <button
+            tabIndex={0}
+            onClick={() => setApp("system")}
+            className={clsx(
+              "my-2 ml-2 w-1/3 cursor-pointer select-none py-1 text-sm focus:outline-none",
+              {
+                active: app === "system",
+                "font-bold text-white": app === "system",
+                "text--gray-600": app !== "system",
+              }
+            )}>
+            System
+          </button>
+        </div>
+      </div>
+    </>
   );
 };
 
