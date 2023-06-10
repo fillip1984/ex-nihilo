@@ -172,7 +172,7 @@ export const ActivityRouter = createTRPCRouter({
       }
     }),
   readAll: protectedProcedure
-    // .input(z.object({ date: z.date() }))
+    .input(z.object({ date: z.date(), filter: z.string().nullish() }))
     .query(async ({ ctx, input }) => {
       // const result = await ctx.prisma.activity.findMany({
       //   where: {
@@ -208,9 +208,8 @@ export const ActivityRouter = createTRPCRouter({
       //   },
       // });
 
-      const now = new Date();
-      const start = startOfDay(now);
-      const end = endOfDay(now);
+      const start = startOfDay(input.date);
+      const end = endOfDay(input.date);
 
       const result = ctx.prisma.activity.findMany({
         where: {
@@ -218,8 +217,12 @@ export const ActivityRouter = createTRPCRouter({
             gte: start,
             lte: end,
           },
-          skip: false,
-          complete: false,
+          ...(input.filter === "Available"
+            ? { skip: false, complete: false }
+            : {}),
+          ...(input.filter === "Complete" ? { complete: true } : {}),
+          ...(input.filter === "Skipped" ? { skip: true } : {}),
+          // wide open so not necessary ...(input.filter === "All" ? {} : {}),
         },
         include: {
           routine: {

@@ -1,22 +1,29 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import clsx from "clsx";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
-import { FaPlus } from "react-icons/fa";
+import { type SetStateAction, useState, type Dispatch } from "react";
+import { FaCalendarAlt, FaPlus } from "react-icons/fa";
 import { api } from "~/utils/api";
 import TimelineEventCard from "./TimelineEventCard";
 
 const TimelinePage = () => {
   const { data: sessionData } = useSession();
+  const utils = api.useContext();
 
   const [timelineAnimations] = useAutoAnimate();
   const [fabAnimations] = useAutoAnimate();
   const [fabOpen, setFabOpen] = useState(false);
 
-  const utils = api.useContext();
-  const { data: activities } = api.activities.readAll.useQuery();
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const filterOptions = ["Available", "Complete", "Skipped", "All"];
+  const [filter, setFilter] = useState(filterOptions[0]);
+
+  const { data: activities } = api.activities.readAll.useQuery({
+    date: selectedDate,
+    filter,
+  });
+
   const completeAct = api.activities.complete.useMutation({
     onSuccess: async () => {
       await utils.activities.invalidate();
@@ -29,18 +36,10 @@ const TimelinePage = () => {
   });
 
   const handleComplete = (id: string) => {
-    console.log("consider it done", id);
     completeAct.mutate({ id });
-    // setEvents(
-    //   events.map((event) =>
-    //     event.id === id ? { ...event, complete: !event.complete } : event
-    //   )
-    // );
-    // setEvents(events.filter((event) => event.id !== id));
   };
 
   const handleSkip = (id: string) => {
-    console.log("skipping", id);
     skipAct.mutate({ id });
   };
 
@@ -50,15 +49,29 @@ const TimelinePage = () => {
         {sessionData?.user.name && (
           <h3 className="mt-4 font-bold">Hello {sessionData?.user.name}</h3>
         )}
-        <h4>
+        <h4 className="flex items-center justify-center gap-2">
           {activities?.length}
           <span className="text-slate-500"> activities for today </span>
-          {format(new Date(), "MM/dd/yyyy")}
+
+          <input
+            type="date"
+            value={format(selectedDate, "yyyy-MM-dd")}
+            onChange={(e) =>
+              setSelectedDate(parse(e.target.value, "yyyy-MM-dd", new Date()))
+            }
+            className="w-auto rounded-none border-0 border-b-2 bg-slate-900 p-0 text-xl text-white"
+          />
+          <FaCalendarAlt />
         </h4>
       </div>
-      <div>
+
+      <div className="my-4">
         <h4>Filters</h4>
-        <Filters />
+        <Filters
+          filterOptions={filterOptions}
+          filter={filter}
+          setFilter={setFilter}
+        />
       </div>
       <div
         id="timeline-grid"
@@ -108,12 +121,34 @@ const TimelinePage = () => {
   );
 };
 
-const Filters = () => {
-  // type FilterOptions = "Available" | "Complete" | "Skipped" | "All";
-  const filters = ["Available", "Complete", "Skipped", "All"];
-  const [filter, setFilter] = useState("Available");
+const Filters = ({
+  filterOptions,
+  filter,
+  setFilter,
+}: {
+  filterOptions: string[];
+  filter: string | undefined;
+  setFilter: Dispatch<SetStateAction<string | undefined>>;
+}) => {
+  const calculateTranslate = (filter: string | undefined) => {
+    if (filter === undefined) {
+      return "";
+    }
 
-  const [app, setApp] = useState<"light" | "dark" | "system">("light");
+    switch (filterOptions.indexOf(filter)) {
+      case 0:
+        return "translate-x-0";
+      case 1:
+        return "translate-x-full";
+      case 2:
+        return "translate-x-[200%]";
+      case 3:
+        return "translate-x-[300%]";
+      default:
+        throw new Error("not setup to go beyond 3 options");
+    }
+  };
+
   return (
     <>
       <div
@@ -121,68 +156,25 @@ const Filters = () => {
         className="relative mx-2 mt-2 rounded-md bg-slate-700 p-1">
         <div
           id="slider-container"
-          className={clsx(
-            "absolute inset-y-0 h-full w-1/3 transform px-4 py-1 transition-transform",
-            {
-              "translate-x-0": app === "light",
-              "translate-x-full": app === "dark",
-              "translate-x-[200%]": app === "system",
-            }
-          )}>
+          className={`
+            absolute inset-y-0 h-full w-1/4 transform px-4 py-1 transition-transform ${calculateTranslate(
+              filter
+            )}`}>
           <div
             id="slider"
-            className={clsx(
-              "h-full w-full rounded-md bg-slate-400",
-              {
-                active: app === "light",
-                "bg-gray-600": app === "dark",
-              },
-              {
-                // needs to be separate object otherwise dark/light & system keys overlap resulting in a visual bug
-                ["bg-gray-600"]: app === "system",
-              }
-            )}></div>
+            className="h-full w-full rounded-md bg-slate-400"></div>
         </div>
-        <div className="relative flex h-full w-full">
-          <button
-            tabIndex={0}
-            onClick={() => setApp("light")}
-            className={clsx(
-              "my-2 ml-2 w-1/3 cursor-pointer select-none py-1 text-sm focus:outline-none",
-              {
-                active: app === "light",
-                "text--gray-900 font-bold": app === "light",
-                "text--gray-600": app !== "light",
-              }
-            )}>
-            Light
-          </button>
-          <button
-            tabIndex={0}
-            onClick={() => setApp("dark")}
-            className={clsx(
-              "my-2 ml-2 w-1/3 cursor-pointer select-none py-1 text-sm focus:outline-none",
-              {
-                active: app === "dark",
-                "font-bold text-white": app === "dark",
-                "text--gray-600": app !== "dark",
-              }
-            )}>
-            Dark
-          </button>
-          <button
-            tabIndex={0}
-            onClick={() => setApp("system")}
-            className={clsx(
-              "my-2 ml-2 w-1/3 cursor-pointer select-none py-1 text-sm focus:outline-none",
-              {
-                active: app === "system",
-                "font-bold text-white": app === "system",
-                "text--gray-600": app !== "system",
-              }
-            )}>
-            System
-          </button>
+        <div className="relative grid h-full w-full grid-cols-4">
+          {filterOptions.map((filterOption) => (
+            <button
+              key={filterOption}
+              onClick={() => setFilter(filterOption)}
+              className={`p-3 text-sm ${
+                filterOption === filter ? "font-bold" : ""
+              }`}>
+              {filterOption}
+            </button>
+          ))}
         </div>
       </div>
     </>
