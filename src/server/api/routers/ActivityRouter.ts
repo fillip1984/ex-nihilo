@@ -174,40 +174,6 @@ export const ActivityRouter = createTRPCRouter({
   readAll: protectedProcedure
     .input(z.object({ date: z.date(), filter: z.string().nullish() }))
     .query(async ({ ctx, input }) => {
-      // const result = await ctx.prisma.activity.findMany({
-      //   where: {
-      //     start: {
-      //       gte: startOfDay(new Date()),
-      //       lte: endOfDay(new Date()),
-      //     },
-      //   },
-      //   select: {
-      //     id: true,
-      //     start: true,
-      //     end: true,
-      //     complete: true,
-      //     completedAt: true,
-      //     skip: true,
-      //     routine: {
-      //       select: {
-      //         name: true,
-      //         description: true,
-      //         startDate: true,
-      //         endDate: true,
-      //         fromTime: true,
-      //         toTime: true,
-      //         topic: {
-      //           select: {
-      //             name: true,
-      //             color: true,
-      //             icon: true,
-      //           },
-      //         },
-      //       },
-      //     },
-      //   },
-      // });
-
       const start = startOfDay(input.date);
       const end = endOfDay(input.date);
 
@@ -232,6 +198,33 @@ export const ActivityRouter = createTRPCRouter({
           },
         },
       });
+
+      // TODO: need to finish this
+      // let sunrise;
+      // let sunset;
+      // const sunInfo = await fetchSunInfo(new Date());
+      // if (sunInfo) {
+      //   sunrise = {
+      //     id: createId(),
+      //     name: "Sunrise",
+      //     description: "Nature stuf",
+      //     occurrenceType: "DAILY",
+      //     fromTime: sunInfo.sunrise,
+      //     // color: "bg-yellow-300/60 text-yellow-200",
+      //     // icon: "<BsSunrise />",
+      //   };
+      // }
+      // if (sunInfo) {
+      //   sunset = {
+      //     id: createId(),
+      //     name: "Sunset",
+      //     description: "Nature stuf",
+      //     occurrenceType: "DAILY",
+      //     fromTime: sunInfo.sunset,
+      //     // color: "bg-blue-300/60 text-blue-200",
+      //     // icon: "<BsSunset />",
+      //   };
+      // }
 
       return result;
     }),

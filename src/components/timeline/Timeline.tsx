@@ -65,8 +65,7 @@ const TimelinePage = () => {
         </h4>
       </div>
 
-      <div className="my-4 text-center">
-        <h4>Filters</h4>
+      <div className="mb-4 text-center">
         <Filters
           filterOptions={filterOptions}
           filter={filter}
@@ -157,19 +156,19 @@ const Filters = ({
         <div
           id="slider-container"
           className={`
-            absolute inset-y-0 h-full w-1/4 transform px-4 py-1 transition-transform ${calculateTranslate(
+            absolute inset-y-0 h-full w-1/4 transform transition-transform ${calculateTranslate(
               filter
             )}`}>
           <div
             id="slider"
             className="h-full w-full rounded-md bg-slate-400"></div>
         </div>
-        <div className="relative grid h-full w-full grid-cols-4">
+        <div className="relative flex h-full w-full">
           {filterOptions.map((filterOption) => (
             <button
               key={filterOption}
               onClick={() => setFilter(filterOption)}
-              className={`p-3 text-sm ${
+              className={`flex w-full flex-col items-center justify-center py-3 text-sm ${
                 filterOption === filter ? "font-bold" : ""
               }`}>
               {filterOption}
