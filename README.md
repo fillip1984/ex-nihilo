@@ -7,3 +7,7 @@ Agenda, time tracking, habit forming, productivity tool (mobile UI)
 * [Security - how to get Github OAuth working with T3 stack](https://www.youtube.com/watch?v=J1gzN1SAhyM)
 
 * [Setting up multiple env files for prisma](https://www.prisma.io/docs/guides/development-environment/environment-variables/using-multiple-env-files)
+
+* favico
+Taken from wikimedia, converted using
+[https://favicon.io/favicon-converter/](https://favicon.io/favicon-converter/)
