@@ -67,6 +67,7 @@ export type TimelineEvent = {
   icon: string;
 
   activity: Activity | null;
+  topicName: string;
 
   lengthOfDate: Duration | null;
 };

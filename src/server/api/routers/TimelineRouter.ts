@@ -78,6 +78,7 @@ const buildActivityInfo = async (
       color: activity.routine.topic.color,
       icon: activity.routine.topic.icon,
       activity: activity,
+      topicName: activity.routine.topic.name,
       lengthOfDate: null,
     };
     return event;
@@ -106,6 +107,7 @@ const buildSunInfo = async (date: Date) => {
       color: "bg-yellow-300/60 text-yellow-200",
       icon: "BsSunrise",
       activity: null,
+      topicName: "Nature",
       lengthOfDate: sunInfo.dayLength,
     };
   }
@@ -126,6 +128,7 @@ const buildSunInfo = async (date: Date) => {
       color: "bg-blue-300/60 text-blue-200",
       icon: "BsSunset",
       activity: null,
+      topicName: "Nature",
       lengthOfDate: sunInfo.dayLength,
     };
   }

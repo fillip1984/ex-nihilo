@@ -9,16 +9,11 @@ import {
   MdOutlineCleaningServices,
 } from "react-icons/md";
 import { type TimelineEvent } from "~/types";
+import { api } from "~/utils/api";
 
-const TimelineEventCard = ({
-  event,
-  handleComplete,
-  handleSkip,
-}: {
-  event: TimelineEvent;
-  handleComplete: (id: string) => void;
-  handleSkip: (id: string) => void;
-}) => {
+const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
+  const utils = api.useContext();
+
   const selectIcon = (iconName: string) => {
     switch (iconName) {
       case "FaBed":
@@ -34,6 +29,27 @@ const TimelineEventCard = ({
       default:
         return <GiPerspectiveDiceSixFacesRandom />;
     }
+  };
+
+  const completeAct = api.activities.complete.useMutation({
+    onSuccess: async () => {
+      await utils.timeline.invalidate();
+      await utils.activities.invalidate();
+    },
+  });
+  const skipAct = api.activities.skip.useMutation({
+    onSuccess: async () => {
+      await utils.timeline.invalidate();
+      await utils.activities.invalidate();
+    },
+  });
+
+  const handleComplete = (id: string) => {
+    completeAct.mutate({ id });
+  };
+
+  const handleSkip = (id: string) => {
+    skipAct.mutate({ id });
   };
 
   return (
@@ -58,31 +74,49 @@ const TimelineEventCard = ({
           </p>
           <p className="flex items-center gap-2 text-xs text-gray-400">
             <BiCategory />
-            {event.name}
+            {event.topicName}
           </p>
-          {/* <p>{event.startDate.toLocaleString()}</p>
-          <p>{event.start.toLocaleString()}</p> */}
         </div>
       </div>
       {event.complete !== null && event.skip !== null && (
-        <div className="flex  text-3xl">
+        <div className="flex rounded-b-lg bg-slate-700 text-3xl">
           <button
             type="button"
             onClick={() => handleComplete(event.id)}
-            className={`flex flex-1 justify-center rounded-bl-lg bg-green-400 p-2 transition-colors duration-300 ${
-              event.skip ? "hidden" : ""
+            className={`flex flex-1 items-center justify-center gap-2 text-green-400 transition-colors duration-300 hover:text-green-500 ${
+              event.skip
+                ? "border-b-lg hidden"
+                : "rounded-bl-lg border-r-2 border-r-slate-500 py-1"
             } `}
             disabled={event.complete || event.skip}>
             <MdCheck />
+            {event.completedAt && (
+              <span className="text-sm">
+                Completed:{" "}
+                {Intl.DateTimeFormat("en-US", {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                }).format(event.completedAt)}
+              </span>
+            )}
           </button>
           <button
             type="button"
             onClick={() => handleSkip(event.id)}
-            className={`flex flex-1 justify-center rounded-br-lg bg-red-400 p-2 transition-colors duration-300 ${
-              event.complete ? "hidden" : ""
+            className={`flex flex-1 items-center justify-center gap-2 py-1 text-red-400 transition-colors duration-300 hover:text-red-500 ${
+              event.complete ? "border-b-lg hidden" : "rounded-br-lg"
             }`}
             disabled={event.complete || event.skip}>
             <MdNotInterested />
+            {event.skip && (
+              <span className="text-sm">
+                Skipped:{" "}
+                {Intl.DateTimeFormat("en-US", {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                }).format(event.activity?.updatedAt)}
+              </span>
+            )}
           </button>
         </div>
       )}

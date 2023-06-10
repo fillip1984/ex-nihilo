@@ -13,8 +13,6 @@ import { api } from "~/utils/api";
 import TimelineEventCard from "./TimelineEventCard";
 
 const TimelinePage = () => {
-  const utils = api.useContext();
-
   const [timelineAnimations] = useAutoAnimate();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -25,25 +23,6 @@ const TimelinePage = () => {
     date: selectedDate,
     filter,
   });
-
-  const completeAct = api.activities.complete.useMutation({
-    onSuccess: async () => {
-      await utils.activities.invalidate();
-    },
-  });
-  const skipAct = api.activities.skip.useMutation({
-    onSuccess: async () => {
-      await utils.activities.invalidate();
-    },
-  });
-
-  const handleComplete = (id: string) => {
-    completeAct.mutate({ id });
-  };
-
-  const handleSkip = (id: string) => {
-    skipAct.mutate({ id });
-  };
 
   return (
     <div className="mx-auto my-4 flex w-full select-none flex-col overflow-hidden px-4 md:w-2/3 lg:w-1/3">
@@ -98,12 +77,7 @@ const TimelinePage = () => {
           ref={timelineAnimations}
           className="flex w-full flex-col gap-3">
           {events?.map((event) => (
-            <TimelineEventCard
-              key={event.id}
-              event={event}
-              handleComplete={handleComplete}
-              handleSkip={handleSkip}
-            />
+            <TimelineEventCard key={event.id} event={event} />
           ))}
         </div>
       )}
