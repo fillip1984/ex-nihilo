@@ -1,9 +1,8 @@
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useState } from "react";
-import { FaHourglassStart, FaSlidersH, FaSignOutAlt } from "react-icons/fa";
+import { FaHourglassStart, FaSignOutAlt } from "react-icons/fa";
 
 const Nav = () => {
   return (
@@ -20,17 +19,17 @@ const Nav = () => {
 };
 
 const AvatarAndMenu = () => {
-  const router = useRouter();
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
   const { data: sessionData } = useSession();
 
   const menuItems = [
     { label: "Sign out", icon: <FaSignOutAlt />, action: () => void signOut() },
-    {
-      label: "Preferences",
-      icon: <FaSlidersH />,
-      action: () => void router.push("/preferences"),
-    },
+    // TODO: finish preferences
+    // {
+    //   label: "Preferences",
+    //   icon: <FaSlidersH />,
+    //   action: () => void router.push("/preferences"),
+    // },
   ];
 
   const handleAvatarMenuToggle = () => {

@@ -15,8 +15,6 @@ const TimelinePage = () => {
   const utils = api.useContext();
 
   const [timelineAnimations] = useAutoAnimate();
-  const [fabAnimations] = useAutoAnimate();
-  const [fabOpen, setFabOpen] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const filterOptions = ["Available", "Complete", "Skipped", "All"];
@@ -80,7 +78,7 @@ const TimelinePage = () => {
       </div>
 
       <div className="mb-4 text-center">
-        <Filters
+        <FiltersBar
           filterOptions={filterOptions}
           filter={filter}
           setFilter={setFilter}
@@ -100,41 +98,12 @@ const TimelinePage = () => {
         ))}
       </div>
 
-      <div ref={fabAnimations}>
-        {/* href="/activitys/new" */}
-        {fabOpen && (
-          <div className="fixed bottom-0 left-1/2 right-0 top-2/3 z-[998]">
-            <div className="flex flex-col items-end gap-6 p-8 text-xl font-bold">
-              <Link
-                href="/routines"
-                className="rounded-lg bg-slate-200/20 p-2 backdrop-blur-sm md:left-3/4">
-                Manage Routines
-              </Link>
-              <Link
-                href="/topics"
-                className="rounded-lg bg-slate-200/20 p-2 backdrop-blur-sm md:left-3/4">
-                Manage Topics
-              </Link>
-            </div>
-          </div>
-        )}
-      </div>
-      <button
-        onClick={() => setFabOpen((prev) => !prev)}
-        className="fixed bottom-8 right-8 z-[999] flex h-16 w-16 items-center justify-center rounded-full bg-slate-300 text-4xl text-slate-800 transition-colors duration-300 ease-in-out hover:bg-slate-400">
-        <FaPlus />
-      </button>
-      <div
-        id="fab-backdrop"
-        onClick={() => setFabOpen((prev) => !prev)}
-        className={`absolute bottom-0 left-0 right-0 top-0 z-[997] ${
-          fabOpen ? "" : "hidden"
-        }`}></div>
+      <FabSection />
     </div>
   );
 };
 
-const Filters = ({
+const FiltersBar = ({
   filterOptions,
   filter,
   setFilter,
@@ -191,6 +160,54 @@ const Filters = ({
         </div>
       </div>
     </>
+  );
+};
+
+const FabSection = () => {
+  const [fabOpen, setFabOpen] = useState(false);
+  const fabOptions = [
+    {
+      href: "/routines",
+      label: "Manage Routines",
+    },
+    {
+      href: "/topics",
+      label: "Manage Topics",
+    },
+  ];
+
+  return (
+    <div>
+      <div className="relative">
+        <div className="fixed bottom-28 right-8 z-[998]">
+          <div className="flex flex-col items-end gap-6 text-xl font-bold">
+            {fabOptions.map((fabOption) => (
+              <Link
+                key={fabOption.label}
+                href={fabOption.href}
+                className={`rounded bg-slate-800 p-2 text-slate-200 transition duration-200 ease-in-out ${
+                  fabOpen ? "opacity-100" : "translate-y-3 opacity-0"
+                }`}>
+                {fabOption.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+      <button
+        onClick={() => setFabOpen((prev) => !prev)}
+        className={`fixed bottom-8 right-8 z-[999] flex h-16 w-16 items-center justify-center rounded-full bg-slate-300 text-4xl text-slate-800 transition duration-300 ease-in-out hover:bg-slate-400 ${
+          fabOpen ? "rotate-45" : ""
+        }`}>
+        <FaPlus />
+      </button>
+      <div
+        id="fab-backdrop"
+        onClick={() => setFabOpen((prev) => !prev)}
+        className={`absolute bottom-0 left-0 right-0 top-0 z-[997] bg-slate-200/30 backdrop-blur-sm ${
+          fabOpen ? "" : "hidden"
+        }`}></div>
+    </div>
   );
 };
 
