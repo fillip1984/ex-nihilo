@@ -80,7 +80,7 @@ const RoutineList = () => {
 
                 {routine.occurrenceType === "WEEKLY" && (
                   <div className="text-sm text-slate-400">
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 rounded border p-1">
                       {routine.weeklyDaysSelected.map((day) => (
                         <span
                           key={day.id}
