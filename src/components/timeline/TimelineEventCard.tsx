@@ -10,6 +10,7 @@ import {
 } from "react-icons/md";
 import { type TimelineEvent } from "~/types";
 import { api } from "~/utils/api";
+import { HH_mm_aka24hr } from "~/utils/date";
 
 const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
   const utils = api.useContext();
@@ -63,9 +64,9 @@ const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
           <b>{event.name}</b>
           <p className="flex items-center gap-2 text-sm text-gray-200">
             <FaRegClock />
-            {format(event.fromTime, "HH:mm")}
+            {format(event.fromTime, HH_mm_aka24hr)}
             {event.toTime && !isEqual(event.fromTime, event.toTime)
-              ? " - " + format(event.toTime, "HH:mm")
+              ? " - " + format(event.toTime, HH_mm_aka24hr)
               : ""}
           </p>
           <p className="flex items-center gap-2 text-sm text-gray-400">

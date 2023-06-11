@@ -1,6 +1,7 @@
 import { format, intervalToDuration, parseISO } from "date-fns";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { yyyyMMddHyphenated } from "~/utils/date";
 
 export type SunInfoResponse = {
   results: {
@@ -31,7 +32,7 @@ export const fetchSunInfo = async (date: Date) => {
   // TODO: hard coded lat and longitude would have to be fed in for other users
   const lat = 38.18519;
   const long = -85.55975;
-  const formattedDate = format(date, "yyyy-MM-dd");
+  const formattedDate = format(date, yyyyMMddHyphenated);
   const formatted = 0;
 
   // provided by: https://sunrise-sunset.org/api

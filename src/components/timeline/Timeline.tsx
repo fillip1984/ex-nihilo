@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { api } from "~/utils/api";
 import TimelineEventCard from "./TimelineEventCard";
+import { yyyyMMddHyphenated } from "~/utils/date";
 
 const TimelinePage = () => {
   const [timelineAnimations] = useAutoAnimate();
@@ -35,9 +36,11 @@ const TimelinePage = () => {
           <span className="text-slate-500"> activities for </span>
           <input
             type="date"
-            value={format(selectedDate, "yyyy-MM-dd")}
+            value={format(selectedDate, yyyyMMddHyphenated)}
             onChange={(e) =>
-              setSelectedDate(parse(e.target.value, "yyyy-MM-dd", new Date()))
+              setSelectedDate(
+                parse(e.target.value, yyyyMMddHyphenated, new Date())
+              )
             }
             className="w-auto rounded-none border-0 border-b-2 bg-slate-900 p-0 text-xl text-white"
           />

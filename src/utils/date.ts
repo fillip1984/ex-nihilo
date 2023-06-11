@@ -1,7 +1,8 @@
-import { getYear } from "date-fns";
+export const yyyyMMddHyphenated = "yyyy-MM-dd";
+export const HH_mm_aka24hr = "HH:mm";
 
 export const nextNewYears = (date: Date) => {
-  const nextNewYears = new Date(getYear(date) + 1, 0, 1);
+  const nextNewYears = new Date(date.getFullYear() + 1, 0, 1);
   return nextNewYears;
 };
 

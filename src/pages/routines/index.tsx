@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { BsBodyText, BsClock, BsRepeat } from "react-icons/bs";
 import { api } from "~/utils/api";
+import { HH_mm_aka24hr } from "~/utils/date";
 
 const RoutineList = () => {
   const router = useRouter();
@@ -67,8 +68,10 @@ const RoutineList = () => {
             </div>
             <div className="flex items-center gap-2">
               <BsClock className="text-2xl" />
-              {format(routine.fromTime, "HH:mm")}
-              {routine.toTime ? " - " + format(routine.toTime, "HH:mm") : ""}
+              {format(routine.fromTime, HH_mm_aka24hr)}
+              {routine.toTime
+                ? " - " + format(routine.toTime, HH_mm_aka24hr)
+                : ""}
             </div>
             {/* <p className="text-xs text-gray-300">{event.topic}</p> */}
             {/* // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}

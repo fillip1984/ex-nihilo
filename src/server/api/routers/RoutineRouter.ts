@@ -4,6 +4,7 @@ import { z } from "zod";
 import { routineFormSchema } from "~/types";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { createActivitiesFromRoutine } from "./ActivityRouter";
+import { HH_mm_aka24hr, yyyyMMddHyphenated } from "~/utils/date";
 
 export const RoutineRouter = createTRPCRouter({
   create: protectedProcedure
@@ -16,11 +17,15 @@ export const RoutineRouter = createTRPCRouter({
           name: input.routine.name,
           description: input.routine.description,
           occurrenceType: input.routine.occurrenceType,
-          startDate: parse(input.routine.startDate, "yyyy-MM-dd", new Date()),
-          fromTime: parse(input.routine.fromTime, "HH:mm", new Date()),
-          toTime: parse(input.routine.toTime, "HH:mm", new Date()),
+          startDate: parse(
+            input.routine.startDate,
+            yyyyMMddHyphenated,
+            new Date()
+          ),
+          fromTime: parse(input.routine.fromTime, HH_mm_aka24hr, new Date()),
+          toTime: parse(input.routine.toTime, HH_mm_aka24hr, new Date()),
           endDate: input.routine.endDate
-            ? parse(input.routine.endDate, "yyyy-MM-dd", new Date())
+            ? parse(input.routine.endDate, yyyyMMddHyphenated, new Date())
             : null,
           neverEnds: input.routine.neverEnds,
           dailyEveryValue: input.routine.dailyEveryValue,
