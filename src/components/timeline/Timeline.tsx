@@ -88,17 +88,19 @@ const Header = ({
           className="flex items-center">
           <FaChevronLeft />
         </button>
-        <input
-          type="date"
-          value={format(selectedDate, yyyyMMddHyphenated)}
-          onChange={(e) =>
-            setSelectedDate(
-              parse(e.target.value, yyyyMMddHyphenated, new Date())
-            )
-          }
-          className="w-auto rounded-none border-0 border-b-2 bg-slate-900 p-0 text-xl text-white"
-        />
-        <FaCalendarAlt />
+        <div className="input-appender relative">
+          <input
+            type="date"
+            value={format(selectedDate, yyyyMMddHyphenated)}
+            onChange={(e) =>
+              setSelectedDate(
+                parse(e.target.value, yyyyMMddHyphenated, new Date())
+              )
+            }
+            className="w-auto cursor-pointer rounded-none border-0 border-b-2 bg-slate-900 p-1 pr-10 text-xl text-white"
+          />
+          <FaCalendarAlt className="pointer-events-none absolute right-2 top-1" />
+        </div>
         <button
           onClick={() => setSelectedDate((prev) => addDays(prev, 1))}
           className="flex items-center">
