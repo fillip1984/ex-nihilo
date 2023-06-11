@@ -50,6 +50,7 @@ export const routineFormSchema = z.object({
 export type RoutineFormSchemaType = z.infer<typeof routineFormSchema>;
 
 export const topicFormSchema = z.object({
+  id: z.string().nullish(),
   name: z.string().min(1),
   description: z.string().min(1),
   icon: z.string().min(1),

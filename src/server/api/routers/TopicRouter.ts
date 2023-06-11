@@ -40,6 +40,25 @@ export const TopicRouter = createTRPCRouter({
 
       return topic;
     }),
+  update: protectedProcedure
+    .input(topicFormSchema)
+    .mutation(async ({ ctx, input }) => {
+      if (!input.id) {
+        throw new Error("unable to update topic without id");
+      }
+
+      const result = await ctx.prisma.topic.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+          description: input.description,
+          icon: input.icon,
+          color: input.color,
+        },
+      });
+
+      return result;
+    }),
   delete: protectedProcedure
     .input(z.object({ id: z.string().cuid() }))
     .mutation(async ({ ctx, input }) => {

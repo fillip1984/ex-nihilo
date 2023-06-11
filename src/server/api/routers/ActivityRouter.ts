@@ -1,14 +1,12 @@
 import { type DaySelector, type Routine } from "@prisma/client";
 import {
   addDays,
-  endOfDay,
   isAfter,
   isSameDay,
   isSunday,
   isWithinInterval,
   nextSunday,
   previousSunday,
-  startOfDay,
 } from "date-fns";
 import { z } from "zod";
 import { prisma } from "~/server/db";
@@ -61,19 +59,18 @@ const createDailyActivities = async (routine: Routine, userId: string) => {
   let start = routine.startDate;
   const end = routine.endDate ?? nextNewYears(new Date());
   while (!isSameDay(start, end) && !isAfter(start, end)) {
-    if (true) {
-      console.log(
-        `adding daily activity for routine: ${
-          routine.name
-        } on: ${start.toLocaleString()}`
-      );
-      activitiesToAdd.push({
-        routineId: routine.id,
-        start,
-        end: start,
-        userId,
-      });
-    }
+    console.log(
+      `adding daily activity for routine: ${
+        routine.name
+      } on: ${start.toLocaleString()}`
+    );
+    activitiesToAdd.push({
+      routineId: routine.id,
+      start,
+      end: start,
+      userId,
+    });
+
     start = addDays(start, routine.dailyEveryValue);
   }
 
@@ -120,8 +117,8 @@ const createWeeklyActivities = async (
 
     start = nextSunday(start);
   }
-  // chop off out of range ranges
 
+  // chop off out of range ranges
   datesToAdd = datesToAdd.filter((date) =>
     isWithinInterval(date, startEndInterval)
   );
@@ -178,66 +175,39 @@ export const ActivityRouter = createTRPCRouter({
         await createActivitiesFromRoutine(routine, ctx.session.user.id);
       }
     }),
-  readAll: protectedProcedure
-    .input(z.object({ date: z.date(), filter: z.string().nullish() }))
-    .query(async ({ ctx, input }) => {
-      const start = startOfDay(input.date);
-      const end = endOfDay(input.date);
+  // readAll: protectedProcedure
+  //   .input(z.object({ date: z.date(), filter: z.string().nullish() }))
+  //   .query(async ({ ctx, input }) => {
+  //     const start = startOfDay(input.date);
+  //     const end = endOfDay(input.date);
 
-      const userId = ctx.session.user.id;
+  //     const userId = ctx.session.user.id;
 
-      const result = ctx.prisma.activity.findMany({
-        where: {
-          userId,
-          start: {
-            gte: start,
-            lte: end,
-          },
-          ...(input.filter === "Available"
-            ? { skip: false, complete: false }
-            : {}),
-          ...(input.filter === "Complete" ? { complete: true } : {}),
-          ...(input.filter === "Skipped" ? { skip: true } : {}),
-          // wide open so not necessary ...(input.filter === "All" ? {} : {}),
-        },
-        include: {
-          routine: {
-            include: {
-              topic: true,
-            },
-          },
-        },
-      });
+  //     const result = ctx.prisma.activity.findMany({
+  //       where: {
+  //         userId,
+  //         start: {
+  //           gte: start,
+  //           lte: end,
+  //         },
+  //         ...(input.filter === "Available"
+  //           ? { skip: false, complete: false }
+  //           : {}),
+  //         ...(input.filter === "Complete" ? { complete: true } : {}),
+  //         ...(input.filter === "Skipped" ? { skip: true } : {}),
+  //         // wide open so not necessary ...(input.filter === "All" ? {} : {}),
+  //       },
+  //       include: {
+  //         routine: {
+  //           include: {
+  //             topic: true,
+  //           },
+  //         },
+  //       },
+  //     });
 
-      // TODO: need to finish this
-      // let sunrise;
-      // let sunset;
-      // const sunInfo = await fetchSunInfo(new Date());
-      // if (sunInfo) {
-      //   sunrise = {
-      //     id: createId(),
-      //     name: "Sunrise",
-      //     description: "Nature stuf",
-      //     occurrenceType: "DAILY",
-      //     fromTime: sunInfo.sunrise,
-      //     // color: "bg-yellow-300/60 text-yellow-200",
-      //     // icon: "<BsSunrise />",
-      //   };
-      // }
-      // if (sunInfo) {
-      //   sunset = {
-      //     id: createId(),
-      //     name: "Sunset",
-      //     description: "Nature stuf",
-      //     occurrenceType: "DAILY",
-      //     fromTime: sunInfo.sunset,
-      //     // color: "bg-blue-300/60 text-blue-200",
-      //     // icon: "<BsSunset />",
-      //   };
-      // }
-
-      return result;
-    }),
+  //     return result;
+  //   }),
   complete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {

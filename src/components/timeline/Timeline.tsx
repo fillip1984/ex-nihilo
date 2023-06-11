@@ -10,8 +10,8 @@ import {
   FaPlus,
 } from "react-icons/fa";
 import { api } from "~/utils/api";
-import TimelineEventCard from "./TimelineEventCard";
 import { yyyyMMddHyphenated } from "~/utils/date";
+import TimelineEventCard from "./TimelineEventCard";
 
 const TimelinePage = () => {
   const [timelineAnimations] = useAutoAnimate();
@@ -27,13 +27,21 @@ const TimelinePage = () => {
 
   return (
     <div className="mx-auto my-4 flex w-full select-none flex-col overflow-hidden px-4 md:w-2/3 lg:w-1/3">
-      <div className="my-4 text-center">
-        {/* {sessionData?.user.name && (
-          <h3 className="mt-4 font-bold">Hello {sessionData?.user.name}</h3>
-        )} */}
+      <div className="relative my-4 text-center">
         <h4 className="flex items-center justify-center gap-2">
           {events?.length}
-          <span className="text-slate-500"> activities for </span>
+          <span className="text-slate-500">
+            {" "}
+            activities for{" "}
+            <span className="text-white">{format(selectedDate, "EEEE")}</span>
+          </span>
+        </h4>
+        <div className="mt-4 flex items-center justify-center gap-4 text-2xl">
+          <button
+            onClick={() => setSelectedDate((prev) => addDays(prev, -1))}
+            className="flex items-center">
+            <FaChevronLeft />
+          </button>
           <input
             type="date"
             value={format(selectedDate, yyyyMMddHyphenated)}
@@ -45,13 +53,6 @@ const TimelinePage = () => {
             className="w-auto rounded-none border-0 border-b-2 bg-slate-900 p-0 text-xl text-white"
           />
           <FaCalendarAlt />
-        </h4>
-        <div className="mt-4 flex items-center justify-center gap-4 text-2xl">
-          <button
-            onClick={() => setSelectedDate((prev) => addDays(prev, -1))}
-            className="flex items-center">
-            <FaChevronLeft />
-          </button>
           <button
             onClick={() => setSelectedDate((prev) => addDays(prev, 1))}
             className="flex items-center">
