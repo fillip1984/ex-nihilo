@@ -15,6 +15,7 @@ import {
 import { routineFormSchema, type RoutineFormSchemaType } from "~/types";
 
 import { api } from "~/utils/api";
+import { months } from "~/utils/date";
 
 const NewRoutine = () => {
   const [occurrenceAnimation] = useAutoAnimate();
@@ -72,21 +73,6 @@ const NewRoutine = () => {
     };
     reset(newRoutine);
   }, [reset]);
-
-  const months = [
-    { name: "January", shortName: "Jan", number: 1 },
-    { name: "February", shortName: "Feb", number: 2 },
-    { name: "March", shortName: "Mar", number: 3 },
-    { name: "April", shortName: "Apr", number: 4 },
-    { name: "May", shortName: "May", number: 5 },
-    { name: "June", shortName: "June", number: 6 },
-    { name: "July", shortName: "July", number: 7 },
-    { name: "August", shortName: "Aug", number: 8 },
-    { name: "September", shortName: "Sept", number: 9 },
-    { name: "October", shortName: "Oct", number: 10 },
-    { name: "November", shortName: "Nov", number: 11 },
-    { name: "December", shortName: "Dec", number: 12 },
-  ];
 
   const occurrenceTypeWatch = useWatch({
     control,
