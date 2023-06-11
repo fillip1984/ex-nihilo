@@ -28,6 +28,11 @@ export const TopicRouter = createTRPCRouter({
       orderBy: {
         name: "asc",
       },
+      include: {
+        _count: {
+          select: { routines: true },
+        },
+      },
     });
     return result;
   }),

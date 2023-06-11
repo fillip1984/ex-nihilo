@@ -83,7 +83,7 @@ const TopicPage = () => {
         </div>
         <div className="grid grid-cols-5 items-center gap-2 space-y-1 px-2">
           <label>Icon</label>
-          <select className="col-span-2 col-start-4" {...register("icon")}>
+          <select className="col-span-3 col-start-3" {...register("icon")}>
             <option value=""></option>
             {icons.map((icon) => (
               <option key={icon.label} value={icon.value}>
