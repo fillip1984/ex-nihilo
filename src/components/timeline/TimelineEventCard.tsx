@@ -11,7 +11,6 @@ import {
 import { type TimelineEvent } from "~/types";
 import { api } from "~/utils/api";
 import { HH_mm_aka24hr } from "~/utils/date";
-
 const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
   const utils = api.useContext();
 
@@ -31,28 +30,29 @@ const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
         return <GiPerspectiveDiceSixFacesRandom />;
     }
   };
-
-  const completeAct = api.activities.complete.useMutation({
-    onSuccess: async () => {
-      await utils.timeline.invalidate();
-      await utils.activities.invalidate();
-    },
-  });
-  const skipAct = api.activities.skip.useMutation({
-    onSuccess: async () => {
-      await utils.timeline.invalidate();
-      await utils.activities.invalidate();
-    },
-  });
+  const { mutate: completeAct, isLoading: isCompleting } =
+    api.activities.complete.useMutation({
+      onSuccess: async () => {
+        await utils.timeline.invalidate();
+        await utils.activities.invalidate();
+      },
+    });
+  const { mutate: skipAct, isLoading: isSkipping } =
+    api.activities.skip.useMutation({
+      onSuccess: async () => {
+        await utils.timeline.invalidate();
+        await utils.activities.invalidate();
+      },
+    });
+  const isMutating = isCompleting || isSkipping;
 
   const handleComplete = (id: string) => {
-    completeAct.mutate({ id });
+    completeAct({ id });
   };
 
   const handleSkip = (id: string) => {
-    skipAct.mutate({ id });
+    skipAct({ id });
   };
-
   return (
     <div className="flex flex-col">
       <div className="flex items-center gap-3 rounded-t-lg bg-white/10 p-2 transition duration-300 ease-in-out hover:bg-white/20">
@@ -89,8 +89,8 @@ const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
                 ? "border-b-lg hidden"
                 : "rounded-bl-lg border-r-2 border-r-slate-500 py-1"
             } `}
-            disabled={event.complete || event.skip}>
-            <MdCheck />
+            disabled={event.complete || event.skip || isMutating}>
+            <MdCheck className={`${isCompleting ? "animate-pulse" : ""}`} />
             {event.completedAt && (
               <span className="text-sm">
                 Completed:{" "}
@@ -107,8 +107,10 @@ const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
             className={`flex flex-1 items-center justify-center gap-2 py-1 text-red-400 transition-colors duration-300 hover:text-red-500 ${
               event.complete ? "border-b-lg hidden" : "rounded-br-lg"
             }`}
-            disabled={event.complete || event.skip}>
-            <MdNotInterested />
+            disabled={event.complete || event.skip || isMutating}>
+            <MdNotInterested
+              className={`${isSkipping ? "animate-pulse" : ""}`}
+            />
             {event.skip && (
               <span className="text-sm">
                 Skipped:{" "}
