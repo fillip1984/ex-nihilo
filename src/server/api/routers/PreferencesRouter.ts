@@ -2,14 +2,21 @@ import { preferencesFormSchema } from "~/types";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const PreferencesRouter = createTRPCRouter({
-  create: protectedProcedure
+  save: protectedProcedure
     .input(preferencesFormSchema)
     .mutation(async ({ ctx, input }) => {
-      const result = await ctx.prisma.preferences.create({
-        data: {
+      const result = await ctx.prisma.preferences.upsert({
+        where: {
+          userId: ctx.session.user.id,
+        },
+        update: {
           longitude: input.longitude,
           latitude: input.latitude,
+        },
+        create: {
           userId: ctx.session.user.id,
+          longitude: input.longitude,
+          latitude: input.latitude,
         },
       });
       return result;
@@ -23,19 +30,4 @@ export const PreferencesRouter = createTRPCRouter({
 
     return preferences;
   }),
-  update: protectedProcedure
-    .input(preferencesFormSchema)
-    .mutation(async ({ ctx, input }) => {
-      const result = await ctx.prisma.preferences.update({
-        where: {
-          userId: ctx.session.user.id,
-        },
-        data: {
-          longitude: input.longitude,
-          latitude: input.latitude,
-        },
-      });
-
-      return result;
-    }),
 });

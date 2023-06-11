@@ -1,18 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import { BsGeoAlt } from "react-icons/bs";
 import { preferencesFormSchema, type PreferencesFormSchemaType } from "~/types";
 import { api } from "~/utils/api";
 
 const Preferences = () => {
+  // read data stuff
   const { data: preferences } = api.preferences.read.useQuery();
-
-  const { register, reset, setValue } = useForm<PreferencesFormSchemaType>({
-    resolver: zodResolver(preferencesFormSchema),
-  });
-
+  const { register, reset, setValue, handleSubmit } =
+    useForm<PreferencesFormSchemaType>({
+      resolver: zodResolver(preferencesFormSchema),
+    });
   useEffect(() => {
     if (preferences) {
       reset({
@@ -22,11 +22,22 @@ const Preferences = () => {
     }
   }, [preferences, reset]);
 
+  // change/mutate stuff
+  const utils = api.useContext();
+  const savePreferences = api.preferences.save.useMutation({
+    onSuccess: async () => {
+      await utils.preferences.invalidate();
+      await utils.activities.invalidate();
+    },
+  });
+  const onSubmit: SubmitHandler<PreferencesFormSchemaType> = (formData) => {
+    savePreferences.mutate({ ...formData });
+  };
+
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) {
       console.error("Your browser does not support geolocation");
     }
-    // const { currentLong, currentLat } = position.coords;
     navigator.geolocation.getCurrentPosition(
       (position: GeolocationPosition) => {
         console.log(`Success! Accuracy: ${position.coords.accuracy}`);
@@ -44,7 +55,10 @@ const Preferences = () => {
       <div className="py-4">
         <h3 className="text-center uppercase">User Preferences</h3>
       </div>
-      <form>
+      <form
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate>
         <div className="form-card rounded-lg bg-slate-300 p-2 text-slate-700">
           <div className="form-card-title flex items-center gap-2 py-2 text-2xl">
             <BsGeoAlt />
