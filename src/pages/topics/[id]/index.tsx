@@ -16,7 +16,7 @@ const TopicPage = () => {
     {
       id: id as string,
     },
-    { enabled: !!id }
+    { enabled: !!id, refetchOnWindowFocus: false }
   );
   const { register, reset, handleSubmit } = useForm<TopicFormSchemaType>({
     resolver: zodResolver(topicFormSchema),

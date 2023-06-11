@@ -87,6 +87,8 @@ export const RoutineRouter = createTRPCRouter({
         userId,
       },
       include: {
+        weeklyDaysSelected: true,
+        monthlyDaysSelected: true,
         _count: {
           select: { activities: true },
         },
