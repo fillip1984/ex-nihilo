@@ -82,19 +82,19 @@ const Preferences = () => {
                 })}
                 className="col-span-2"
               />
-              <div className="form-card-field-set grid grid-cols-3 items-center">
-                <label htmlFor="longitude">Longitude</label>
-                <input
-                  type="number"
-                  step={0.01}
-                  id="longitude"
-                  placeholder="Longitude formatted like -85.7585"
-                  {...register("longitude", {
-                    valueAsNumber: true,
-                  })}
-                  className="col-span-2"
-                />
-              </div>
+            </div>
+            <div className="form-card-field-set grid grid-cols-3 items-center">
+              <label htmlFor="longitude">Longitude</label>
+              <input
+                type="number"
+                step={0.01}
+                id="longitude"
+                placeholder="Longitude formatted like -85.7585"
+                {...register("longitude", {
+                  valueAsNumber: true,
+                })}
+                className="col-span-2"
+              />
             </div>
           </div>
           <div className="flex justify-center py-2">
