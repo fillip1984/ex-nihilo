@@ -1,6 +1,13 @@
 import { type Activity, OccurrenceType } from "@prisma/client";
 import { z } from "zod";
 
+export const preferencesFormSchema = z.object({
+  longitude: z.number(),
+  latitude: z.number(),
+});
+
+export type PreferencesFormSchemaType = z.infer<typeof preferencesFormSchema>;
+
 export const routineFormSchema = z.object({
   routine: z
     .object({
