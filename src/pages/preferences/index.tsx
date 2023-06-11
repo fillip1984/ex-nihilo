@@ -8,7 +8,9 @@ import { api } from "~/utils/api";
 
 const Preferences = () => {
   // read data stuff
-  const { data: preferences } = api.preferences.read.useQuery();
+  const { data: preferences } = api.preferences.read.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
   const { register, reset, setValue, handleSubmit } =
     useForm<PreferencesFormSchemaType>({
       resolver: zodResolver(preferencesFormSchema),
