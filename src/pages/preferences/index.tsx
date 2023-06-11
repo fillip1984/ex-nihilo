@@ -105,6 +105,16 @@ const Preferences = () => {
               Use my current location
             </button>
           </div>
+          <div className="text-center">
+            <b>Want to somewhat preserve your privacy?</b>
+            <p>Provide only 2 numbers past the decimal</p>
+            <a
+              target="_blank"
+              href="https://en.wikipedia.org/wiki/Decimal_degrees#Precision"
+              className="underline">
+              Explanation
+            </a>
+          </div>
         </div>
 
         <div className="form-fixed-button-group fixed bottom-0 left-0 right-0 z-50 flex h-16 border-t-4 border-t-white bg-slate-800">
