@@ -24,11 +24,11 @@ export const TimelineRouter = createTRPCRouter({
       });
 
       if (input.filter === "Available" || input.filter === "All") {
-        if (preferences?.longitude && preferences.latitude) {
+        if (preferences?.latitude && preferences?.longitude) {
           const { sunrise, sunset } = await buildSunInfo(
             input.date,
-            preferences.longitude,
-            preferences.latitude
+            preferences.latitude,
+            preferences.longitude
           );
           if (sunrise && sunset) {
             events.unshift(sunrise);
@@ -99,12 +99,12 @@ const buildActivityInfo = async (
 
 const buildSunInfo = async (
   date: Date,
-  longitude: number,
-  latitude: number
+  latitude: number,
+  longitude: number
 ) => {
   let sunrise: TimelineEvent | null = null;
   let sunset: TimelineEvent | null = null;
-  const sunInfo = await fetchSunInfo(date, longitude, latitude);
+  const sunInfo = await fetchSunInfo(date, latitude, longitude);
   if (sunInfo) {
     sunrise = {
       type: "Suninfo",

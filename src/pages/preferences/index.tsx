@@ -18,8 +18,8 @@ const Preferences = () => {
   useEffect(() => {
     if (preferences) {
       reset({
-        longitude: preferences.longitude,
         latitude: preferences.latitude,
+        longitude: preferences.longitude,
       });
     }
   }, [preferences, reset]);
@@ -43,8 +43,8 @@ const Preferences = () => {
     navigator.geolocation.getCurrentPosition(
       (position: GeolocationPosition) => {
         console.log(`Success! Accuracy: ${position.coords.accuracy}`);
-        setValue("longitude", position.coords.longitude);
         setValue("latitude", position.coords.latitude);
+        setValue("longitude", position.coords.longitude);
       },
       () => {
         console.error("Failed!?");
@@ -71,19 +71,6 @@ const Preferences = () => {
               Your location is used to fetch info such as sunrise/sunset info
             </p>
             <div className="form-card-field-set grid grid-cols-3 items-center">
-              <label htmlFor="longitude">Longitude</label>
-              <input
-                type="number"
-                step={0.01}
-                id="longitude"
-                placeholder="Longitude formatted like -85.7585"
-                {...register("longitude", {
-                  valueAsNumber: true,
-                })}
-                className="col-span-2"
-              />
-            </div>
-            <div className="form-card-field-set grid grid-cols-3 items-center">
               <label htmlFor="latitude">Latitude</label>
               <input
                 type="number"
@@ -95,6 +82,19 @@ const Preferences = () => {
                 })}
                 className="col-span-2"
               />
+              <div className="form-card-field-set grid grid-cols-3 items-center">
+                <label htmlFor="longitude">Longitude</label>
+                <input
+                  type="number"
+                  step={0.01}
+                  id="longitude"
+                  placeholder="Longitude formatted like -85.7585"
+                  {...register("longitude", {
+                    valueAsNumber: true,
+                  })}
+                  className="col-span-2"
+                />
+              </div>
             </div>
           </div>
           <div className="flex justify-center py-2">

@@ -29,8 +29,8 @@ export type SunInfo = {
 // TODO: externalized this so that we could call it from TimelineRouter as well...not sure if there's a way to call a router from another router?
 export const fetchSunInfo = async (
   date: Date,
-  longitude: number,
-  latitude: number
+  latitude: number,
+  longitude: number
 ) => {
   prisma.preferences;
   console.log("fetching sun info");
@@ -80,8 +80,8 @@ export const SunInfoRouter = createTRPCRouter({
       if (preferences) {
         const sunInfo = await fetchSunInfo(
           input.date,
-          preferences.longitude,
-          preferences.latitude
+          preferences.latitude,
+          preferences.longitude
         );
         return sunInfo;
       }

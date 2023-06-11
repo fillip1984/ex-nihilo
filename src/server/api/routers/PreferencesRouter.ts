@@ -10,13 +10,13 @@ export const PreferencesRouter = createTRPCRouter({
           userId: ctx.session.user.id,
         },
         update: {
-          longitude: input.longitude,
           latitude: input.latitude,
+          longitude: input.longitude,
         },
         create: {
           userId: ctx.session.user.id,
-          longitude: input.longitude,
           latitude: input.latitude,
+          longitude: input.longitude,
         },
       });
       return result;
