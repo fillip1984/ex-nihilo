@@ -27,39 +27,11 @@ const TimelinePage = () => {
 
   return (
     <div className="mx-auto my-4 flex w-full select-none flex-col overflow-hidden px-4 md:w-2/3 lg:w-1/3">
-      <div className="relative my-4 text-center">
-        <h4 className="flex items-center justify-center gap-2">
-          {events?.length}
-          <span className="text-slate-500">
-            {" "}
-            activities for{" "}
-            <span className="text-white">{format(selectedDate, "EEEE")}</span>
-          </span>
-        </h4>
-        <div className="mt-4 flex items-center justify-center gap-4 text-2xl">
-          <button
-            onClick={() => setSelectedDate((prev) => addDays(prev, -1))}
-            className="flex items-center">
-            <FaChevronLeft />
-          </button>
-          <input
-            type="date"
-            value={format(selectedDate, yyyyMMddHyphenated)}
-            onChange={(e) =>
-              setSelectedDate(
-                parse(e.target.value, yyyyMMddHyphenated, new Date())
-              )
-            }
-            className="w-auto rounded-none border-0 border-b-2 bg-slate-900 p-0 text-xl text-white"
-          />
-          <FaCalendarAlt />
-          <button
-            onClick={() => setSelectedDate((prev) => addDays(prev, 1))}
-            className="flex items-center">
-            <FaChevronRight />
-          </button>
-        </div>
-      </div>
+      <Header
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        eventCount={events?.length}
+      />
 
       <div className="mb-4 text-center">
         <FiltersBar
@@ -87,6 +59,52 @@ const TimelinePage = () => {
       )}
 
       <FabSection />
+    </div>
+  );
+};
+
+const Header = ({
+  selectedDate,
+  setSelectedDate,
+  eventCount,
+}: {
+  selectedDate: Date;
+  setSelectedDate: Dispatch<SetStateAction<Date>>;
+  eventCount: number | undefined;
+}) => {
+  return (
+    <div className="relative my-4 text-center">
+      <h4 className="flex items-center justify-center gap-2">
+        {eventCount ?? ""}
+        <span className="text-slate-500">
+          {" "}
+          activities for{" "}
+          <span className="text-white">{format(selectedDate, "EEEE")}</span>
+        </span>
+      </h4>
+      <div className="mt-4 flex items-center justify-center gap-4 text-2xl">
+        <button
+          onClick={() => setSelectedDate((prev) => addDays(prev, -1))}
+          className="flex items-center">
+          <FaChevronLeft />
+        </button>
+        <input
+          type="date"
+          value={format(selectedDate, yyyyMMddHyphenated)}
+          onChange={(e) =>
+            setSelectedDate(
+              parse(e.target.value, yyyyMMddHyphenated, new Date())
+            )
+          }
+          className="w-auto rounded-none border-0 border-b-2 bg-slate-900 p-0 text-xl text-white"
+        />
+        <FaCalendarAlt />
+        <button
+          onClick={() => setSelectedDate((prev) => addDays(prev, 1))}
+          className="flex items-center">
+          <FaChevronRight />
+        </button>
+      </div>
     </div>
   );
 };

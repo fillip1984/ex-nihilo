@@ -53,9 +53,9 @@ const Preferences = () => {
   };
 
   return (
-    <div className="form-container mx-auto w-full md:w-2/3 lg:w-1/2 xl:w-1/3">
+    <div className="form-container mx-auto w-full px-4 md:w-2/3 lg:w-1/2 xl:w-1/3">
       <div className="py-4">
-        <h3 className="text-center uppercase">User Preferences</h3>
+        <h2>User Preferences</h2>
       </div>
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
