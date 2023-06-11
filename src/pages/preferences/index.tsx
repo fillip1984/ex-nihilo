@@ -14,11 +14,13 @@ const Preferences = () => {
   });
 
   useEffect(() => {
-    reset({
-      longitude: preferences?.longitude,
-      latitude: preferences?.latitude,
-    });
-  }, [reset]);
+    if (preferences) {
+      reset({
+        longitude: preferences.longitude,
+        latitude: preferences.latitude,
+      });
+    }
+  }, [preferences, reset]);
 
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) {

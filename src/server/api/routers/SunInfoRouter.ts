@@ -1,6 +1,7 @@
 import { format, intervalToDuration, parseISO } from "date-fns";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { prisma } from "~/server/db";
 import { yyyyMMddHyphenated } from "~/utils/date";
 
 export type SunInfoResponse = {
@@ -26,19 +27,21 @@ export type SunInfo = {
 };
 
 // TODO: externalized this so that we could call it from TimelineRouter as well...not sure if there's a way to call a router from another router?
-export const fetchSunInfo = async (date: Date) => {
+export const fetchSunInfo = async (
+  date: Date,
+  longitude: number,
+  latitude: number
+) => {
+  prisma.preferences;
   console.log("fetching sun info");
 
-  // TODO: hard coded lat and longitude would have to be fed in for other users
-  const lat = 38.18519;
-  const long = -85.55975;
   const formattedDate = format(date, yyyyMMddHyphenated);
   const formatted = 0;
 
   // provided by: https://sunrise-sunset.org/api
   // changing formatted to 1 changes response values!
   const sunInfoResponse = await fetch(
-    `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${long}&date=${formattedDate}&formatted=${formatted}`
+    `https://api.sunrise-sunset.org/json?lat=${latitude}&lng=${longitude}&date=${formattedDate}&formatted=${formatted}`
   );
 
   if (!sunInfoResponse.ok) {
@@ -70,8 +73,19 @@ export const fetchSunInfo = async (date: Date) => {
 export const SunInfoRouter = createTRPCRouter({
   read: protectedProcedure
     .input(z.object({ date: z.date() }))
-    .query(async ({ input }) => {
-      const sunInfo = await fetchSunInfo(input.date);
-      return sunInfo;
+    .query(async ({ ctx, input }) => {
+      const preferences = await ctx.prisma.preferences.findUnique({
+        where: { userId: ctx.session.user.id },
+      });
+      if (preferences) {
+        const sunInfo = await fetchSunInfo(
+          input.date,
+          preferences.longitude,
+          preferences.latitude
+        );
+        return sunInfo;
+      }
+
+      return null;
     }),
 });

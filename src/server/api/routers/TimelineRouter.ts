@@ -9,7 +9,7 @@ import { fetchSunInfo } from "./SunInfoRouter";
 export const TimelineRouter = createTRPCRouter({
   buildAgenda: protectedProcedure
     .input(z.object({ date: z.date(), filter: z.string().nullish() }))
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       // fold in the cheese
       let events: TimelineEvent[] = [];
 
@@ -19,11 +19,21 @@ export const TimelineRouter = createTRPCRouter({
         events = events.concat(activities);
       }
 
+      const preferences = await ctx.prisma.preferences.findUnique({
+        where: { userId: ctx.session.user.id },
+      });
+
       if (input.filter === "Available" || input.filter === "All") {
-        const { sunrise, sunset } = await buildSunInfo(input.date);
-        if (sunrise && sunset) {
-          events.unshift(sunrise);
-          events.push(sunset);
+        if (preferences?.longitude && preferences.latitude) {
+          const { sunrise, sunset } = await buildSunInfo(
+            input.date,
+            preferences.longitude,
+            preferences.latitude
+          );
+          if (sunrise && sunset) {
+            events.unshift(sunrise);
+            events.push(sunset);
+          }
         }
       }
 
@@ -87,10 +97,14 @@ const buildActivityInfo = async (
   return activitiesAsTLEvents;
 };
 
-const buildSunInfo = async (date: Date) => {
+const buildSunInfo = async (
+  date: Date,
+  longitude: number,
+  latitude: number
+) => {
   let sunrise: TimelineEvent | null = null;
   let sunset: TimelineEvent | null = null;
-  const sunInfo = await fetchSunInfo(date);
+  const sunInfo = await fetchSunInfo(date, longitude, latitude);
   if (sunInfo) {
     sunrise = {
       type: "Suninfo",
