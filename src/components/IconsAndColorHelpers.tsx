@@ -82,7 +82,7 @@ export const IconSearchModal = ({
   };
   return (
     <div className="modal-and-backdrop-container fixed inset-0">
-      <div className="modal w-full sm:w-auto inset-20 z-[999] rounded-lg bg-slate-900 p-2 text-white">
+      <div className="modal fixed inset-20 z-[999] rounded-lg bg-slate-900 p-2 text-white">
         <input
           type="search"
           value={iconSearch}
@@ -130,7 +130,7 @@ export const ColorSearchModal = ({
   };
   return (
     <div className="modal-and-backdrop-container fixed inset-0">
-      <div className="modal w-full sm:w-auto fixed inset-20 z-[999] rounded-lg bg-slate-900 p-2 text-white">
+      <div className="modal fixed inset-20 z-[999] rounded-lg bg-slate-900 p-2 text-white">
         <input
           type="search"
           value={colorSearch}
