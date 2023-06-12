@@ -105,9 +105,11 @@ const NewTopic = () => {
             <label>Color</label>
             <button
               onClick={handleColorSearch}
-              className={`col-span-2 col-start-4 flex items-center justify-center rounded border border-black bg-white p-4 ${retrieveColor(
+              className={`col-span-2 col-start-4 flex items-center justify-center rounded border border-black p-4 ${
                 selectedColor
-              )}`}>
+                  ? retrieveColor(selectedColor)
+                  : "bg-white text-black"
+              }`}>
               {selectedColor ? (
                 <b className="text-white">{selectedColor}</b>
               ) : (
