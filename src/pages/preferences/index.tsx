@@ -1,12 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { type SubmitHandler, useForm } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { BsGeoAlt } from "react-icons/bs";
 import { preferencesFormSchema, type PreferencesFormSchemaType } from "~/types";
 import { api } from "~/utils/api";
 
 const Preferences = () => {
+  const router = useRouter();
+
   // read data stuff
   const { data: preferences } = api.preferences.read.useQuery(undefined, {
     refetchOnWindowFocus: false,
@@ -52,10 +55,22 @@ const Preferences = () => {
     );
   };
 
+  const handleRebuildActivities = () => {
+    console.log("rebuilding activities");
+    createActivities.mutate();
+  };
+
+  const createActivities = api.activities.rebuild.useMutation({
+    onSuccess: async () => {
+      await utils.activities.invalidate();
+      void router.push("/");
+    },
+  });
+
   return (
-    <div className="form-container mx-auto w-full px-4 md:w-2/3 lg:w-1/2 xl:w-1/3">
+    <div className="form-container mx-auto flex w-full flex-col gap-2 px-4 md:w-2/3 lg:w-1/2 xl:w-1/3">
       <div className="py-4">
-        <h2>User Preferences</h2>
+        <h2>Preferences</h2>
       </div>
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -130,6 +145,23 @@ const Preferences = () => {
           </button>
         </div>
       </form>
+
+      <div className="form-card rounded-lg bg-slate-300 p-2 text-slate-700">
+        <div className="border-slate-400 p-2">
+          <p>
+            Rebuild activies deletes and then recreates activities which feed
+            your timeline.
+          </p>
+          <p>
+            <b>ALL ACTIVITY HISTORY WILL BE LOST!</b>
+          </p>
+          <button
+            onClick={handleRebuildActivities}
+            className="my-2 rounded bg-red-600 px-4 py-2 font-bold text-white">
+            Rebuild Activities
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

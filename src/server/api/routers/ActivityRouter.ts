@@ -149,32 +149,23 @@ const deleteActivitiesForRoutine = async (routine: Routine) => {
 };
 
 export const ActivityRouter = createTRPCRouter({
-  create: protectedProcedure
-    .input(
-      z.object({
-        routineIds: z.array(z.string()),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
-      const routines = await ctx.prisma.routine.findMany({
-        where: {
-          id: {
-            in: input.routineIds,
-          },
-          userId,
-        },
-        include: {
-          weeklyDaysSelected: true,
-        },
-      });
+  rebuild: protectedProcedure.mutation(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+    const routines = await ctx.prisma.routine.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        weeklyDaysSelected: true,
+      },
+    });
 
-      //clean out previous, build new
-      for (const routine of routines) {
-        await deleteActivitiesForRoutine(routine);
-        await createActivitiesFromRoutine(routine, ctx.session.user.id);
-      }
-    }),
+    //clean out previous, build new
+    for (const routine of routines) {
+      await deleteActivitiesForRoutine(routine);
+      await createActivitiesFromRoutine(routine, ctx.session.user.id);
+    }
+  }),
   // readAll: protectedProcedure
   //   .input(z.object({ date: z.date(), filter: z.string().nullish() }))
   //   .query(async ({ ctx, input }) => {

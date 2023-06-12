@@ -1,35 +1,16 @@
 import { format, isEqual } from "date-fns";
 import { BiCategory } from "react-icons/bi";
-import { BsBodyText, BsSunrise, BsSunset } from "react-icons/bs";
-import { FaBed, FaRegClock, FaRunning } from "react-icons/fa";
-import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
-import {
-  MdCheck,
-  MdNotInterested,
-  MdOutlineCleaningServices,
-} from "react-icons/md";
+import { BsBodyText } from "react-icons/bs";
+import { FaRegClock } from "react-icons/fa";
+import { MdCheck, MdNotInterested } from "react-icons/md";
+
 import { type TimelineEvent } from "~/types";
 import { api } from "~/utils/api";
 import { HH_mm_aka24hr } from "~/utils/date";
+import { retrieveColor, retrieveIcon } from "../IconsAndColorHelpers";
 const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
   const utils = api.useContext();
 
-  const selectIcon = (iconName: string) => {
-    switch (iconName) {
-      case "FaBed":
-        return <FaBed />;
-      case "FaRunning":
-        return <FaRunning />;
-      case "BsSunrise":
-        return <BsSunrise />;
-      case "BsSunset":
-        return <BsSunset />;
-      case "MdOutlineCleaningServices":
-        return <MdOutlineCleaningServices />;
-      default:
-        return <GiPerspectiveDiceSixFacesRandom />;
-    }
-  };
   const { mutate: completeAct, isLoading: isCompleting } =
     api.activities.complete.useMutation({
       onSuccess: async () => {
@@ -57,8 +38,10 @@ const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
     <div className="flex flex-col">
       <div className="flex items-center gap-3 rounded-t-lg bg-white/10 p-2 transition duration-300 ease-in-out hover:bg-white/20">
         <span
-          className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl ${event.color}`}>
-          {selectIcon(event.icon)}
+          className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl ${retrieveColor(
+            event.color
+          )}`}>
+          {retrieveIcon(event.icon)}
         </span>
         <div className="flex flex-col">
           <b>{event.name}</b>
