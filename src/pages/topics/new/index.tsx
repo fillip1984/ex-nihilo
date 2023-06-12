@@ -85,6 +85,7 @@ const NewTopic = () => {
           <div className="grid grid-cols-5 items-center gap-2 space-y-1 px-2">
             <label>Icon</label>
             <button
+              type="button"
               onClick={handleIconSearch}
               className="col-span-2 col-start-4 flex items-center justify-center rounded border border-black bg-white p-4">
               {selectedIcon ? retrieveIcon(selectedIcon) : <FaSearch />}
@@ -104,6 +105,7 @@ const NewTopic = () => {
           <div className="grid grid-cols-5 items-center gap-2 space-y-1 px-2">
             <label>Color</label>
             <button
+              type="button"
               onClick={handleColorSearch}
               className={`col-span-2 col-start-4 flex items-center justify-center rounded border border-black p-4 ${
                 selectedColor
