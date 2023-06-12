@@ -90,7 +90,7 @@ export const IconSearchModal = ({
           placeholder="search for icons"
           className=""
         />
-        <div className="flex flex-wrap justify-center gap-2 overflow-scroll p-4">
+        <div className="flex flex-wrap justify-center gap-2 overflow-scroll h-[90vh] p-4">
           {iconOptions
             .filter((iconOption) =>
               iconOption.name.toLowerCase().includes(iconSearch.toLowerCase())
