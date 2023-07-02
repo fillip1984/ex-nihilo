@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { BsGeoAlt } from "react-icons/bs";
+import { BsGeoAlt, BsRepeat } from "react-icons/bs";
 import { preferencesFormSchema, type PreferencesFormSchemaType } from "~/types";
 import { api } from "~/utils/api";
 
@@ -147,10 +147,15 @@ const Preferences = () => {
       </form>
 
       <div className="form-card rounded-lg bg-slate-300 p-2 text-slate-700">
-        <div className="border-slate-400 p-2">
+        <div className="form-card-title flex items-center gap-2 py-2 text-2xl">
+          <BsRepeat />
+          <span className="uppercase">Routines and Topics</span>
+        </div>
+        Coming soon...
+        {/* <div className="border-slate-400 p-2">
           <p>
-            Rebuild activies deletes and then recreates activities which feed
-            your timeline.
+            Rebuild activies -&gt; deletes and then recreates activities which
+            feed your timeline.
           </p>
           <p>
             <b>ALL ACTIVITY HISTORY WILL BE LOST!</b>
@@ -159,8 +164,8 @@ const Preferences = () => {
             onClick={handleRebuildActivities}
             className="my-2 rounded bg-red-600 px-4 py-2 font-bold text-white">
             Rebuild Activities
-          </button>
-        </div>
+          </button> 
+        </div>*/}
       </div>
     </div>
   );
