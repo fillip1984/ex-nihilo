@@ -26,7 +26,7 @@ const TimelinePage = () => {
   });
 
   return (
-    <div className="mx-auto my-4 flex w-full select-none flex-col overflow-hidden px-4 md:w-2/3 lg:w-1/3">
+    <div className="mx-auto my-4 flex w-full select-none flex-col overflow-hidden px-4 md:w-3/4 lg:w-2/3 xl:w-1/2">
       <Header
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
