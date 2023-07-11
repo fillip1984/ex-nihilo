@@ -25,17 +25,43 @@ const SignedInView = () => {
 
 const NotSignedInView = () => {
   return (
-    <div className="flex h-screen flex-col items-center justify-center gap-8">
-      <h3>
-        Please{" "}
+    <div className="flex h-screen flex-col items-center pt-8">
+      <div className="mb-8 flex items-center justify-center">
+        <h2>ex nihilo</h2>
+        <FaHourglassStart className="h-24 w-24" />
+      </div>
+
+      <div className="flex flex-col items-center gap-4 rounded-lg border-2 border-white/40 px-8 py-4">
+        <h3 className="mb-2">Please sign in</h3>
+
         <button
-          className="rounded-full bg-white/10 px-4 py-2 font-semibold text-white no-underline transition hover:bg-white/20"
-          onClick={() => void signIn()}>
-          Sign in
+          type="button"
+          onClick={() => void signIn("github")}
+          className="flex w-full items-center gap-4 rounded border-gray-300 bg-white p-3 font-medium text-black">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="images/github-mark.png"
+            alt="Google logo"
+            className="h-8 w-8"
+          />
+          Sign in with GitHub
         </button>
-      </h3>
-      <FaHourglassStart className="h-32 w-32" />
-      <h2>ex nihilo</h2>
+
+        <button
+          type="button"
+          onClick={() =>
+            void signIn("google", { callbackUrl: "http://localhost:3000" })
+          }
+          className="flex w-full items-center gap-4 rounded border-gray-300 bg-white p-3 font-medium text-black">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="images/google_G.png"
+            alt="Google logo"
+            className="h-8 w-8"
+          />
+          Sign in with google
+        </button>
+      </div>
     </div>
   );
 };

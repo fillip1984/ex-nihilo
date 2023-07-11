@@ -11,6 +11,20 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+// Necessary for Next auth (controls whether someone is let it even if they authenticate with a provider)
+model Invitee {
+    id                String   @id @default(cuid())
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
+    email             String
+    userId            String
+    providerName      String
+    providerAccountId String
+    enabled           Boolean  @default(false)
+
+    @@unique([email, userId, providerName, providerAccountId])
+}
+
 // Necessary for Next auth
 model Account {
     id                       String  @id @default(cuid())
