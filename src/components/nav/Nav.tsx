@@ -24,18 +24,26 @@ const AvatarAndMenu = () => {
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
   const { data: sessionData } = useSession();
 
+  const handleAvatarMenuToggle = () => {
+    setAvatarMenuOpen((prev) => !prev);
+  };
+
+  const handleSignOut = () => {
+    signOut({ redirect: false })
+      .then(() => {
+        void router.push("/");
+      })
+      .catch(() => console.log("failed to log out"));
+  };
+
   const menuItems = [
-    { label: "Sign out", icon: <FaSignOutAlt />, action: () => void signOut() },
+    { label: "Sign out", icon: <FaSignOutAlt />, action: handleSignOut },
     {
       label: "Preferences",
       icon: <FaSlidersH />,
       action: () => void router.push("/preferences"),
     },
   ];
-
-  const handleAvatarMenuToggle = () => {
-    setAvatarMenuOpen((prev) => !prev);
-  };
 
   return (
     <>

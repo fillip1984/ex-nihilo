@@ -6,11 +6,11 @@ import {
   FaCalendarAlt,
   FaChevronLeft,
   FaChevronRight,
-  FaCircleNotch,
   FaPlus,
 } from "react-icons/fa";
 import { api } from "~/utils/api";
 import { yyyyMMddHyphenated } from "~/utils/date";
+import LoadingErrorAndRetry from "../shared/LoadingErrorAndRetry";
 import TimelineEventCard from "./TimelineEventCard";
 
 const TimelinePage = () => {
@@ -20,7 +20,12 @@ const TimelinePage = () => {
   const filterOptions = ["Available", "Complete", "Skipped", "All"];
   const [filter, setFilter] = useState(filterOptions[0]);
 
-  const { data: events, isLoading } = api.timeline.buildAgenda.useQuery({
+  const {
+    data: events,
+    isLoading,
+    isError,
+    refetch,
+  } = api.timeline.buildAgenda.useQuery({
     date: selectedDate,
     filter,
   });
@@ -41,13 +46,15 @@ const TimelinePage = () => {
         />
       </div>
 
-      {isLoading && (
-        <div className="flex items-center justify-center">
-          <FaCircleNotch className="animate-spin text-8xl" />
-        </div>
+      {(isLoading || isError) && (
+        <LoadingErrorAndRetry
+          isLoading={isLoading}
+          isError={isError}
+          retry={() => void refetch()}
+        />
       )}
 
-      {!isLoading && (
+      {!isLoading && !isError && (
         <div
           id="timeline-grid"
           ref={timelineAnimations}

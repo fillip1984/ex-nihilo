@@ -7,7 +7,7 @@ import { MdCheck, MdNotInterested } from "react-icons/md";
 import { type TimelineEvent } from "~/types";
 import { api } from "~/utils/api";
 import { HH_mm_aka24hr } from "~/utils/date";
-import { retrieveColor, retrieveIcon } from "../IconsAndColorHelpers";
+import { retrieveColor, retrieveIcon } from "../topics/IconsAndColorHelpers";
 const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
   const utils = api.useContext();
 

@@ -10,7 +10,7 @@ import {
   IconSearchModal,
   retrieveColor,
   retrieveIcon,
-} from "~/components/IconsAndColorHelpers";
+} from "~/components/topics/IconsAndColorHelpers";
 import { topicFormSchema, type TopicFormSchemaType } from "~/types";
 import { api } from "~/utils/api";
 
