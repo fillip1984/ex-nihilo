@@ -45,9 +45,7 @@ export const TimelineRouter = createTRPCRouter({
         return eventA.start.getTime() - eventB.start.getTime();
       });
 
-      events
-        .map((event) => event.name + " " + event.start.toISOString())
-        .forEach((e) => console.log(e));
+      console.log("current dateTtime: ", new Date().toISOString());
 
       return events;
     }),
