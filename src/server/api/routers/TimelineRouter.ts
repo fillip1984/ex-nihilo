@@ -1,4 +1,3 @@
-import { createId } from "@paralleldrive/cuid2";
 import { endOfDay, startOfDay } from "date-fns";
 import { z } from "zod";
 import { prisma } from "~/server/db";
@@ -115,7 +114,7 @@ const buildSunInfo = async (
   if (sunInfo) {
     sunrise = {
       type: "Suninfo",
-      id: createId(),
+      id: date.toISOString() + "sunrise",
       name: "Sunrise",
       description: "Nature stuff",
       start: sunInfo.sunrise,
@@ -135,7 +134,7 @@ const buildSunInfo = async (
   if (sunInfo) {
     sunset = {
       type: "Suninfo",
-      id: createId(),
+      id: date.toISOString() + "sunset",
       name: "Sunset",
       description: "Nature stuff",
       start: sunInfo.sunset,

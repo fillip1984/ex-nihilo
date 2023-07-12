@@ -1,7 +1,6 @@
 import { format, intervalToDuration, parseISO } from "date-fns";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { prisma } from "~/server/db";
 import { yyyyMMddHyphenated } from "~/utils/date";
 
 export type SunInfoResponse = {
@@ -32,8 +31,6 @@ export const fetchSunInfo = async (
   latitude: number,
   longitude: number
 ) => {
-  prisma.preferences;
-
   const formattedDate = format(date, yyyyMMddHyphenated);
   const formatted = 0;
 
@@ -76,15 +73,16 @@ export const SunInfoRouter = createTRPCRouter({
       const preferences = await ctx.prisma.preferences.findUnique({
         where: { userId: ctx.session.user.id },
       });
-      if (preferences && preferences.latitude && preferences.longitude) {
-        const sunInfo = await fetchSunInfo(
-          input.date,
-          preferences.latitude,
-          preferences.longitude
-        );
-        return sunInfo;
+
+      if (!preferences || !preferences.latitude || !preferences.longitude) {
+        return null;
       }
 
-      return null;
+      const sunInfo = await fetchSunInfo(
+        input.date,
+        preferences.latitude,
+        preferences.longitude
+      );
+      return sunInfo;
     }),
 });
