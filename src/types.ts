@@ -22,6 +22,7 @@ export type PreferencesFormSchemaType = z.infer<typeof preferencesFormSchema>;
 export const routineFormSchema = z.object({
   routine: z
     .object({
+      id: z.string().nullish(),
       name: z.string().min(1),
       description: z.string().min(1),
       topicId: z.string().min(1),
@@ -90,8 +91,6 @@ export type TimelineEvent = {
   description: string;
   start: Date;
   end: Date;
-  fromTime: Date;
-  toTime: Date;
   complete: boolean | null;
   completedAt: Date | null;
   skip: boolean | null;

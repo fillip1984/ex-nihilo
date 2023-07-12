@@ -43,9 +43,9 @@ const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
           <b>{event.name}</b>
           <p className="flex items-center gap-2">
             <FaRegClock />
-            {format(event.fromTime, HH_mm_aka24hr)}
-            {event.toTime && !isEqual(event.fromTime, event.toTime)
-              ? " - " + format(event.toTime, HH_mm_aka24hr)
+            {format(event.start, HH_mm_aka24hr)}
+            {event.end && !isEqual(event.start, event.end)
+              ? " - " + format(event.end, HH_mm_aka24hr)
               : ""}
           </p>
           <div className="mt-2 flex flex-col gap-1 text-sm text-gray-400">

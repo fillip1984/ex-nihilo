@@ -82,6 +82,7 @@ const RoutineDetails = () => {
     };
 
     if (!isNew && freshRoutine) {
+      routineDetails.routine.id = freshRoutine.id;
       routineDetails.routine.name = freshRoutine.name;
       routineDetails.routine.description = freshRoutine.description;
       routineDetails.routine.topicId = freshRoutine.topicId;
@@ -145,7 +146,14 @@ const RoutineDetails = () => {
   });
 
   const utils = api.useContext();
-  const createRoutine = api.routines.create.useMutation({
+  const { mutate: createRoutine } = api.routines.create.useMutation({
+    onSuccess: async () => {
+      await utils.routines.invalidate();
+      void router.push("/routines");
+    },
+  });
+
+  const { mutate: updateRoutine } = api.routines.update.useMutation({
     onSuccess: async () => {
       await utils.routines.invalidate();
       void router.push("/routines");
@@ -154,13 +162,17 @@ const RoutineDetails = () => {
 
   const { mutate: deleteRoutine } = api.routines.delete.useMutation({
     onSuccess: async () => {
-      await utils.topics.invalidate();
-      void router.push("/topics");
+      await utils.routines.invalidate();
+      void router.push("/routines");
     },
   });
 
   const onSubmit: SubmitHandler<RoutineFormSchemaType> = (formData) => {
-    createRoutine.mutate({ ...formData });
+    if (isNew) {
+      createRoutine({ ...formData });
+    } else {
+      updateRoutine({ ...formData });
+    }
   };
 
   return (

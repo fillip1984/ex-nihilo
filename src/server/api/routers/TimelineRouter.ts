@@ -42,11 +42,11 @@ export const TimelineRouter = createTRPCRouter({
       }
 
       events = events.sort((eventA, eventB) => {
-        return eventA.fromTime.getTime() - eventB.fromTime.getTime();
+        return eventA.start.getTime() - eventB.start.getTime();
       });
 
       events
-        .map((event) => event.name + " " + event.fromTime.toISOString())
+        .map((event) => event.name + " " + event.start.toISOString())
         .forEach((e) => console.log(e));
 
       return events;
@@ -90,8 +90,8 @@ const buildActivityInfo = async (
       description: activity.routine.description,
       start: activity.start,
       end: activity.end,
-      fromTime: activity.routine.fromTime,
-      toTime: activity.routine.toTime,
+      // fromTime: activity.routine.fromTime,
+      // toTime: activity.routine.toTime,
       complete: activity.complete,
       completedAt: activity.completedAt,
       skip: activity.skip,
@@ -100,8 +100,8 @@ const buildActivityInfo = async (
       activity: activity,
       topicName: activity.routine.topic.name,
       duration: intervalToDuration({
-        start: activity.routine.fromTime,
-        end: activity.routine.toTime,
+        start: activity.start,
+        end: activity.end,
       }),
     };
     return event;
@@ -126,8 +126,6 @@ const buildSunInfo = async (
       description: "Nature stuff",
       start: sunInfo.sunrise,
       end: sunInfo.sunrise,
-      fromTime: sunInfo.sunrise,
-      toTime: sunInfo.sunrise,
       complete: null,
       completedAt: null,
       skip: null,
@@ -146,8 +144,6 @@ const buildSunInfo = async (
       description: "Nature stuff",
       start: sunInfo.sunset,
       end: sunInfo.sunset,
-      fromTime: sunInfo.sunset,
-      toTime: sunInfo.sunset,
       complete: null,
       completedAt: null,
       skip: null,

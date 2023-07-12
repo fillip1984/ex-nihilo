@@ -19,7 +19,7 @@ export const createActivitiesFromRoutine = async (
   },
   userId: string
 ) => {
-  console.log("creating activities from routine", routine.name);
+  // console.log("creating activities from routine", routine.name);
 
   switch (routine.occurrenceType) {
     case "NEVER":
@@ -37,18 +37,33 @@ const createOneTimeActivity = async (routine: Routine, userId: string) => {
       routine.name
     } on: ${routine.startDate.toLocaleString()}`
   );
+
+  if (!routine.endDate) {
+    throw new Error(
+      "Unable to create one time activity from routine, missing end date. Routine: " +
+        routine.name
+    );
+  }
+
+  if (!routine.toTime) {
+    throw new Error(
+      "Unable to create one time activity from routine, missing to time. Routine: " +
+        routine.name
+    );
+  }
+
   return await prisma.activity.create({
     data: {
       routineId: routine.id,
-      start: routine.startDate,
-      end: routine.endDate as Date,
+      start: combineDateAndTime(routine.startDate, routine.fromTime),
+      end: combineDateAndTime(routine.endDate, routine.toTime),
       userId,
     },
   });
 };
 
 const createDailyActivities = async (routine: Routine, userId: string) => {
-  console.log("creating daily activities for routine", routine.name);
+  // console.log("creating daily activities for routine", routine.name);
   const activitiesToAdd = [];
   if (!routine.dailyEveryValue) {
     throw new Error(
@@ -56,8 +71,20 @@ const createDailyActivities = async (routine: Routine, userId: string) => {
     );
   }
 
-  let start = routine.startDate;
-  const end = routine.endDate ?? nextNewYears(new Date());
+  let start = combineDateAndTime(routine.startDate, routine.fromTime);
+
+  const end = routine.neverEnds
+    ? nextNewYears(new Date())
+    : routine.endDate &&
+      routine.toTime &&
+      combineDateAndTime(routine.endDate, routine.toTime);
+
+  if (!end) {
+    throw new Error(
+      "Unable to determine end date for routine: " + routine.name
+    );
+  }
+
   while (!isSameDay(start, end) && !isAfter(start, end)) {
     console.log(
       `adding daily activity for routine: ${
@@ -67,7 +94,7 @@ const createDailyActivities = async (routine: Routine, userId: string) => {
     activitiesToAdd.push({
       routineId: routine.id,
       start,
-      end: start,
+      end: combineDateAndTime(start, routine.toTime),
       userId,
     });
 
