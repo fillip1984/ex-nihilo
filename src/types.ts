@@ -70,6 +70,19 @@ export const topicFormSchema = z.object({
 
 export type TopicFormSchemaType = z.infer<typeof topicFormSchema>;
 
+export const topicSummary = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  icon: z.string(),
+  color: z.string(),
+  _count: z.object({
+    routines: z.number(),
+  }),
+});
+
+export type TopicSummaryType = z.infer<typeof topicSummary>;
+
 export type TimelineEvent = {
   type: TimelineEventType;
   id: string;
@@ -88,7 +101,7 @@ export type TimelineEvent = {
   activity: Activity | null;
   topicName: string;
 
-  lengthOfDate: Duration | null;
+  duration: Duration;
 };
 
 export type TimelineEventType = "Suninfo" | "Activity";

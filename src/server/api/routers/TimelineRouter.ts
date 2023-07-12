@@ -1,4 +1,4 @@
-import { endOfDay, startOfDay } from "date-fns";
+import { endOfDay, intervalToDuration, startOfDay } from "date-fns";
 import { z } from "zod";
 import { prisma } from "~/server/db";
 import { type TimelineEvent } from "~/types";
@@ -44,6 +44,10 @@ export const TimelineRouter = createTRPCRouter({
       events = events.sort((eventA, eventB) => {
         return eventA.fromTime.getTime() - eventB.fromTime.getTime();
       });
+
+      events
+        .map((event) => event.name + " " + event.fromTime.toISOString())
+        .forEach((e) => console.log(e));
 
       return events;
     }),
@@ -95,7 +99,10 @@ const buildActivityInfo = async (
       icon: activity.routine.topic.icon,
       activity: activity,
       topicName: activity.routine.topic.name,
-      lengthOfDate: null,
+      duration: intervalToDuration({
+        start: activity.routine.fromTime,
+        end: activity.routine.toTime,
+      }),
     };
     return event;
   });
@@ -124,11 +131,11 @@ const buildSunInfo = async (
       complete: null,
       completedAt: null,
       skip: null,
-      color: "bg-yellow-300/60 text-yellow-200",
+      color: "Yellow",
       icon: "BsSunrise",
       activity: null,
       topicName: "Nature",
-      lengthOfDate: sunInfo.dayLength,
+      duration: sunInfo.dayLength,
     };
   }
   if (sunInfo) {
@@ -144,12 +151,11 @@ const buildSunInfo = async (
       complete: null,
       completedAt: null,
       skip: null,
-      // occurrenceType: "DAILY",
-      color: "bg-blue-300/60 text-blue-200",
+      color: "Yellow",
       icon: "BsSunset",
       activity: null,
       topicName: "Nature",
-      lengthOfDate: sunInfo.dayLength,
+      duration: sunInfo.dayLength,
     };
   }
 

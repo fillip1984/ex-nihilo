@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { BsBodyText, BsListTask } from "react-icons/bs";
 import LoadingErrorAndRetry from "~/components/shared/LoadingErrorAndRetry";
+import TopicCard from "~/components/topics/TopicCard";
 import { api } from "~/utils/api";
 
 const TopicList = () => {
@@ -38,26 +38,7 @@ const TopicList = () => {
 
         {!isLoading &&
           !isError &&
-          topics?.map((topic) => (
-            <Link
-              href={`/topics/${topic.id}`}
-              key={topic.id}
-              className="flex w-full items-center gap-3 rounded-lg bg-white/10 p-2 transition duration-300 ease-in-out hover:bg-white/20">
-              <div className="card-body flex flex-col gap-4 p-2">
-                <div className="flex items-center gap-2">
-                  <BsBodyText className="text-2xl" />
-                  <div>
-                    <b>{topic.name}</b>
-                    <p>{topic.description}</p>
-                  </div>
-                </div>
-                <div className="factoid flex items-center gap-2">
-                  <BsListTask className="text-2xl" />
-                  {topic._count.routines.toString()}
-                </div>
-              </div>
-            </Link>
-          ))}
+          topics?.map((topic) => <TopicCard key={topic.id} topic={topic} />)}
       </div>
     </div>
   );

@@ -14,7 +14,7 @@ import {
   MdOutlineLocalLaundryService,
 } from "react-icons/md";
 
-export const iconOptions = [
+const iconOptions = [
   { name: "BiBed", icon: <BiBed /> },
   { name: "BsTrash", icon: <BsTrash /> },
   { name: "FaBed", icon: <FaBed /> },
@@ -53,6 +53,7 @@ export const colorOptions = [
   { name: "Indigo", value: "bg-indigo-300/60 text-indigo-200" },
   { name: "Orange", value: "bg-orange-300/60 text-orange-200" },
   { name: "Red", value: "bg-red-400/60 text-red-300" },
+  { name: "Yellow", value: "bg-yellow-400/60 text-yellow-300" },
 ];
 
 export const retrieveColor = (colorName: string) => {
@@ -62,6 +63,23 @@ export const retrieveColor = (colorName: string) => {
   }
 
   return retrievedColor.value;
+};
+
+export const IconAvatar = ({
+  icon,
+  color,
+}: {
+  icon: string;
+  color: string;
+}) => {
+  return (
+    <span
+      className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl ${retrieveColor(
+        color
+      )}`}>
+      {retrieveIcon(icon)}
+    </span>
+  );
 };
 
 // TODO: should probably swap to headless UI for this or use the native modal element
