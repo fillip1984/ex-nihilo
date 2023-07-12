@@ -43,27 +43,21 @@ type PotentialInvitee = {
  * Sometimes we want to build something and keep it to ourself, or we want to share by allowing access
  * on an invitation only basis, this accomplishes that.
  *
- * Checks if given user is on the list (Invitee table) with enabled flag set to true.
+ * Checks if given user is on the list, Invitation table, with enabled flag set to true.
  *
- * If someone attempts to log in, we upsert them into the Invitee table and set the enabled
- * flag to false so it only takes a word from the individual to yous' and yous' flipsis the switch, somehows...
+ * If someone attempts to log in, we upsert them into the Invitation table and set the enabled
+ * flag to false so it only takes a word from the individual to yous', and yous', flip'sis the switch.
+ * Right now, there is no built in functionality to flip the enabled switch, you just have to connect
+ * to the database and flip it yourself.
  *
  * @see https://next-auth.js.org/configuration/callbacks#sign-in-callback
  */
 const isInvited = async ({
-  // user,
   account,
   profile,
 }: {
-  // user: User | AdapterUser;
   account: Account | null;
   profile?: Profile | undefined;
-  // email?:
-  //   | {
-  //       verificationRequest?: boolean | undefined;
-  //     }
-  //   | undefined;
-  // credentials?: unknown | undefined;
 }) => {
   if (!profile) {
     console.log("isInvited was not passed a profile from Auth");
@@ -105,11 +99,9 @@ const isInvited = async ({
 };
 
 const getInvitee = (potentialInvitee: PotentialInvitee) => {
-  const invitee = prisma.invitee.findUnique({
+  const invitee = prisma.invitation.findUnique({
     where: {
-      email_userId_providerName_providerAccountId: {
-        email: potentialInvitee.email,
-        userId: potentialInvitee.userId,
+      providerName_providerAccountId: {
         providerName: potentialInvitee.providerName,
         providerAccountId: potentialInvitee.providerAccountId,
       },
@@ -121,11 +113,9 @@ const getInvitee = (potentialInvitee: PotentialInvitee) => {
 const addInviteeForPossibleFutureAccess = async (
   potentialInvitee: PotentialInvitee
 ) => {
-  const possibleFutureInvitee = await prisma.invitee.upsert({
+  const possibleFutureInvitee = await prisma.invitation.upsert({
     where: {
-      email_userId_providerName_providerAccountId: {
-        email: potentialInvitee.email,
-        userId: potentialInvitee.userId,
+      providerName_providerAccountId: {
         providerName: potentialInvitee.providerName,
         providerAccountId: potentialInvitee.providerAccountId,
       },

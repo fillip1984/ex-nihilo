@@ -13,7 +13,12 @@ export const TimelineRouter = createTRPCRouter({
       // fold in the cheese
       let events: TimelineEvent[] = [];
 
-      const activities = await buildActivityInfo(input.date, input.filter);
+      const userId = ctx.session.user.id;
+      const activities = await buildActivityInfo(
+        userId,
+        input.date,
+        input.filter
+      );
 
       if (activities) {
         events = events.concat(activities);
@@ -46,6 +51,7 @@ export const TimelineRouter = createTRPCRouter({
 });
 
 const buildActivityInfo = async (
+  userId: string,
   date: Date,
   filter: string | null | undefined
 ) => {
@@ -54,6 +60,7 @@ const buildActivityInfo = async (
 
   const result = await prisma.activity.findMany({
     where: {
+      userId,
       start: {
         gte: start,
         lte: end,
