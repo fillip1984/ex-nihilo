@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -10,7 +9,7 @@ import { preferencesFormSchema, type PreferencesFormSchemaType } from "~/types";
 import { api } from "~/utils/api";
 
 const Preferences = () => {
-  const router = useRouter();
+  // const router = useRouter();
 
   // read data stuff
   const {
@@ -21,10 +20,15 @@ const Preferences = () => {
   } = api.preferences.read.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
-  const { register, reset, setValue, handleSubmit } =
-    useForm<PreferencesFormSchemaType>({
-      resolver: zodResolver(preferencesFormSchema),
-    });
+  const {
+    register,
+    reset,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<PreferencesFormSchemaType>({
+    resolver: zodResolver(preferencesFormSchema),
+  });
   useEffect(() => {
     if (preferences) {
       reset({
@@ -53,27 +57,26 @@ const Preferences = () => {
     }
     navigator.geolocation.getCurrentPosition(
       (position: GeolocationPosition) => {
-        console.log(`Success! Accuracy: ${position.coords.accuracy}`);
         setValue("latitude", position.coords.latitude);
         setValue("longitude", position.coords.longitude);
       },
-      () => {
-        console.error("Failed!?");
+      (e) => {
+        console.error("Failed to use your current location", e);
       }
     );
   };
 
-  const handleRebuildActivities = () => {
-    console.log("rebuilding activities");
-    createActivities.mutate();
-  };
+  // const handleRebuildActivities = () => {
+  //   console.log("rebuilding activities");
+  //   createActivities.mutate();
+  // };
 
-  const createActivities = api.activities.rebuild.useMutation({
-    onSuccess: async () => {
-      await utils.activities.invalidate();
-      void router.push("/");
-    },
-  });
+  // const createActivities = api.activities.rebuild.useMutation({
+  //   onSuccess: async () => {
+  //     await utils.activities.invalidate();
+  //     void router.push("/");
+  //   },
+  // });
 
   return (
     <div className="form-container mx-auto flex w-full flex-col gap-2 px-4 md:w-2/3 lg:w-1/2 xl:w-1/3">
@@ -131,6 +134,17 @@ const Preferences = () => {
                     className="col-span-2"
                   />
                 </div>
+                {errors.latitude?.message && (
+                  <span className="col-span-5 text-red-400">
+                    {errors.latitude.message}
+                  </span>
+                )}
+
+                {errors.longitude?.message && (
+                  <span className="col-span-5 text-red-400">
+                    {errors.longitude.message}
+                  </span>
+                )}
               </div>
               <div className="flex justify-center py-2">
                 <button

@@ -22,11 +22,20 @@ export const PreferencesRouter = createTRPCRouter({
       return result;
     }),
   read: protectedProcedure.query(async ({ ctx }) => {
-    const preferences = await ctx.prisma.preferences.findUnique({
+    let preferences = await ctx.prisma.preferences.findUnique({
       where: {
         userId: ctx.session.user.id,
       },
     });
+
+    // build out preferences if it doesn't already exist
+    if (!preferences) {
+      preferences = await ctx.prisma.preferences.create({
+        data: {
+          userId: ctx.session.user.id,
+        },
+      });
+    }
 
     return preferences;
   }),

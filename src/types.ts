@@ -1,10 +1,21 @@
 import { type Activity, OccurrenceType } from "@prisma/client";
 import { z } from "zod";
 
+// TODO: figure out how to allow undefined or null. Right now there is no way to reset or zero out these values
 export const preferencesFormSchema = z.object({
-  latitude: z.number(),
-  longitude: z.number(),
+  latitude: z.number().nullish(),
+  longitude: z.number().nullish(),
 });
+// TODO: figure out how to require both
+// .refine(
+//   (data) =>
+//     (data.latitude && !data.latitude) || (data.longitude && !data.latitude),
+//   {
+//     message:
+//       "Either provide both longitude and latitude or don't supply either",
+//     path: ["longitude"],
+//   }
+// );
 
 export type PreferencesFormSchemaType = z.infer<typeof preferencesFormSchema>;
 

@@ -83,8 +83,8 @@ model Preferences {
     user      User     @relation(fields: [userId], references: [id])
     userId    String   @unique
 
-    latitude  Float
-    longitude Float
+    latitude  Float?
+    longitude Float?
 }
 
 // Necessary for Next auth

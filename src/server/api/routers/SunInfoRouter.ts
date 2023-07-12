@@ -77,7 +77,7 @@ export const SunInfoRouter = createTRPCRouter({
       const preferences = await ctx.prisma.preferences.findUnique({
         where: { userId: ctx.session.user.id },
       });
-      if (preferences) {
+      if (preferences && preferences.latitude && preferences.longitude) {
         const sunInfo = await fetchSunInfo(
           input.date,
           preferences.latitude,
