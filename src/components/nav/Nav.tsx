@@ -7,9 +7,11 @@ import { FaHourglassStart, FaSignOutAlt, FaSlidersH } from "react-icons/fa";
 
 const Nav = () => {
   const [currentTime, setCurrentTime] = useState("");
+  const [tz, setTz] = useState("");
 
   useEffect(() => {
     setCurrentTime(new Date().toISOString());
+    setTz(Intl.DateTimeFormat().resolvedOptions().timeZone);
   }, []);
   return (
     <nav className="fixed left-0 right-0 top-0 z-[997] flex h-16 items-center justify-between bg-slate-600 px-4 py-2">
@@ -19,6 +21,7 @@ const Nav = () => {
           ex nihilo
         </h3>
         <p className="text-white">Current time is: {currentTime}</p>
+        <p className="text-white">Current timezone is: {tz}</p>
       </Link>
       <AvatarAndMenu />
     </nav>
