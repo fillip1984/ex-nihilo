@@ -56,8 +56,6 @@ export const colorOptions = [
 ];
 
 export const retrieveColor = (colorName: string) => {
-  console.log(colorName);
-
   const retrievedColor = colorOptions.find((color) => color.name === colorName);
   if (!retrievedColor) {
     return "";

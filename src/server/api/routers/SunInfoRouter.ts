@@ -33,7 +33,6 @@ export const fetchSunInfo = async (
   longitude: number
 ) => {
   prisma.preferences;
-  console.log("fetching sun info");
 
   const formattedDate = format(date, yyyyMMddHyphenated);
   const formatted = 0;

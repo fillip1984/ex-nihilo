@@ -60,24 +60,24 @@ const isInvited = async ({
   profile?: Profile | undefined;
 }) => {
   if (!profile) {
-    console.log("isInvited was not passed a profile from Auth");
+    console.error("isInvited was not passed a profile from Auth");
     return false;
   }
 
   if (!account) {
-    console.log("isInvited was not passed an account from Auth");
+    console.error("isInvited was not passed an account from Auth");
     return false;
   }
 
   if (!profile.email) {
-    console.log(
+    console.error(
       "isInvited was expecting profile.email to be defined but it was not"
     );
     return false;
   }
 
   if (!profile.name) {
-    console.log(
+    console.error(
       "isInvited was expecting profile.name to be defined but it was not"
     );
     return false;

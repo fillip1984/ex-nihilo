@@ -163,11 +163,6 @@ const RoutineDetails = () => {
     createRoutine.mutate({ ...formData });
   };
 
-  // TODO: useful but should be removed once we've worked out the zod schema and validation
-  useEffect(() => {
-    console.log("Errors", errors);
-  }, [errors]);
-
   return (
     <div className="form-container mx-auto w-full px-4 md:w-2/3 lg:w-1/2 xl:w-1/3">
       <form
