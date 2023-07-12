@@ -37,12 +37,12 @@ const AvatarAndMenu = () => {
   };
 
   const menuItems = [
-    { label: "Sign out", icon: <FaSignOutAlt />, action: handleSignOut },
     {
       label: "Preferences",
       icon: <FaSlidersH />,
       action: () => void router.push("/preferences"),
     },
+    { label: "Sign out", icon: <FaSignOutAlt />, action: handleSignOut },
   ];
 
   return (
