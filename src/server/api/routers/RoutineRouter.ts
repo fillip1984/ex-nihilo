@@ -103,6 +103,10 @@ export const RoutineRouter = createTRPCRouter({
         where: {
           id: input.id,
         },
+        include: {
+          weeklyDaysSelected: true,
+          monthlyDaysSelected: true,
+        },
       });
 
       return routine;

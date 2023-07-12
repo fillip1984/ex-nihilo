@@ -13,6 +13,7 @@ export const routineFormSchema = z.object({
     .object({
       name: z.string().min(1),
       description: z.string().min(1),
+      topicId: z.string().min(1),
       occurrenceType: z.nativeEnum(OccurrenceType),
       dailyEveryValue: z.number().nullish(),
       yearlyMonthValue: z.number().nullish(),
@@ -20,9 +21,8 @@ export const routineFormSchema = z.object({
       startDate: z.string().min(1),
       fromTime: z.string().min(1),
       toTime: z.string().min(1),
-      endDate: z.string().nullish(),
       neverEnds: z.boolean(),
-      topicId: z.string().min(1),
+      endDate: z.string().nullish(),
     })
     .refine(
       (data) => data.neverEnds || (data.endDate && data.endDate?.length > 0),
