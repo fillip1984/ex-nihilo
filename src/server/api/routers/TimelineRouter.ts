@@ -45,8 +45,6 @@ export const TimelineRouter = createTRPCRouter({
         return eventA.start.getTime() - eventB.start.getTime();
       });
 
-      console.log("current dateTtime: ", new Date().toISOString());
-      console.log("current tz: ", Intl.DateTimeFormat().resolvedOptions().timeZone);
       return events;
     }),
 });
