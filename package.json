@@ -24,6 +24,7 @@
     "@trpc/react-query": "^10.26.0",
     "@trpc/server": "^10.26.0",
     "date-fns": "^2.30.0",
+    "date-fns-tz": "^2.0.0",
     "decimal.js": "^10.4.3",
     "next": "^13.4.2",
     "next-auth": "^4.22.1",

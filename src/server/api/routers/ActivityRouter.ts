@@ -1,8 +1,9 @@
 import { type DaySelector, type Routine } from "@prisma/client";
 import {
   addDays,
+  addHours,
+  endOfYear,
   isAfter,
-  isSameDay,
   isSunday,
   isWithinInterval,
   nextSunday,
@@ -10,7 +11,11 @@ import {
 } from "date-fns";
 import { z } from "zod";
 import { prisma } from "~/server/db";
-import { combineDateAndTime, nextNewYears } from "~/utils/date";
+import {
+  combineDateAndTime,
+  isDaylightSavingsTime,
+  nextNewYears,
+} from "~/utils/date";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const createActivitiesFromRoutine = async (
@@ -52,18 +57,51 @@ const createOneTimeActivity = async (routine: Routine, userId: string) => {
     );
   }
 
+  const userPreferences = await prisma.preferences.findUnique({
+    where: { userId },
+  });
+  if (!userPreferences) {
+    throw new Error("Unable to determine user timezone, userId: " + userId);
+  }
+  const timezone = userPreferences.timezone;
+
+  const start = combineDateAndTime(routine.startDate, routine.fromTime);
+  const end = combineDateAndTime(routine.endDate, routine.toTime);
+
+  let activityStart = start;
+  let activityEnd = end;
+
+  const isCreatedDuringDaylistSavings = isDaylightSavingsTime(
+    combineDateAndTime(start, routine.fromTime),
+    timezone
+  );
+
+  if (
+    !isCreatedDuringDaylistSavings &&
+    isDaylightSavingsTime(activityStart, timezone)
+  ) {
+    activityStart = addHours(activityStart, -1);
+    activityEnd = addHours(activityEnd, -1);
+  } else if (
+    isCreatedDuringDaylistSavings &&
+    !isDaylightSavingsTime(activityStart, timezone)
+  ) {
+    activityStart = addHours(activityStart, 1);
+    activityEnd = addHours(activityEnd, 1);
+  }
+
   return await prisma.activity.create({
     data: {
       routineId: routine.id,
-      start: combineDateAndTime(routine.startDate, routine.fromTime),
-      end: combineDateAndTime(routine.endDate, routine.toTime),
+      start: activityStart,
+      end: activityEnd,
       userId,
     },
   });
 };
 
 const createDailyActivities = async (routine: Routine, userId: string) => {
-  // console.log("creating daily activities for routine", routine.name);
+  console.log("creating daily activities for routine", routine.name);
   const activitiesToAdd = [];
   if (!routine.dailyEveryValue) {
     throw new Error(
@@ -71,13 +109,11 @@ const createDailyActivities = async (routine: Routine, userId: string) => {
     );
   }
 
-  let start = combineDateAndTime(routine.startDate, routine.fromTime);
-
-  const end = routine.neverEnds
-    ? nextNewYears(new Date())
-    : routine.endDate &&
-      routine.toTime &&
-      combineDateAndTime(routine.endDate, routine.toTime);
+  let start = routine.startDate;
+  // if "Never end" is selected we build out activities for the given year.
+  // An activity will ask on New Years if we should build out the new year or
+  // if user wants to make adjustments
+  const end = routine.neverEnds ? endOfYear(start) : routine.endDate;
 
   if (!end) {
     throw new Error(
@@ -85,18 +121,44 @@ const createDailyActivities = async (routine: Routine, userId: string) => {
     );
   }
 
-  while (!isSameDay(start, end) && !isAfter(start, end)) {
-    // console.log(
-    //   `adding daily activity for routine: ${
-    //     routine.name
-    //   } on: ${start.toLocaleString()}`
-    // );
-    activitiesToAdd.push({
+  const userPreferences = await prisma.preferences.findUnique({
+    where: { userId },
+  });
+  if (!userPreferences) {
+    throw new Error("Unable to determine user timezone, userId: " + userId);
+  }
+  const timezone = userPreferences.timezone;
+
+  const isCreatedDuringDaylistSavings = isDaylightSavingsTime(
+    combineDateAndTime(start, routine.fromTime),
+    timezone
+  );
+
+  while (start <= end) {
+    let activityStart = combineDateAndTime(start, routine.fromTime);
+    let activityEnd = combineDateAndTime(start, routine.toTime);
+
+    if (
+      !isCreatedDuringDaylistSavings &&
+      isDaylightSavingsTime(activityStart, timezone)
+    ) {
+      activityStart = addHours(activityStart, -1);
+      activityEnd = addHours(activityEnd, -1);
+    } else if (
+      isCreatedDuringDaylistSavings &&
+      !isDaylightSavingsTime(activityStart, timezone)
+    ) {
+      activityStart = addHours(activityStart, 1);
+      activityEnd = addHours(activityEnd, 1);
+    }
+
+    const activity = {
       routineId: routine.id,
-      start,
-      end: combineDateAndTime(start, routine.toTime),
+      start: activityStart,
+      end: activityEnd,
       userId,
-    });
+    };
+    activitiesToAdd.push(activity);
 
     start = addDays(start, routine.dailyEveryValue);
   }

@@ -85,6 +85,8 @@ model Preferences {
 
     latitude  Float?
     longitude Float?
+
+    timezone String @default("America/New_York")
 }
 
 // Necessary for Next auth
@@ -109,11 +111,12 @@ model Routine {
     dailyEveryValue  Int?
     yearlyMonthValue Int?
     yearlyDayValue   Int?
-    // you can store as @db.Date and @db.Time but problem is that Postgres (or possibly Prisma) assumes everything is stored as UTC and so it applies your timezone offset causing dates/times to change
-    startDate        DateTime //daylight savings time didn't work: @db.Date
-    fromTime         DateTime //daylight savings time didn't work: @db.Time
-    toTime           DateTime //daylight savings time didn't work: @db.Time@db.Time
-    endDate          DateTime? //daylight savings time didn't work: @db.Date
+    // time is tricky. Everything will be stored as UTC time. So if you set a start time of 1/1/23 00:00 (midnight), depending on day light savings time, it will set it for 1/2/23 04:00 or 05:00.
+    // Seems like dayjs and date-fns have issues with daylight savings so I rolled my own solution under date.js
+    startDate        DateTime
+    fromTime         DateTime
+    toTime           DateTime
+    endDate          DateTime?
     neverEnds        Boolean
 
     weeklyDaysSelected  DaySelector[] @relation("WeeklyDaysSelected")

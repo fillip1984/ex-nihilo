@@ -66,17 +66,20 @@ const Preferences = () => {
     );
   };
 
-  // const handleRebuildActivities = () => {
-  //   console.log("rebuilding activities");
-  //   createActivities.mutate();
-  // };
+  const { mutate: createActivities } = api.activities.rebuild.useMutation({
+    onMutate: () => {
+      toast("Rebuilding activities");
+    },
+    onSuccess: async () => {
+      await utils.activities.invalidate();
+      toast.success("Rebuild of activities complete");
+    },
+  });
 
-  // const createActivities = api.activities.rebuild.useMutation({
-  //   onSuccess: async () => {
-  //     await utils.activities.invalidate();
-  //     void router.push("/");
-  //   },
-  // });
+  const handleRebuildActivities = () => {
+    console.log("rebuilding activities");
+    createActivities();
+  };
 
   return (
     <div className="form-container mx-auto flex w-full flex-col gap-2 px-4 md:w-2/3 lg:w-1/2 xl:w-1/3">
@@ -186,20 +189,20 @@ const Preferences = () => {
               <span className="uppercase">Routines and Topics</span>
             </div>
             Coming soon...
-            {/* <div className="border-slate-400 p-2">
-          <p>
-            Rebuild activies -&gt; deletes and then recreates activities which
-            feed your timeline.
-          </p>
-          <p>
-            <b>ALL ACTIVITY HISTORY WILL BE LOST!</b>
-          </p>
-          <button
-            onClick={handleRebuildActivities}
-            className="my-2 rounded bg-red-600 px-4 py-2 font-bold text-white">
-            Rebuild Activities
-          </button> 
-        </div>*/}
+            <div className="border-slate-400 p-2">
+              <p>
+                Rebuild activies -&gt; deletes and then recreates activities
+                which feed your timeline.
+              </p>
+              <p>
+                <b>ALL ACTIVITY HISTORY WILL BE LOST!</b>
+              </p>
+              <button
+                onClick={handleRebuildActivities}
+                className="my-2 rounded bg-red-600 px-4 py-2 font-bold text-white">
+                Rebuild Activities
+              </button>
+            </div>
           </div>
         </div>
       )}
