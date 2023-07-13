@@ -1,7 +1,6 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { OccurrenceType } from "@prisma/client";
-import { format, getDaysInMonth } from "date-fns";
+import { format, getDaysInMonth, parse } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -28,7 +27,9 @@ const RoutineDetails = () => {
   const [specificLocationAnimation] = useAutoAnimate();
   const [specificLocation, setSpecificLocation] = useState(false);
 
-  const { data: topics } = api.topics.readAll.useQuery();
+  const { data: topics } = api.topics.readAll.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
 
   const { data: freshRoutine } = api.routines.readOne.useQuery(
     { id: id as string },
@@ -66,46 +67,34 @@ const RoutineDetails = () => {
       { label: "Saturday", abbreviatedLabel: "Sat", selected: false },
     ];
 
-    const routineDetails: RoutineFormSchemaType = {
-      routine: {
-        name: "",
-        description: "",
-        topicId: "",
-        startDate: "",
-        fromTime: "",
-        toTime: "",
-        neverEnds: true,
-        occurrenceType: OccurrenceType.NEVER,
-      },
-      weeklyDaySelectorOptions: weeklyDaySelectorOptions,
-      monthlyDaySelectorOptions: monthlyDaySelectorOptions,
-    };
-
-    if (!isNew && freshRoutine) {
-      routineDetails.routine.id = freshRoutine.id;
-      routineDetails.routine.name = freshRoutine.name;
-      routineDetails.routine.description = freshRoutine.description;
-      routineDetails.routine.topicId = freshRoutine.topicId;
-      routineDetails.routine.occurrenceType = freshRoutine.occurrenceType;
-      routineDetails.routine.dailyEveryValue = freshRoutine.dailyEveryValue;
-      routineDetails.routine.yearlyMonthValue = freshRoutine.yearlyMonthValue;
-      routineDetails.routine.yearlyDayValue = freshRoutine.yearlyDayValue;
-      routineDetails.routine.startDate = format(
-        freshRoutine.startDate,
-        yyyyMMddHyphenated
-      );
-      routineDetails.routine.fromTime = format(
-        freshRoutine.fromTime,
-        HH_mm_aka24hr
-      );
-      routineDetails.routine.toTime = format(
-        freshRoutine.toTime,
-        HH_mm_aka24hr
-      );
-      routineDetails.routine.neverEnds = freshRoutine.neverEnds ?? false;
-      routineDetails.routine.endDate = freshRoutine.endDate
-        ? format(freshRoutine.endDate, yyyyMMddHyphenated)
-        : "";
+    if (isNew) {
+      const routineDetails = {
+        weeklyDaySelectorOptions: weeklyDaySelectorOptions,
+        monthlyDaySelectorOptions: monthlyDaySelectorOptions,
+      };
+      reset(routineDetails);
+    } else if (!isNew && freshRoutine) {
+      const routineDetails = {
+        routine: {
+          id: freshRoutine.id,
+          name: freshRoutine.name,
+          description: freshRoutine.description,
+          topicId: freshRoutine.topicId,
+          occurrenceType: freshRoutine.occurrenceType,
+          dailyEveryValue: freshRoutine.dailyEveryValue,
+          yearlyMonthValue: freshRoutine.yearlyMonthValue,
+          yearlyDayValue: freshRoutine.yearlyDayValue,
+          startDate: format(freshRoutine.startDate, yyyyMMddHyphenated),
+          fromTime: format(freshRoutine.fromTime, HH_mm_aka24hr),
+          toTime: format(freshRoutine.toTime, HH_mm_aka24hr),
+          neverEnds: freshRoutine.neverEnds,
+          endDate: freshRoutine.endDate
+            ? format(freshRoutine.endDate, yyyyMMddHyphenated)
+            : undefined,
+        },
+        weeklyDaySelectorOptions,
+        monthlyDaySelectorOptions,
+      };
 
       if (freshRoutine.weeklyDaysSelected.length > 0) {
         routineDetails.weeklyDaySelectorOptions =
@@ -130,9 +119,9 @@ const RoutineDetails = () => {
             return selection;
           });
       }
-    }
 
-    reset(routineDetails);
+      reset(routineDetails);
+    }
   }, [freshRoutine, reset, id, isNew]);
 
   const occurrenceTypeWatch = useWatch({
@@ -401,20 +390,35 @@ const RoutineDetails = () => {
               <input
                 type="date"
                 className="col-span-2 col-start-4"
-                {...register("routine.startDate")}
+                {...register("routine.startDate", {
+                  setValueAs: (v) => {
+                    if (!v) return undefined;
+                    return parse(v as string, yyyyMMddHyphenated, new Date());
+                  },
+                })}
               />
             </div>
             <div className="grid grid-cols-6 items-center gap-2">
               <label>From</label>
               <input
                 type="time"
-                {...register("routine.fromTime")}
+                {...register("routine.fromTime", {
+                  setValueAs: (v) => {
+                    if (!v) return undefined;
+                    return parse(v as string, "HH:mm", new Date());
+                  },
+                })}
                 className="col-span-2"
               />
               <label>To</label>
               <input
                 type="time"
-                {...register("routine.toTime")}
+                {...register("routine.toTime", {
+                  setValueAs: (v) => {
+                    if (!v) return undefined;
+                    return parse(v as string, "HH:mm", new Date());
+                  },
+                })}
                 className="col-span-2"
               />
             </div>
@@ -434,7 +438,12 @@ const RoutineDetails = () => {
                 <input
                   type="date"
                   className="col-span-2 col-start-4"
-                  {...register("routine.endDate")}
+                  {...register("routine.endDate", {
+                    setValueAs: (v) => {
+                      if (!v) return undefined;
+                      return parse(v as string, yyyyMMddHyphenated, new Date());
+                    },
+                  })}
                   disabled={neverEndsWatch}
                 />
                 {errors.routine?.endDate && (

@@ -30,19 +30,16 @@ export const routineFormSchema = z.object({
       dailyEveryValue: z.number().nullish(),
       yearlyMonthValue: z.number().nullish(),
       yearlyDayValue: z.number().nullish(),
-      startDate: z.string().min(1),
-      fromTime: z.string().min(1),
-      toTime: z.string().min(1),
+      startDate: z.string().or(z.date()),
+      fromTime: z.string().or(z.date()),
+      toTime: z.string().or(z.date()),
       neverEnds: z.boolean(),
-      endDate: z.string().nullish(),
+      endDate: z.string().or(z.date()).optional(),
     })
-    .refine(
-      (data) => data.neverEnds || (data.endDate && data.endDate?.length > 0),
-      {
-        message: "Either select an end date or select the never ends option",
-        path: ["endDate"],
-      }
-    ),
+    .refine((data) => data.neverEnds || (data.endDate && data.endDate), {
+      message: "Either select an end date or select the never ends option",
+      path: ["endDate"],
+    }),
   weeklyDaySelectorOptions: z.array(
     z.object({
       label: z.string(),

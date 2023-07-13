@@ -114,7 +114,7 @@ model Routine {
     fromTime         DateTime //daylight savings time didn't work: @db.Time
     toTime           DateTime //daylight savings time didn't work: @db.Time@db.Time
     endDate          DateTime? //daylight savings time didn't work: @db.Date
-    neverEnds        Boolean?
+    neverEnds        Boolean
 
     weeklyDaysSelected  DaySelector[] @relation("WeeklyDaysSelected")
     monthlyDaysSelected DaySelector[] @relation("MonthlyDaysSelected")

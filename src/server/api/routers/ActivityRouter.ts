@@ -32,11 +32,11 @@ export const createActivitiesFromRoutine = async (
 };
 
 const createOneTimeActivity = async (routine: Routine, userId: string) => {
-  console.log(
-    `creating one time activity for routine: ${
-      routine.name
-    } on: ${routine.startDate.toLocaleString()}`
-  );
+  // console.log(
+  //   `creating one time activity for routine: ${
+  //     routine.name
+  //   } on: ${routine.startDate.toLocaleString()}`
+  // );
 
   if (!routine.endDate) {
     throw new Error(
@@ -86,11 +86,11 @@ const createDailyActivities = async (routine: Routine, userId: string) => {
   }
 
   while (!isSameDay(start, end) && !isAfter(start, end)) {
-    console.log(
-      `adding daily activity for routine: ${
-        routine.name
-      } on: ${start.toLocaleString()}`
-    );
+    // console.log(
+    //   `adding daily activity for routine: ${
+    //     routine.name
+    //   } on: ${start.toLocaleString()}`
+    // );
     activitiesToAdd.push({
       routineId: routine.id,
       start,
