@@ -6,6 +6,9 @@ import {
   eachMonthOfInterval,
   endOfMonth,
   endOfYear,
+  getHours,
+  getMinutes,
+  getYear,
   isAfter,
   isBefore,
   isSunday,
@@ -266,71 +269,57 @@ const createYearlyActivities = async (
   },
   userId: string
 ) => {
-  throw new Error("Not built yet");
-  // let datesToAdd: Date[] = [];
+  if (!routine.yearlyMonthValue) {
+    throw new Error(
+      "Unable to create yearly activities without yearly month value, routine: " +
+        routine.name
+    );
+  }
 
-  // const userTimezone = await getUserTimezone(userId);
+  if (!routine.yearlyDayValue) {
+    throw new Error(
+      "Unable to create yearly activities without yearly day value, routine: " +
+        routine.name
+    );
+  }
 
-  // let start = combineDateAndTime(routine.startDate, routine.fromTime);
-  // const initialDate = start;
-  // // if "Never end" is selected we build out activities for the given year.
-  // // An activity will ask on New Years if we should build out the new year or
-  // // if user wants to make adjustments
-  // const end = routine.neverEnds
-  //   ? endOfYear(start)
-  //   : combineDateAndTime(routine.endDate as Date, routine.toTime);
-  // const startEndInterval = { start, end };
+  const start = routine.startDate;
+  const end = endOfYear(start);
+  const thisYear = { start, end };
 
-  // // set start to current week's sunday, will remove if out of range later
-  // if (!isSunday(start)) {
-  //   start = previousSunday(start);
-  // }
-  // const selectedDays = routine.weeklyDaysSelected.filter((day) => day.selected);
-  // while (!isAfter(start, end)) {
-  //   selectedDays.forEach((day) => {
-  //     if (day.label === "Sunday") {
-  //       datesToAdd.push(start);
-  //     } else if (day.label === "Monday") {
-  //       datesToAdd.push(addDays(start, 1));
-  //     } else if (day.label === "Tuesday") {
-  //       datesToAdd.push(addDays(start, 2));
-  //     } else if (day.label === "Wednesday") {
-  //       datesToAdd.push(addDays(start, 3));
-  //     } else if (day.label === "Thursday") {
-  //       datesToAdd.push(addDays(start, 4));
-  //     } else if (day.label === "Friday") {
-  //       datesToAdd.push(addDays(start, 5));
-  //     } else if (day.label === "Saturday") {
-  //       datesToAdd.push(addDays(start, 6));
-  //     }
-  //   });
+  const userTimezone = await getUserTimezone(userId);
 
-  //   start = nextSunday(start);
-  // }
+  const activityStart = new Date(
+    getYear(routine.startDate),
+    routine.yearlyMonthValue - 1,
+    routine.yearlyDayValue,
+    getHours(routine.fromTime),
+    getMinutes(routine.fromTime)
+  );
 
-  // // chop off out of range ranges
-  // datesToAdd = datesToAdd.filter((date) =>
-  //   isWithinInterval(date, startEndInterval)
-  // );
+  const activityEnd = new Date(
+    getYear(routine.startDate),
+    routine.yearlyMonthValue - 1,
+    routine.yearlyDayValue,
+    getHours(routine.toTime),
+    getMinutes(routine.toTime)
+  );
 
-  // const activitiesToAdd = new Array(datesToAdd.length);
-  // datesToAdd.forEach((date) => {
-  //   activitiesToAdd.push({
-  //     routineId: routine.id,
-  //     start: adjustForDaylightSavings(initialDate, userTimezone, date),
-  //     end: adjustForDaylightSavings(
-  //       initialDate,
-  //       userTimezone,
-  //       combineDateAndTime(date, routine.toTime)
-  //     ),
-  //     userId,
-  //   });
-  // });
+  const activity = {
+    routineId: routine.id,
+    start: adjustForDaylightSavings(start, userTimezone, activityStart),
+    end: adjustForDaylightSavings(start, userTimezone, activityEnd),
+    userId,
+  };
 
-  // const result = await prisma.activity.createMany({
-  //   data: activitiesToAdd,
-  // });
-  // return result;
+  if (isWithinInterval(activity.start, thisYear)) {
+    const result = await prisma.activity.create({
+      data: activity,
+    });
+    return result;
+  }
+
+  return null;
 };
 
 const deleteActivitiesForRoutine = async (routine: Routine) => {
