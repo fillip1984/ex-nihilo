@@ -453,20 +453,6 @@ const RoutineDetails = () => {
                 {...register("routine.startDate")}
               />
             </div>
-            <div className="grid grid-cols-6 items-center gap-2">
-              <label>From</label>
-              <input
-                type="time"
-                {...register("routine.fromTime")}
-                className="col-span-2"
-              />
-              <label>To</label>
-              <input
-                type="time"
-                {...register("routine.toTime")}
-                className="col-span-2"
-              />
-            </div>
             {occurrenceTypeWatch !== "NEVER" && (
               <div className="grid grid-cols-5 items-center gap-2">
                 <label>Ends</label>
@@ -493,6 +479,20 @@ const RoutineDetails = () => {
                 )}
               </div>
             )}
+            <div className="grid grid-cols-6 items-center gap-2 pt-3">
+              <label>From</label>
+              <input
+                type="time"
+                {...register("routine.fromTime")}
+                className="col-span-2"
+              />
+              <label>To</label>
+              <input
+                type="time"
+                {...register("routine.toTime")}
+                className="col-span-2"
+              />
+            </div>
           </div>
         </div>
 
