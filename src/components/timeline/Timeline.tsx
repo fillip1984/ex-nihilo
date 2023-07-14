@@ -201,7 +201,7 @@ const FabSection = () => {
                 key={fabOption.label}
                 href={fabOption.href}
                 className={`rounded bg-slate-800 p-2 text-slate-200 transition duration-200 ease-in-out ${
-                  fabOpen ? "opacity-100" : "translate-y-3 opacity-0"
+                  fabOpen ? "opacity-100" : "hidden"
                 }`}>
                 {fabOption.label}
               </Link>
