@@ -16,6 +16,7 @@ export type RoutineAndAll = Routine & {
 export const preferencesFormSchema = z.object({
   latitude: z.number().nullish(),
   longitude: z.number().nullish(),
+  timezone: z.string(),
 });
 // TODO: figure out how to require both
 // .refine(

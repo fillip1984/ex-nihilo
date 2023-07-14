@@ -34,6 +34,7 @@ const Preferences = () => {
       reset({
         latitude: preferences.latitude,
         longitude: preferences.longitude,
+        timezone: preferences.timezone,
       });
     }
   }, [preferences, reset]);
@@ -167,6 +168,19 @@ const Preferences = () => {
                   Explanation
                 </a>
               </div>
+
+              <div className="form-card-field-set my-2 grid grid-cols-3 items-center">
+                <label htmlFor="timezone">Timezone</label>
+                <select
+                  {...register("timezone")}
+                  id="timezone"
+                  className="col-span-2">
+                  <option value="America/New_York">America/New York</option>
+                </select>
+              </div>
+              <p className="text-center text-xs">
+                Timezone is used for observing Daylight savings time
+              </p>
             </div>
 
             <div className="form-fixed-button-group fixed bottom-0 left-0 right-0 z-50 flex h-16 border-t-4 border-t-white bg-slate-800">
