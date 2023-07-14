@@ -9,32 +9,33 @@ import {
   GiIonicColumn,
   GiPerspectiveDiceSixFacesRandom,
 } from "react-icons/gi";
-import { GrMonitor, GrStatusUnknown } from "react-icons/gr";
+import { GrStatusUnknown } from "react-icons/gr";
 import {
   MdOutlineCleaningServices,
   MdOutlineLocalLaundryService,
 } from "react-icons/md";
+import { PiTelevisionThin } from "react-icons/pi";
 
 const iconOptions = [
-  { name: "BiBed", icon: <BiBed /> },
-  { name: "BsTrash", icon: <BsTrash /> },
-  { name: "FaBed", icon: <FaBed /> },
-  { name: "FaBrain", icon: <FaBrain /> },
-  { name: "FaRunning", icon: <FaRunning /> },
-  { name: "BsSunrise", icon: <BsSunrise /> },
-  { name: "BsSunset", icon: <BsSunset /> },
-  { name: "FaToilet", icon: <FaToilet /> },
-  { name: "GiForkKnifeSpoon", icon: <GiForkKnifeSpoon /> },
-  { name: "GiGrass", icon: <GiGrass /> },
-  { name: "GrMonitor", icon: <GrMonitor /> },
-  { name: "GiIonicColumn", icon: <GiIonicColumn /> },
+  { name: "Bed", icon: <BiBed /> },
+  { name: "Trash", icon: <BsTrash /> },
+  { name: "Bed", icon: <FaBed /> },
+  { name: "Brain", icon: <FaBrain /> },
+  { name: "Running", icon: <FaRunning /> },
+  { name: "Sunrise", icon: <BsSunrise /> },
+  { name: "Sunset", icon: <BsSunset /> },
+  { name: "Toilet", icon: <FaToilet /> },
+  { name: "Silverware", icon: <GiForkKnifeSpoon /> },
+  { name: "Grass", icon: <GiGrass /> },
+  { name: "TV", icon: <PiTelevisionThin /> },
+  { name: "Column", icon: <GiIonicColumn /> },
   {
-    name: "GiPerspectiveDiceSixFacesRandom",
+    name: "Unknown",
     icon: <GiPerspectiveDiceSixFacesRandom />,
   },
-  { name: "MdOutlineCleaningServices", icon: <MdOutlineCleaningServices /> },
+  { name: "Broom", icon: <MdOutlineCleaningServices /> },
   {
-    name: "MdOutlineLocalLaundryService",
+    name: "Laundry",
     icon: <MdOutlineLocalLaundryService />,
   },
 ];
