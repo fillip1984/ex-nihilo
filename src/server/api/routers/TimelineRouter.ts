@@ -4,18 +4,24 @@ import { prisma } from "~/server/db";
 import { type TimelineEvent } from "~/types";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { fetchSunInfo } from "./SunInfoRouter";
+import { utcToZonedTime } from "date-fns-tz";
+import { getUserTimezone } from "./PreferencesRouter";
 
 export const TimelineRouter = createTRPCRouter({
   buildAgenda: protectedProcedure
     .input(z.object({ date: z.date(), filter: z.string().nullish() }))
     .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      const userTimeZone = await getUserTimezone(userId);
+      const userTime = utcToZonedTime(input.date, userTimeZone);
+      console.log("building agenda for", userTime, input.filter);
+
       // fold in the cheese
       let events: TimelineEvent[] = [];
 
-      const userId = ctx.session.user.id;
       const activities = await buildActivityInfo(
         userId,
-        input.date,
+        userTime,
         input.filter
       );
 
@@ -30,7 +36,7 @@ export const TimelineRouter = createTRPCRouter({
       if (input.filter === "Available" || input.filter === "All") {
         if (preferences?.latitude && preferences?.longitude) {
           const { sunrise, sunset } = await buildSunInfo(
-            input.date,
+            userTime,
             preferences.latitude,
             preferences.longitude
           );
