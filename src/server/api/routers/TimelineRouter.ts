@@ -14,7 +14,12 @@ export const TimelineRouter = createTRPCRouter({
       const userId = ctx.session.user.id;
       const userTimeZone = await getUserTimezone(userId);
       const userTime = utcToZonedTime(input.date, userTimeZone);
-      console.log("building agenda for", userTime, input.filter);
+      console.log(
+        "building agenda for date:",
+        userTime,
+        " and filter:",
+        input.filter
+      );
 
       // fold in the cheese
       let events: TimelineEvent[] = [];

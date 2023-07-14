@@ -23,32 +23,35 @@ export const PreferencesRouter = createTRPCRouter({
       return result;
     }),
   read: protectedProcedure.query(async ({ ctx }) => {
-    let preferences = await ctx.prisma.preferences.findUnique({
-      where: {
-        userId: ctx.session.user.id,
-      },
-    });
-
-    // build out preferences if it doesn't already exist
-    if (!preferences) {
-      preferences = await ctx.prisma.preferences.create({
-        data: {
-          userId: ctx.session.user.id,
-        },
-      });
-    }
-
-    return preferences;
+    return getOrCreateUserPreferences(ctx.session.user.id);
   }),
 });
 
-export const getUserTimezone = async (userId: string) => {
-  const userPreferences = await prisma.preferences.findUnique({
-    where: { userId },
+export const getOrCreateUserPreferences = async (userId: string) => {
+  let preferences = await prisma.preferences.findUnique({
+    where: {
+      userId,
+    },
   });
-  if (!userPreferences) {
+
+  // build out preferences if it doesn't already exist
+  if (!preferences) {
+    preferences = await prisma.preferences.create({
+      data: {
+        userId,
+      },
+    });
+  }
+
+  return preferences;
+};
+
+export const getUserTimezone = async (userId: string) => {
+  const user = await getOrCreateUserPreferences(userId);
+
+  if (!user) {
     throw new Error("Unable to determine user timezone, userId: " + userId);
   }
 
-  return userPreferences.timezone;
+  return user.timezone;
 };
