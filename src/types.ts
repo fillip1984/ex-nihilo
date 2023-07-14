@@ -1,6 +1,17 @@
-import { type Activity, OccurrenceType } from "@prisma/client";
+import {
+  OccurrenceType,
+  type Activity,
+  type DaySelector,
+  type Routine,
+} from "@prisma/client";
 import { z } from "zod";
 
+/////TRPC STUFF
+export type RoutineAndAll = Routine & {
+  weeklyDaysSelected: DaySelector[];
+  monthlyDaysSelected: DaySelector[];
+};
+/////FORM STUFF
 // TODO: figure out how to allow undefined or null. Right now there is no way to reset or zero out these values
 export const preferencesFormSchema = z.object({
   latitude: z.number().nullish(),

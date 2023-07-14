@@ -1,5 +1,6 @@
 import { preferencesFormSchema } from "~/types";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { prisma } from "~/server/db";
 
 export const PreferencesRouter = createTRPCRouter({
   save: protectedProcedure
@@ -40,3 +41,14 @@ export const PreferencesRouter = createTRPCRouter({
     return preferences;
   }),
 });
+
+export const getUserTimezone = async (userId: string) => {
+  const userPreferences = await prisma.preferences.findUnique({
+    where: { userId },
+  });
+  if (!userPreferences) {
+    throw new Error("Unable to determine user timezone, userId: " + userId);
+  }
+
+  return userPreferences.timezone;
+};
