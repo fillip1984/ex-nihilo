@@ -3,8 +3,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { BsBodyText } from "react-icons/bs";
-import { FaSearch } from "react-icons/fa";
+import { BsArchive, BsBodyText, BsThreeDotsVertical } from "react-icons/bs";
+import { FaSearch, FaTrashAlt } from "react-icons/fa";
+import TextareaAutosize from "react-textarea-autosize";
 import {
   ColorSearchModal,
   IconSearchModal,
@@ -51,7 +52,7 @@ const TopicDetails = () => {
 
   // mutate stuff
   const utils = api.useContext();
-  const deleteTopic = api.topics.delete.useMutation({
+  const { mutate: deleteTopic } = api.topics.delete.useMutation({
     onSuccess: async () => {
       await utils.topics.invalidate();
       void router.push("/topics");
@@ -81,7 +82,7 @@ const TopicDetails = () => {
   };
 
   const handleDelete = () => {
-    deleteTopic.mutate({ id: id as string });
+    deleteTopic({ id: id as string });
   };
 
   const handleIconSearch = () => {
@@ -102,6 +103,23 @@ const TopicDetails = () => {
     }
   }, [selectedColor, setValue]);
 
+  const [topicMenuOpen, setTopicMenuOpen] = useState(false);
+  const topicMenuItems = [
+    {
+      label: "Delete",
+      icon: <FaTrashAlt />,
+      action: handleDelete,
+    },
+    {
+      label: "Archive",
+      icon: <BsArchive />,
+      action: () => {
+        console.log("archive coming soon");
+        setTopicMenuOpen(false);
+      },
+    },
+  ];
+
   return (
     <div className="form-container mx-auto w-full px-4 md:w-2/3 lg:w-1/2 xl:w-1/3">
       <form
@@ -109,13 +127,57 @@ const TopicDetails = () => {
         onSubmit={handleSubmit(onSubmit)}
         className="mx-4 flex flex-col gap-2 pt-8">
         <div className="form-card rounded-lg bg-slate-300 p-2 text-slate-700">
+          <div className="relative flex items-center justify-between">
+            <div className="form-card-title flex items-center gap-2 py-2 text-2xl">
+              <BsBodyText />
+              <span className="uppercase">Routine</span>
+            </div>
+            {!isNew && (
+              <button
+                type="button"
+                onClick={() => setTopicMenuOpen(true)}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-400/50">
+                <BsThreeDotsVertical />
+              </button>
+            )}
+            <div
+              id="avatar-menu"
+              className={`bg- absolute right-0 top-12 z-[999] w-36 rounded bg-white/70 backdrop-blur transition duration-300 ease-in-out ${
+                topicMenuOpen ? "" : "hidden"
+              }`}>
+              <div className="flex flex-col p-2">
+                {topicMenuItems.map((menuItem) => (
+                  <button
+                    type="button"
+                    key={menuItem.label}
+                    onClick={menuItem.action}
+                    className="flex items-center gap-2 rounded p-2 text-slate-600 hover:bg-slate-400 hover:text-white">
+                    {menuItem.icon}
+                    {menuItem.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div
+              id="routineMenu-backdrop"
+              onClick={() => setTopicMenuOpen(false)}
+              className={`fixed bottom-0 left-0 right-0 top-0 z-[998] ${
+                topicMenuOpen ? "" : "hidden"
+              }`}
+            />
+          </div>
+        </div>
+        <div className="form-card rounded-lg bg-slate-300 p-2 text-slate-700">
           <div className="form-card-title flex items-center gap-2 py-2 text-2xl">
             <BsBodyText />
             <span className="uppercase">INFO</span>
           </div>
           <div className="form-card-field-set space-y-1 px-2">
             <input type="text" placeholder="Name" {...register("name")} />
-            <textarea placeholder="Details" {...register("description")} />
+            <TextareaAutosize
+              placeholder="Details"
+              {...register("description")}
+            />
           </div>
           <div className="grid grid-cols-5 items-center gap-2 space-y-1 px-2">
             <label>Icon</label>
@@ -167,7 +229,7 @@ const TopicDetails = () => {
           </div> */}
         </div>
 
-        {!isNew && (
+        {/* {!isNew && (
           <div className="flex items-center justify-center">
             <button
               type="button"
@@ -176,7 +238,7 @@ const TopicDetails = () => {
               Delete
             </button>
           </div>
-        )}
+        )} */}
         {/* <div className="mt-4 flex justify-between p-4"> */}
         <div className="fixed bottom-0 left-0 right-0 z-50 flex h-16 border-t-4 border-t-white bg-slate-800">
           <Link

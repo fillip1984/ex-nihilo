@@ -6,12 +6,16 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm, useWatch, type SubmitHandler } from "react-hook-form";
 import {
+  BsArchive,
   BsBodyText,
   BsChevronDown,
   BsClock,
   BsGeoAlt,
   BsRepeat,
+  BsThreeDotsVertical,
 } from "react-icons/bs";
+import { FaTrashAlt } from "react-icons/fa";
+import TextareaAutosize from "react-textarea-autosize";
 import { routineFormSchema, type RoutineFormSchemaType } from "~/types";
 
 import { api } from "~/utils/api";
@@ -164,12 +168,70 @@ const RoutineDetails = () => {
     }
   };
 
+  const [routineMenuOpen, setRoutineMenuOpen] = useState(false);
+  const routineMenuItems = [
+    {
+      label: "Delete",
+      icon: <FaTrashAlt />,
+      action: () => deleteRoutine({ id: id as string }),
+    },
+    {
+      label: "Archive",
+      icon: <BsArchive />,
+      action: () => {
+        console.log("archive coming soon");
+        setRoutineMenuOpen(false);
+      },
+    },
+  ];
+
   return (
     <div className="form-container mx-auto w-full px-4 md:w-2/3 lg:w-1/2 xl:w-1/3">
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-2 pt-8">
+        <div className="form-card rounded-lg bg-slate-300 p-2 text-slate-700">
+          <div className="relative flex items-center justify-between">
+            <div className="form-card-title flex items-center gap-2 py-2 text-2xl">
+              <BsBodyText />
+              <span className="uppercase">Routine</span>
+            </div>
+            {!isNew && (
+              <button
+                type="button"
+                onClick={() => setRoutineMenuOpen(true)}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-400/50">
+                <BsThreeDotsVertical />
+              </button>
+            )}
+            <div
+              id="avatar-menu"
+              className={`bg- absolute right-0 top-12 z-[999] w-36 rounded bg-white/70 backdrop-blur transition duration-300 ease-in-out ${
+                routineMenuOpen ? "" : "hidden"
+              }`}>
+              <div className="flex flex-col p-2">
+                {routineMenuItems.map((menuItem) => (
+                  <button
+                    type="button"
+                    key={menuItem.label}
+                    onClick={menuItem.action}
+                    className="flex items-center gap-2 rounded p-2 text-slate-600 hover:bg-slate-400 hover:text-white">
+                    {menuItem.icon}
+                    {menuItem.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div
+              id="routineMenu-backdrop"
+              onClick={() => setRoutineMenuOpen(false)}
+              className={`fixed bottom-0 left-0 right-0 top-0 z-[998] ${
+                routineMenuOpen ? "" : "hidden"
+              }`}
+            />
+          </div>
+        </div>
         <div className="form-card rounded-lg bg-slate-300 p-2 text-slate-700">
           <div className="form-card-title flex items-center gap-2 py-2 text-2xl">
             <BsBodyText />
@@ -181,7 +243,7 @@ const RoutineDetails = () => {
               placeholder="Name"
               {...register("routine.name")}
             />
-            <textarea
+            <TextareaAutosize
               placeholder="Description"
               {...register("routine.description")}
             />
@@ -482,17 +544,6 @@ const RoutineDetails = () => {
             </div>
           )}
         </div>
-
-        {!isNew && freshRoutine && (
-          <div className="flex items-center justify-center">
-            <button
-              type="button"
-              onClick={() => deleteRoutine({ id: freshRoutine?.id })}
-              className="my-4 flex w-1/2 items-center justify-center gap-1 rounded bg-red-600 px-4 py-2 text-2xl text-black">
-              Delete
-            </button>
-          </div>
-        )}
 
         {/* <div className="mt-4 flex justify-between p-4"> */}
         <div className="fixed bottom-0 left-0 right-0 z-50 flex h-16 border-t-4 border-t-white bg-slate-800">
