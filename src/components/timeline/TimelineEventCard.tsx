@@ -1,20 +1,15 @@
 import { format, formatDuration, isEqual } from "date-fns";
 import { BiCategory } from "react-icons/bi";
 import { BsBodyText } from "react-icons/bs";
-import {
-  FaCaretDown,
-  FaChevronDown,
-  FaRegClock,
-  FaStopwatch,
-} from "react-icons/fa";
+import { FaChevronDown, FaRegClock, FaStopwatch } from "react-icons/fa";
 import { MdCheck, MdNotInterested } from "react-icons/md";
 
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useState } from "react";
 import { type TimelineEvent } from "~/types";
 import { api } from "~/utils/api";
 import { HH_mm_aka24hr } from "~/utils/date";
 import { IconAvatar } from "../topics/IconsAndColorHelpers";
-import { useState } from "react";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
   const utils = api.useContext();
