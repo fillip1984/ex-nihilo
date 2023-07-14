@@ -110,6 +110,7 @@ const buildActivityInfo = async (
         start: activity.start,
         end: activity.end,
       }),
+      onComplete: activity.routine.onComplete,
     };
     return event;
   });
@@ -141,6 +142,7 @@ const buildSunInfo = async (
       activity: null,
       topicName: "Nature",
       duration: sunInfo.dayLength,
+      onComplete: "SIMPLE",
     };
   }
   if (sunInfo) {
@@ -159,6 +161,7 @@ const buildSunInfo = async (
       activity: null,
       topicName: "Nature",
       duration: sunInfo.dayLength,
+      onComplete: "SIMPLE",
     };
   }
 

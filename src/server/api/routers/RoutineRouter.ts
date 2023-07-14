@@ -14,6 +14,7 @@ export const RoutineRouter = createTRPCRouter({
         data: {
           name: input.routine.name,
           description: input.routine.description,
+          onComplete: input.routine.onComplete,
           occurrenceType: input.routine.occurrenceType,
           startDate: input.routine.startDate,
           fromTime: input.routine.fromTime,
@@ -125,6 +126,7 @@ export const RoutineRouter = createTRPCRouter({
         data: {
           name: input.routine.name,
           description: input.routine.description,
+          onComplete: input.routine.onComplete,
           occurrenceType: input.routine.occurrenceType,
           startDate: input.routine.startDate,
           fromTime: input.routine.fromTime,

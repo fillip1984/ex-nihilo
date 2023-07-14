@@ -1,4 +1,5 @@
 import {
+  CompleteOptionType,
   OccurrenceType,
   type Activity,
   type DaySelector,
@@ -38,6 +39,7 @@ export const routineFormSchema = z.object({
       name: z.string().min(1),
       description: z.string().min(1),
       topicId: z.string().min(1),
+      onComplete: z.nativeEnum(CompleteOptionType),
       occurrenceType: z.nativeEnum(OccurrenceType),
       dailyEveryValue: z.number().nullish(),
       yearlyMonthValue: z.number().nullish(),
@@ -48,6 +50,7 @@ export const routineFormSchema = z.object({
       neverEnds: z.boolean(),
       endDate: z.string().optional(),
     })
+    // TODO: bugs!, leaving alone for now but need to overhaul this form's validation
     .refine((data) => data.neverEnds || (data.endDate && data.endDate), {
       message: "Either select an end date or select the never ends option",
       path: ["endDate"],
@@ -110,6 +113,8 @@ export type TimelineEvent = {
   topicName: string;
 
   duration: Duration;
+
+  onComplete: CompleteOptionType;
 };
 
 export type TimelineEventType = "Suninfo" | "Activity";

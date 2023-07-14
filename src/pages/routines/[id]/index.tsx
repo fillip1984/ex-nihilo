@@ -84,6 +84,7 @@ const RoutineDetails = () => {
           name: freshRoutine.name,
           description: freshRoutine.description,
           topicId: freshRoutine.topicId,
+          onComplete: freshRoutine.onComplete,
           occurrenceType: freshRoutine.occurrenceType,
           dailyEveryValue: freshRoutine.dailyEveryValue,
           yearlyMonthValue: freshRoutine.yearlyMonthValue,
@@ -159,6 +160,10 @@ const RoutineDetails = () => {
   });
 
   const onSubmit: SubmitHandler<RoutineFormSchemaType> = (formData) => {
+    if (formData.routine.occurrenceType === "NEVER") {
+      formData.routine.endDate = formData.routine.startDate;
+    }
+
     if (isNew) {
       createRoutine({ ...formData });
     } else {
@@ -249,7 +254,7 @@ const RoutineDetails = () => {
           <div className="grid grid-cols-5 items-center gap-2 px-2">
             <label>Topic</label>
             <select
-              className="col-span-2 col-start-4"
+              className="col-span-3 col-start-3"
               {...register("routine.topicId")}>
               <option value=""></option>
               {topics?.map((topic) => (
@@ -257,6 +262,20 @@ const RoutineDetails = () => {
                   {topic.name}
                 </option>
               ))}
+            </select>
+          </div>
+          <div className="mt-1 grid grid-cols-5 items-center gap-2 px-2">
+            <label className="col-span-2">On completion</label>
+            <select
+              className="col-span-3 col-start-3"
+              {...register("routine.onComplete")}>
+              <option value="SIMPLE">No interaction</option>
+              <option value="NOTE">Take notes</option>
+              <option value="WEIGH_IN">Weigh in</option>
+              <option value="BLOOD_PRESSURE_READING">
+                Blood pressure reading
+              </option>
+              <option value="RUNNERS_LOG">Running log</option>
             </select>
           </div>
         </div>
