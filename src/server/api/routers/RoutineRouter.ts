@@ -85,6 +85,9 @@ export const RoutineRouter = createTRPCRouter({
           select: { activities: true },
         },
       },
+      orderBy: {
+        name: "asc",
+      },
     });
     return result;
   }),
