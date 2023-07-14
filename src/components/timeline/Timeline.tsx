@@ -219,7 +219,7 @@ const FabSection = () => {
       <div
         id="fab-backdrop"
         onClick={() => setFabOpen((prev) => !prev)}
-        className={`absolute bottom-0 left-0 right-0 top-0 z-[997] bg-slate-200/30 backdrop-blur-sm ${
+        className={`fixed bottom-0 left-0 right-0 top-0 z-[997] bg-slate-200/30 backdrop-blur-sm ${
           fabOpen ? "" : "hidden"
         }`}></div>
     </div>
