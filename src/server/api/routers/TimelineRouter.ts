@@ -1,11 +1,11 @@
 import { endOfDay, intervalToDuration, startOfDay } from "date-fns";
+import { zonedTimeToUtc } from "date-fns-tz";
 import { z } from "zod";
 import { prisma } from "~/server/db";
 import { type TimelineEvent } from "~/types";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { fetchSunInfo } from "./SunInfoRouter";
-import { utcToZonedTime } from "date-fns-tz";
 import { getUserTimezone } from "./PreferencesRouter";
+import { fetchSunInfo } from "./SunInfoRouter";
 
 export const TimelineRouter = createTRPCRouter({
   buildAgenda: protectedProcedure
@@ -13,10 +13,13 @@ export const TimelineRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
       const userTimeZone = await getUserTimezone(userId);
-      const userTime = utcToZonedTime(input.date, userTimeZone);
+      const searchIntervalUTC = {
+        start: zonedTimeToUtc(startOfDay(input.date), userTimeZone),
+        end: zonedTimeToUtc(endOfDay(input.date), userTimeZone),
+      };
       console.log(
-        "building agenda for date:",
-        userTime,
+        "building agenda for interval:",
+        searchIntervalUTC,
         " and filter:",
         input.filter
       );
@@ -26,7 +29,7 @@ export const TimelineRouter = createTRPCRouter({
 
       const activities = await buildActivityInfo(
         userId,
-        userTime,
+        searchIntervalUTC,
         input.filter
       );
 
@@ -41,7 +44,7 @@ export const TimelineRouter = createTRPCRouter({
       if (input.filter === "Available" || input.filter === "All") {
         if (preferences?.latitude && preferences?.longitude) {
           const { sunrise, sunset } = await buildSunInfo(
-            userTime,
+            searchIntervalUTC.start,
             preferences.latitude,
             preferences.longitude
           );
@@ -62,18 +65,15 @@ export const TimelineRouter = createTRPCRouter({
 
 const buildActivityInfo = async (
   userId: string,
-  date: Date,
+  searchIntervalUTC: { start: Date; end: Date },
   filter: string | null | undefined
 ) => {
-  const start = startOfDay(date);
-  const end = endOfDay(date);
-
   const result = await prisma.activity.findMany({
     where: {
       userId,
       start: {
-        gte: start,
-        lte: end,
+        gte: searchIntervalUTC.start,
+        lte: searchIntervalUTC.end,
       },
       ...(filter === "Available" ? { skip: false, complete: false } : {}),
       ...(filter === "Complete" ? { complete: true } : {}),

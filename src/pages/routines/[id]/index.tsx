@@ -1,6 +1,6 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format, getDaysInMonth, parse } from "date-fns";
+import { getDaysInMonth } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -19,7 +19,7 @@ import TextareaAutosize from "react-textarea-autosize";
 import { routineFormSchema, type RoutineFormSchemaType } from "~/types";
 
 import { api } from "~/utils/api";
-import { HH_mm_aka24hr, months, yyyyMMddHyphenated } from "~/utils/date";
+import { getMonths } from "~/utils/date";
 
 const RoutineDetails = () => {
   const router = useRouter();
@@ -88,13 +88,11 @@ const RoutineDetails = () => {
           dailyEveryValue: freshRoutine.dailyEveryValue,
           yearlyMonthValue: freshRoutine.yearlyMonthValue,
           yearlyDayValue: freshRoutine.yearlyDayValue,
-          startDate: format(freshRoutine.startDate, yyyyMMddHyphenated),
-          fromTime: format(freshRoutine.fromTime, HH_mm_aka24hr),
-          toTime: format(freshRoutine.toTime, HH_mm_aka24hr),
+          startDate: freshRoutine.startDate,
+          fromTime: freshRoutine.fromTime,
+          toTime: freshRoutine.toTime,
           neverEnds: freshRoutine.neverEnds,
-          endDate: freshRoutine.endDate
-            ? format(freshRoutine.endDate, yyyyMMddHyphenated)
-            : undefined,
+          endDate: freshRoutine.endDate ?? undefined,
         },
         weeklyDaySelectorOptions,
         monthlyDaySelectorOptions,
@@ -194,7 +192,6 @@ const RoutineDetails = () => {
         <div className="form-card rounded-lg bg-slate-300 p-2 text-slate-700">
           <div className="relative flex items-center justify-between">
             <div className="form-card-title flex items-center gap-2 py-2 text-2xl">
-              <BsBodyText />
               <span className="uppercase">Routine</span>
             </div>
             {!isNew && (
@@ -407,7 +404,7 @@ const RoutineDetails = () => {
                     {...register("routine.yearlyMonthValue", {
                       valueAsNumber: true,
                     })}>
-                    {months.map((month) => (
+                    {getMonths().map((month) => (
                       <option key={month.number} value={month.number}>
                         {month.name}
                       </option>
@@ -453,35 +450,20 @@ const RoutineDetails = () => {
               <input
                 type="date"
                 className="col-span-2 col-start-4"
-                {...register("routine.startDate", {
-                  setValueAs: (v) => {
-                    if (!v) return undefined;
-                    return parse(v as string, yyyyMMddHyphenated, new Date());
-                  },
-                })}
+                {...register("routine.startDate")}
               />
             </div>
             <div className="grid grid-cols-6 items-center gap-2">
               <label>From</label>
               <input
                 type="time"
-                {...register("routine.fromTime", {
-                  setValueAs: (v) => {
-                    if (!v) return undefined;
-                    return parse(v as string, "HH:mm", new Date());
-                  },
-                })}
+                {...register("routine.fromTime")}
                 className="col-span-2"
               />
               <label>To</label>
               <input
                 type="time"
-                {...register("routine.toTime", {
-                  setValueAs: (v) => {
-                    if (!v) return undefined;
-                    return parse(v as string, "HH:mm", new Date());
-                  },
-                })}
+                {...register("routine.toTime")}
                 className="col-span-2"
               />
             </div>
@@ -501,12 +483,7 @@ const RoutineDetails = () => {
                 <input
                   type="date"
                   className="col-span-2 col-start-4"
-                  {...register("routine.endDate", {
-                    setValueAs: (v) => {
-                      if (!v) return undefined;
-                      return parse(v as string, yyyyMMddHyphenated, new Date());
-                    },
-                  })}
+                  {...register("routine.endDate")}
                   disabled={neverEndsWatch}
                 />
                 {errors.routine?.endDate && (

@@ -1,10 +1,8 @@
-import { format } from "date-fns";
 import Link from "next/link";
 import { BsBodyText, BsClock, BsRepeat } from "react-icons/bs";
 import { TbTimelineEvent } from "react-icons/tb";
 import LoadingErrorAndRetry from "~/components/shared/LoadingErrorAndRetry";
 import { api } from "~/utils/api";
-import { HH_mm_aka24hr } from "~/utils/date";
 
 const RoutineList = () => {
   const {
@@ -80,10 +78,8 @@ const RoutineList = () => {
                 </div>
                 <div className="factoid flex items-center gap-2">
                   <BsClock className="text-2xl" />
-                  {format(routine.fromTime, HH_mm_aka24hr)}
-                  {routine.toTime
-                    ? " - " + format(routine.toTime, HH_mm_aka24hr)
-                    : ""}
+                  {routine.fromTime}
+                  {routine.toTime ? " - " + routine.toTime : ""}
                 </div>
                 {/* <p className="text-xs text-gray-300">{event.topic}</p> */}
                 {/* // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}

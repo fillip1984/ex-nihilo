@@ -2,9 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["jsonProtocol"]
-    binaryTargets   = ["native", "linux-arm64-openssl-1.0.x"]
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "linux-arm64-openssl-1.0.x"]
 }
 
 datasource db {
@@ -113,10 +112,10 @@ model Routine {
     yearlyDayValue   Int?
     // time is tricky. Everything will be stored as UTC time. So if you set a start time of 1/1/23 00:00 (midnight), depending on day light savings time, it will set it for 1/2/23 04:00 or 05:00.
     // Seems like dayjs and date-fns have issues with daylight savings so I rolled my own solution under date.js
-    startDate        DateTime
-    fromTime         DateTime
-    toTime           DateTime
-    endDate          DateTime?
+    startDate        String
+    fromTime         String
+    toTime           String
+    endDate          String?
     neverEnds        Boolean
 
     weeklyDaysSelected  DaySelector[] @relation("WeeklyDaysSelected")

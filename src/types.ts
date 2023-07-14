@@ -42,11 +42,11 @@ export const routineFormSchema = z.object({
       dailyEveryValue: z.number().nullish(),
       yearlyMonthValue: z.number().nullish(),
       yearlyDayValue: z.number().nullish(),
-      startDate: z.string().or(z.date()),
-      fromTime: z.string().or(z.date()),
-      toTime: z.string().or(z.date()),
+      startDate: z.string(),
+      fromTime: z.string(),
+      toTime: z.string(),
       neverEnds: z.boolean(),
-      endDate: z.string().or(z.date()).optional(),
+      endDate: z.string().optional(),
     })
     .refine((data) => data.neverEnds || (data.endDate && data.endDate), {
       message: "Either select an end date or select the never ends option",

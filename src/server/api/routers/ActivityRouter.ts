@@ -1,19 +1,17 @@
 import { type DaySelector, type Routine } from "@prisma/client";
 import {
   addDays,
-  addHours,
   eachDayOfInterval,
   eachMonthOfInterval,
   endOfMonth,
   endOfYear,
-  getHours,
-  getMinutes,
   getYear,
   isAfter,
   isBefore,
   isSunday,
   isWithinInterval,
   nextSunday,
+  parse,
   previousSunday,
   setDate,
   startOfMonth,
@@ -21,7 +19,7 @@ import {
 import { z } from "zod";
 import { prisma } from "~/server/db";
 import { type RoutineAndAll } from "~/types";
-import { combineDateAndTime, isDaylightSavingsTime } from "~/utils/date";
+import { combineDateAndTime, yyyyMMddHyphenated } from "~/utils/date";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { getUserTimezone } from "./PreferencesRouter";
 
@@ -29,8 +27,6 @@ export const createActivitiesFromRoutine = async (
   routine: RoutineAndAll,
   userId: string
 ) => {
-  // console.log("creating activities from routine", routine.name);
-
   switch (routine.occurrenceType) {
     case "NEVER":
       return await createOneTimeActivity(routine, userId);
@@ -49,27 +45,26 @@ const createOneTimeActivity = async (
   routine: RoutineAndAll,
   userId: string
 ) => {
-  if (!routine.endDate) {
-    throw new Error(
-      "Unable to create one time activity from routine, missing end date. Routine: " +
-        routine.name
-    );
-  }
-
-  if (!routine.toTime) {
-    throw new Error(
-      "Unable to create one time activity from routine, missing to time. Routine: " +
-        routine.name
-    );
-  }
+  console.log("creating one time activity for routine", routine.name);
 
   const userTimezone = await getUserTimezone(userId);
 
-  const start = combineDateAndTime(routine.startDate, routine.fromTime);
-  const end = combineDateAndTime(routine.endDate, routine.toTime);
+  if (!routine.endDate) {
+    throw new Error(
+      "Unable to create one time activity from routine, missing end date. Routine: " +
+        routine.id
+    );
+  }
 
-  const activityStart = adjustForDaylightSavings(start, userTimezone, start);
-  const activityEnd = adjustForDaylightSavings(start, userTimezone, end);
+  const startDate = parse(routine.startDate, yyyyMMddHyphenated, new Date());
+  const endDate = parse(routine.endDate, yyyyMMddHyphenated, new Date());
+
+  const activityStart = combineDateAndTime(
+    startDate,
+    routine.fromTime,
+    userTimezone
+  );
+  const activityEnd = combineDateAndTime(endDate, routine.toTime, userTimezone);
 
   return await prisma.activity.create({
     data: {
@@ -87,38 +82,40 @@ const createDailyActivities = async (
 ) => {
   console.log("creating daily activities for routine", routine.name);
 
+  const userTimezone = await getUserTimezone(userId);
+
   if (!routine.dailyEveryValue) {
     throw new Error(
       "Routine.dailyEveryValue (a.k.a. Every x days value) is not set"
     );
   }
 
-  const start = combineDateAndTime(routine.startDate, routine.fromTime);
+  const startDate = parse(routine.startDate, yyyyMMddHyphenated, new Date());
 
+  let endDate: Date;
   // if "Never end" is selected we build out activities for the given year.
   // An activity will ask on New Years if we should build out the new year or
   // if user wants to make adjustments
-  const end = routine.neverEnds
-    ? endOfYear(start)
-    : combineDateAndTime(routine.endDate as Date, routine.toTime);
+  if (routine.neverEnds) {
+    endDate = endOfYear(startDate);
+  } else if (routine.endDate) {
+    endDate = parse(routine.endDate, yyyyMMddHyphenated, new Date());
+  } else {
+    throw new Error(
+      "Unable to create weekly activities from routine, missing end date (wasn't marked as never ending). Routine: " +
+        routine.id
+    );
+  }
 
-  const days = eachDayOfInterval({ start, end });
-  console.log({ start, end });
-
-  const userTimezone = await getUserTimezone(userId);
+  const days = eachDayOfInterval({ start: startDate, end: endDate });
 
   const activities = days.map((day) => {
-    console.log(day);
-    const activityStart = adjustForDaylightSavings(
-      start,
-      userTimezone,
-      combineDateAndTime(day, routine.fromTime)
+    const activityStart = combineDateAndTime(
+      day,
+      routine.fromTime,
+      userTimezone
     );
-    const activityEnd = adjustForDaylightSavings(
-      start,
-      userTimezone,
-      combineDateAndTime(day, routine.toTime)
-    );
+    const activityEnd = combineDateAndTime(day, routine.toTime, userTimezone);
 
     const activity = {
       routineId: routine.id,
@@ -139,45 +136,53 @@ const createWeeklyActivities = async (
   routine: RoutineAndAll,
   userId: string
 ) => {
+  console.log("creating weekly activities for routine", routine.name);
   let datesToAdd: Date[] = [];
 
   const userTimezone = await getUserTimezone(userId);
 
-  let start = combineDateAndTime(routine.startDate, routine.fromTime);
-  const initialDate = start;
+  let startDate = parse(routine.startDate, yyyyMMddHyphenated, new Date());
+  let endDate: Date;
   // if "Never end" is selected we build out activities for the given year.
   // An activity will ask on New Years if we should build out the new year or
   // if user wants to make adjustments
-  const end = routine.neverEnds
-    ? endOfYear(start)
-    : combineDateAndTime(routine.endDate as Date, routine.toTime);
-  const startEndInterval = { start, end };
+  if (routine.neverEnds) {
+    endDate = endOfYear(startDate);
+  } else if (routine.endDate) {
+    endDate = parse(routine.endDate, yyyyMMddHyphenated, new Date());
+  } else {
+    throw new Error(
+      "Unable to create weekly activities from routine, missing end date (wasn't marked as never ending). Routine: " +
+        routine.id
+    );
+  }
+  const startEndInterval = { start: startDate, end: endDate };
 
   // set start to current week's sunday, will remove if out of range later
-  if (!isSunday(start)) {
-    start = previousSunday(start);
+  if (!isSunday(startDate)) {
+    startDate = previousSunday(startDate);
   }
   const selectedDays = routine.weeklyDaysSelected.filter((day) => day.selected);
-  while (!isAfter(start, end)) {
+  while (!isAfter(startDate, endDate)) {
     selectedDays.forEach((day) => {
       if (day.label === "Sunday") {
-        datesToAdd.push(start);
+        datesToAdd.push(startDate);
       } else if (day.label === "Monday") {
-        datesToAdd.push(addDays(start, 1));
+        datesToAdd.push(addDays(startDate, 1));
       } else if (day.label === "Tuesday") {
-        datesToAdd.push(addDays(start, 2));
+        datesToAdd.push(addDays(startDate, 2));
       } else if (day.label === "Wednesday") {
-        datesToAdd.push(addDays(start, 3));
+        datesToAdd.push(addDays(startDate, 3));
       } else if (day.label === "Thursday") {
-        datesToAdd.push(addDays(start, 4));
+        datesToAdd.push(addDays(startDate, 4));
       } else if (day.label === "Friday") {
-        datesToAdd.push(addDays(start, 5));
+        datesToAdd.push(addDays(startDate, 5));
       } else if (day.label === "Saturday") {
-        datesToAdd.push(addDays(start, 6));
+        datesToAdd.push(addDays(startDate, 6));
       }
     });
 
-    start = nextSunday(start);
+    startDate = nextSunday(startDate);
   }
 
   // chop off out of range ranges
@@ -186,15 +191,11 @@ const createWeeklyActivities = async (
   );
 
   const activitiesToAdd = new Array(datesToAdd.length);
-  datesToAdd.forEach((date) => {
+  datesToAdd.forEach((day) => {
     activitiesToAdd.push({
       routineId: routine.id,
-      start: adjustForDaylightSavings(initialDate, userTimezone, date),
-      end: adjustForDaylightSavings(
-        initialDate,
-        userTimezone,
-        combineDateAndTime(date, routine.toTime)
-      ),
+      start: combineDateAndTime(day, routine.fromTime, userTimezone),
+      end: combineDateAndTime(day, routine.toTime, userTimezone),
       userId,
     });
   });
@@ -209,17 +210,28 @@ const createMonthlyActivities = async (
   routine: RoutineAndAll,
   userId: string
 ) => {
+  console.log("creating monthly activities for routine", routine.name);
+
   const datesToAdd: Date[] = [];
 
   const userTimezone = await getUserTimezone(userId);
 
-  //figure out how many months we're building for
-  const start = combineDateAndTime(routine.startDate, routine.fromTime);
-  const end = routine.neverEnds
-    ? endOfYear(start)
-    : combineDateAndTime(routine.endDate as Date, routine.toTime);
-
-  const months = eachMonthOfInterval({ start, end });
+  const startDate = parse(routine.startDate, yyyyMMddHyphenated, new Date());
+  let endDate: Date;
+  // if "Never end" is selected we build out activities for the given year.
+  // An activity will ask on New Years if we should build out the new year or
+  // if user wants to make adjustments
+  if (routine.neverEnds) {
+    endDate = endOfYear(startDate);
+  } else if (routine.endDate) {
+    endDate = parse(routine.endDate, yyyyMMddHyphenated, new Date());
+  } else {
+    throw new Error(
+      "Unable to create weekly activities from routine, missing end date (wasn't marked as never ending). Routine: " +
+        routine.id
+    );
+  }
+  const months = eachMonthOfInterval({ start: startDate, end: endDate });
   months.forEach((month) => {
     const monthStart = startOfMonth(month);
     const monthEnd = endOfMonth(month);
@@ -235,7 +247,7 @@ const createMonthlyActivities = async (
         }
         return date;
       })
-      .filter((day) => isAfter(day, start) && isBefore(day, end))
+      .filter((day) => isAfter(day, startDate) && isBefore(day, endDate))
       .forEach((day) => datesToAdd.push(day));
   });
 
@@ -243,16 +255,8 @@ const createMonthlyActivities = async (
   datesToAdd.forEach((date) => {
     activitiesToAdd.push({
       routineId: routine.id,
-      start: adjustForDaylightSavings(
-        start,
-        userTimezone,
-        combineDateAndTime(date, routine.fromTime)
-      ),
-      end: adjustForDaylightSavings(
-        start,
-        userTimezone,
-        combineDateAndTime(date, routine.toTime)
-      ),
+      start: combineDateAndTime(date, routine.fromTime, userTimezone),
+      end: combineDateAndTime(date, routine.toTime, userTimezone),
       userId,
     });
   });
@@ -269,6 +273,10 @@ const createYearlyActivities = async (
   },
   userId: string
 ) => {
+  console.log("creating yearly activities for routine", routine.name);
+
+  const userTimezone = await getUserTimezone(userId);
+
   if (!routine.yearlyMonthValue) {
     throw new Error(
       "Unable to create yearly activities without yearly month value, routine: " +
@@ -283,32 +291,45 @@ const createYearlyActivities = async (
     );
   }
 
-  const start = routine.startDate;
-  const end = endOfYear(start);
-  const thisYear = { start, end };
+  const startDate = parse(routine.startDate, yyyyMMddHyphenated, new Date());
 
-  const userTimezone = await getUserTimezone(userId);
+  let endDate: Date;
+  // if "Never end" is selected we build out activities for the given year.
+  // An activity will ask on New Years if we should build out the new year or
+  // if user wants to make adjustments
+  if (routine.neverEnds) {
+    endDate = endOfYear(startDate);
+  } else if (routine.endDate) {
+    endDate = parse(routine.endDate, yyyyMMddHyphenated, new Date());
+  } else {
+    throw new Error(
+      "Unable to create weekly activities from routine, missing end date (wasn't marked as never ending). Routine: " +
+        routine.id
+    );
+  }
 
-  const activityStart = new Date(
-    getYear(routine.startDate),
-    routine.yearlyMonthValue - 1,
-    routine.yearlyDayValue,
-    getHours(routine.fromTime),
-    getMinutes(routine.fromTime)
-  );
-
-  const activityEnd = new Date(
-    getYear(routine.startDate),
-    routine.yearlyMonthValue - 1,
-    routine.yearlyDayValue,
-    getHours(routine.toTime),
-    getMinutes(routine.toTime)
-  );
+  const thisYear = { start: startDate, end: endDate };
 
   const activity = {
     routineId: routine.id,
-    start: adjustForDaylightSavings(start, userTimezone, activityStart),
-    end: adjustForDaylightSavings(start, userTimezone, activityEnd),
+    start: combineDateAndTime(
+      new Date(
+        getYear(startDate),
+        routine.yearlyMonthValue - 1,
+        routine.yearlyDayValue
+      ),
+      routine.fromTime,
+      userTimezone
+    ),
+    end: combineDateAndTime(
+      new Date(
+        getYear(startDate),
+        routine.yearlyMonthValue - 1,
+        routine.yearlyDayValue
+      ),
+      routine.toTime,
+      userTimezone
+    ),
     userId,
   };
 
@@ -329,33 +350,6 @@ const deleteActivitiesForRoutine = async (routine: Routine) => {
     },
   });
   return result;
-};
-
-const adjustForDaylightSavings = (
-  start: Date,
-  userTimezone: string,
-  activityTime: Date
-) => {
-  const isCreatedDuringDaylightSavings = isDaylightSavingsTime(
-    start,
-    userTimezone
-  );
-
-  if (
-    !isCreatedDuringDaylightSavings &&
-    isDaylightSavingsTime(activityTime, userTimezone)
-  ) {
-    return addHours(activityTime, -1);
-  }
-
-  if (
-    isCreatedDuringDaylightSavings &&
-    !isDaylightSavingsTime(activityTime, userTimezone)
-  ) {
-    return addHours(activityTime, 1);
-  }
-
-  return activityTime;
 };
 
 export const ActivityRouter = createTRPCRouter({
