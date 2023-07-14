@@ -359,6 +359,7 @@ const deleteActivitiesForRoutine = async (routine: Routine) => {
 export const ActivityRouter = createTRPCRouter({
   rebuild: protectedProcedure.mutation(async ({ ctx }) => {
     const userId = ctx.session.user.id;
+    console.log("Rebuilding activities for user: ", userId);
     const routines = await ctx.prisma.routine.findMany({
       where: {
         userId,
@@ -374,6 +375,7 @@ export const ActivityRouter = createTRPCRouter({
       await deleteActivitiesForRoutine(routine);
       await createActivitiesFromRoutine(routine, ctx.session.user.id);
     }
+    console.log("Rebuilt activities for user: ", userId);
   }),
   // readAll: protectedProcedure
   //   .input(z.object({ date: z.date(), filter: z.string().nullish() }))

@@ -161,7 +161,11 @@ const RoutineDetails = () => {
   });
 
   const { mutateAsync: rebuildActivities } =
-    api.routines.rebuildActivities.useMutation();
+    api.routines.rebuildActivities.useMutation({
+      onSuccess: async () => {
+        await utils.routines.invalidate();
+      },
+    });
 
   const onSubmit: SubmitHandler<RoutineFormSchemaType> = (formData) => {
     if (formData.routine.occurrenceType === "NEVER") {

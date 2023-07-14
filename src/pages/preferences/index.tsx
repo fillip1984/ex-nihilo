@@ -67,19 +67,20 @@ const Preferences = () => {
     );
   };
 
-  const { mutate: createActivities } = api.activities.rebuild.useMutation({
-    onMutate: () => {
-      toast("Rebuilding activities");
-    },
-    onSuccess: async () => {
-      await utils.activities.invalidate();
-      toast.success("Rebuild of activities complete");
-    },
-  });
+  const { mutateAsync: rebuildActivities } = api.activities.rebuild.useMutation(
+    {
+      onSuccess: async () => {
+        await utils.activities.invalidate();
+      },
+    }
+  );
 
   const handleRebuildActivities = () => {
-    console.log("rebuilding activities");
-    createActivities();
+    void toast.promise(rebuildActivities(), {
+      loading: "Rebuilding activities",
+      success: "Rebuilt activities",
+      error: "Failed to rebuild activities",
+    });
   };
 
   return (
