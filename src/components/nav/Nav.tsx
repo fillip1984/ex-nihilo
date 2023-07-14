@@ -33,7 +33,7 @@ const AvatarAndMenu = () => {
       .then(() => {
         void router.push("/");
       })
-      .catch(() => console.log("failed to log out"));
+      .catch(() => console.error("failed to log out"));
   };
 
   const menuItems = [

@@ -94,7 +94,7 @@ const isInvited = async ({
   if (!invitee) {
     invitee = await addInviteeForPossibleFutureAccess(potentialInvitee);
   }
-  // console.log("isInvited?", invitee.enabled);
+
   return invitee.enabled;
 };
 
