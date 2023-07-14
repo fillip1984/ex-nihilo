@@ -175,6 +175,7 @@ const TopicDetails = () => {
           <div className="form-card-field-set space-y-1 px-2">
             <input type="text" placeholder="Name" {...register("name")} />
             <TextareaAutosize
+              minRows={2}
               placeholder="Details"
               {...register("description")}
             />

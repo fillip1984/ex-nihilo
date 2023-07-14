@@ -244,6 +244,7 @@ const RoutineDetails = () => {
               {...register("routine.name")}
             />
             <TextareaAutosize
+              minRows={2}
               placeholder="Description"
               {...register("routine.description")}
             />
