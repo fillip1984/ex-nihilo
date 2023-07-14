@@ -88,6 +88,7 @@ export const RoutineRouter = createTRPCRouter({
       },
       orderBy: {
         name: "asc",
+        createdAt: "asc",
       },
     });
     return result;
