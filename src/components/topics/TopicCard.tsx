@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BsBodyText, BsListTask } from "react-icons/bs";
+import { BsListTask } from "react-icons/bs";
 import { type TopicSummaryType } from "~/types";
 import { IconAvatar } from "./IconsAndColorHelpers";
 
@@ -16,10 +16,8 @@ const TopicCard = ({ topic }: { topic: TopicSummaryType }) => {
         </h4>
 
         <div className="flex flex-col gap-3 pl-4">
-          <div className="flex items-center gap-5">
-            <BsBodyText className="h-6 w-6" />
-            <p>{topic.description}</p>
-          </div>
+          <p>{topic.description}</p>
+
           <div className="flex items-center gap-5">
             <BsListTask className="h-6 w-6" />
             {topic._count.routines}
