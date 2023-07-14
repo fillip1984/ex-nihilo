@@ -109,12 +109,12 @@ export const IconSearchModal = ({
     setIconSearchModalVisible(false);
   };
   return (
-    <Dialog
-      open={isOpen}
-      onClose={() => setIconSearchModalVisible(false)}
-      initialFocus={undefined}>
-      <div className="modal-and-backdrop-container fixed inset-0">
-        <div className="modal fixed inset-20 z-[999] rounded-lg bg-slate-900 p-2 text-white">
+    <Dialog open={isOpen} onClose={() => setIconSearchModalVisible(false)}>
+      {/* The backdrop, rendered as a fixed sibling to the panel container */}
+      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+
+      <div className="fixed inset-0">
+        <div className="modal fixed inset-20 z-[999] overflow-y-auto rounded-lg bg-slate-900 p-2 text-white">
           <input
             type="search"
             value={iconSearch}
@@ -139,9 +139,6 @@ export const IconSearchModal = ({
               ))}
           </div>
         </div>
-        <div
-          onClick={() => setIconSearchModalVisible(false)}
-          className="backdrop fixed inset-0 z-[998] bg-slate-200/40 backdrop-blur"></div>
       </div>
     </Dialog>
   );
@@ -164,15 +161,12 @@ export const ColorSearchModal = ({
     setColorSearchModalVisible(false);
   };
   return (
-    <Dialog
-      open={isOpen}
-      onClose={() => setColorSearchModalVisible(false)}
-      initialFocus={undefined}>
+    <Dialog open={isOpen} onClose={() => setColorSearchModalVisible(false)}>
       {/* The backdrop, rendered as a fixed sibling to the panel container */}
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
 
-      <div className="modal-and-backdrop-container fixed inset-0">
-        <div className="modal fixed inset-20 z-[999] rounded-lg bg-slate-900 p-2 text-white">
+      <div className="fixed inset-0">
+        <div className="modal fixed inset-20 z-[999] overflow-y-auto rounded-lg bg-slate-900 p-2 text-white">
           <input
             type="search"
             value={colorSearch}
@@ -198,9 +192,6 @@ export const ColorSearchModal = ({
               ))}
           </div>
         </div>
-        <div
-          onClick={() => setColorSearchModalVisible(false)}
-          className="backdrop fixed inset-0 z-[998] bg-slate-200/40 backdrop-blur"></div>
       </div>
     </Dialog>
   );
