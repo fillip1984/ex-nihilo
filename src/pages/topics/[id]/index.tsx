@@ -193,20 +193,19 @@ const TopicDetails = () => {
       </form>
 
       {/* TODO: would be nice if this covered nav and buttons */}
-      {iconSearchModalVisible && (
-        <IconSearchModal
-          setSelectedIcon={setSelectedIcon}
-          setIconSearchModalVisible={setIconSearchModalVisible}
-        />
-      )}
+      <IconSearchModal
+        setSelectedIcon={setSelectedIcon}
+        isOpen={iconSearchModalVisible}
+        setIconSearchModalVisible={setIconSearchModalVisible}
+      />
 
       {/* TODO: would be nice if this covered nav and buttons */}
-      {colorSearchModalVisible && (
-        <ColorSearchModal
-          setSelectedColor={setSelectedColor}
-          setColorSearchModalVisible={setColorSearchModalVisible}
-        />
-      )}
+
+      <ColorSearchModal
+        setSelectedColor={setSelectedColor}
+        isOpen={colorSearchModalVisible}
+        setColorSearchModalVisible={setColorSearchModalVisible}
+      />
     </div>
   );
 };

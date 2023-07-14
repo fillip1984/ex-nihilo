@@ -1,3 +1,4 @@
+import { Dialog } from "@headlessui/react";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { BiBed } from "react-icons/bi";
 import { BsSunrise, BsSunset, BsTrash } from "react-icons/bs";
@@ -85,9 +86,11 @@ export const IconAvatar = ({
 // TODO: should probably swap to headless UI for this or use the native modal element
 export const IconSearchModal = ({
   setSelectedIcon,
+  isOpen,
   setIconSearchModalVisible,
 }: {
   setSelectedIcon: Dispatch<SetStateAction<string>>;
+  isOpen: boolean;
   setIconSearchModalVisible: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [iconSearch, setIconSearch] = useState("");
@@ -97,45 +100,49 @@ export const IconSearchModal = ({
     setIconSearchModalVisible(false);
   };
   return (
-    <div className="modal-and-backdrop-container fixed inset-0">
-      <div className="modal fixed inset-20 z-[999] rounded-lg bg-slate-900 p-2 text-white">
-        <input
-          type="search"
-          value={iconSearch}
-          onChange={(e) => setIconSearch(e.target.value)}
-          placeholder="search for icons"
-          className=""
-        />
-        <div className="flex flex-wrap justify-center gap-2 overflow-scroll p-4 pb-24">
-          {iconOptions
-            .filter((iconOption) =>
-              iconOption.name.toLowerCase().includes(iconSearch.toLowerCase())
-            )
-            .map((iconOption) => (
-              <button
-                key={iconOption.name}
-                type="button"
-                onClick={() => handleIconSelection(iconOption.name)}
-                className="flex h-[90px] w-[90px] flex-col items-center overflow-hidden rounded border border-white p-4 text-2xl hover:bg-slate-300/40">
-                {iconOption.icon}
-                <p className="mt-1 text-xs">{iconOption.name}</p>
-              </button>
-            ))}
+    <Dialog open={isOpen} onClose={() => setIconSearchModalVisible(false)}>
+      <div className="modal-and-backdrop-container fixed inset-0">
+        <div className="modal fixed inset-20 z-[999] rounded-lg bg-slate-900 p-2 text-white">
+          <input
+            type="search"
+            value={iconSearch}
+            onChange={(e) => setIconSearch(e.target.value)}
+            placeholder="search for icons"
+            className=""
+          />
+          <div className="flex flex-wrap justify-center gap-2 overflow-scroll p-4 pb-24">
+            {iconOptions
+              .filter((iconOption) =>
+                iconOption.name.toLowerCase().includes(iconSearch.toLowerCase())
+              )
+              .map((iconOption) => (
+                <button
+                  key={iconOption.name}
+                  type="button"
+                  onClick={() => handleIconSelection(iconOption.name)}
+                  className="flex h-[90px] w-[90px] flex-col items-center overflow-hidden rounded border border-white p-4 text-2xl hover:bg-slate-300/40">
+                  {iconOption.icon}
+                  <p className="mt-1 text-xs">{iconOption.name}</p>
+                </button>
+              ))}
+          </div>
         </div>
+        <div
+          onClick={() => setIconSearchModalVisible(false)}
+          className="backdrop fixed inset-0 z-[998] bg-slate-200/40 backdrop-blur"></div>
       </div>
-      <div
-        onClick={() => setIconSearchModalVisible(false)}
-        className="backdrop fixed inset-0 z-[998] bg-slate-200/40 backdrop-blur"></div>
-    </div>
+    </Dialog>
   );
 };
 
 // TODO: should probably swap to headless UI for this or use the native modal element
 export const ColorSearchModal = ({
   setSelectedColor,
+  isOpen,
   setColorSearchModalVisible,
 }: {
   setSelectedColor: Dispatch<SetStateAction<string>>;
+  isOpen: boolean;
   setColorSearchModalVisible: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [colorSearch, setColorSearch] = useState("");
@@ -145,34 +152,41 @@ export const ColorSearchModal = ({
     setColorSearchModalVisible(false);
   };
   return (
-    <div className="modal-and-backdrop-container fixed inset-0">
-      <div className="modal fixed inset-20 z-[999] rounded-lg bg-slate-900 p-2 text-white">
-        <input
-          type="search"
-          value={colorSearch}
-          onChange={(e) => setColorSearch(e.target.value)}
-          placeholder="search for colors"
-          className=""
-        />
-        <div className="flex flex-wrap justify-center gap-2 overflow-auto p-4">
-          {colorOptions
-            .filter((colorOption) =>
-              colorOption.name.toLowerCase().includes(colorSearch.toLowerCase())
-            )
-            .map((colorOption) => (
-              <button
-                key={colorOption.name}
-                type="button"
-                onClick={() => handleColorSelection(colorOption.name)}
-                className={`flex h-[90px] w-[90px] flex-col items-center overflow-hidden rounded border border-white p-4 text-2xl hover:opacity-90 ${colorOption.value}`}>
-                {colorOption.name}
-              </button>
-            ))}
+    <Dialog open={isOpen} onClose={() => setColorSearchModalVisible(false)}>
+      {/* The backdrop, rendered as a fixed sibling to the panel container */}
+      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+
+      <div className="modal-and-backdrop-container fixed inset-0">
+        <div className="modal fixed inset-20 z-[999] rounded-lg bg-slate-900 p-2 text-white">
+          <input
+            type="search"
+            value={colorSearch}
+            onChange={(e) => setColorSearch(e.target.value)}
+            placeholder="search for colors"
+            className=""
+          />
+          <div className="flex flex-wrap justify-center gap-2 overflow-auto p-4">
+            {colorOptions
+              .filter((colorOption) =>
+                colorOption.name
+                  .toLowerCase()
+                  .includes(colorSearch.toLowerCase())
+              )
+              .map((colorOption) => (
+                <button
+                  key={colorOption.name}
+                  type="button"
+                  onClick={() => handleColorSelection(colorOption.name)}
+                  className={`flex h-[90px] w-[90px] flex-col items-center overflow-hidden rounded border border-white p-4 text-2xl hover:opacity-90 ${colorOption.value}`}>
+                  {colorOption.name}
+                </button>
+              ))}
+          </div>
         </div>
+        <div
+          onClick={() => setColorSearchModalVisible(false)}
+          className="backdrop fixed inset-0 z-[998] bg-slate-200/40 backdrop-blur"></div>
       </div>
-      <div
-        onClick={() => setColorSearchModalVisible(false)}
-        className="backdrop fixed inset-0 z-[998] bg-slate-200/40 backdrop-blur"></div>
-    </div>
+    </Dialog>
   );
 };
