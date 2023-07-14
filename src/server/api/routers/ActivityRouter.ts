@@ -1,7 +1,6 @@
 import { type DaySelector, type Routine } from "@prisma/client";
 import {
   addDays,
-  eachDayOfInterval,
   eachMonthOfInterval,
   endOfMonth,
   endOfYear,
@@ -82,6 +81,8 @@ const createDailyActivities = async (
 ) => {
   console.log("creating daily activities for routine", routine.name);
 
+  const activitiesToAdd = [];
+
   const userTimezone = await getUserTimezone(userId);
 
   if (!routine.dailyEveryValue) {
@@ -90,7 +91,7 @@ const createDailyActivities = async (
     );
   }
 
-  const startDate = parse(routine.startDate, yyyyMMddHyphenated, new Date());
+  let startDate = parse(routine.startDate, yyyyMMddHyphenated, new Date());
 
   let endDate: Date;
   // if "Never end" is selected we build out activities for the given year.
@@ -107,27 +108,30 @@ const createDailyActivities = async (
     );
   }
 
-  const days = eachDayOfInterval({ start: startDate, end: endDate });
-
-  const activities = days.map((day) => {
+  while (!isAfter(startDate, endDate)) {
     const activityStart = combineDateAndTime(
-      day,
+      startDate,
       routine.fromTime,
       userTimezone
     );
-    const activityEnd = combineDateAndTime(day, routine.toTime, userTimezone);
+    const activityEnd = combineDateAndTime(
+      startDate,
+      routine.toTime,
+      userTimezone
+    );
 
-    const activity = {
+    activitiesToAdd.push({
       routineId: routine.id,
       start: activityStart,
       end: activityEnd,
       userId,
-    };
-    return activity;
-  });
+    });
+
+    startDate = addDays(startDate, routine.dailyEveryValue);
+  }
 
   const result = await prisma.activity.createMany({
-    data: activities,
+    data: activitiesToAdd,
   });
   return result;
 };
