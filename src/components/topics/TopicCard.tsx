@@ -11,7 +11,7 @@ const TopicCard = ({ topic }: { topic: TopicSummaryType }) => {
       className="rounded-lg bg-white/10 p-2 transition duration-300 ease-in-out hover:bg-white/20">
       <div className="card-body flex flex-col gap-4 p-2">
         <h4 className="flex items-center gap-2">
-          <IconAvatar icon={topic.icon} color={topic.color} />
+          <IconAvatar iconValue={topic.icon} color={topic.color} />
           {topic.name}
         </h4>
 

@@ -1,7 +1,7 @@
 import { Dialog } from "@headlessui/react";
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { BiBed } from "react-icons/bi";
-import { BsSunrise, BsSunset, BsTrash } from "react-icons/bs";
+import { BsHouse, BsSunrise, BsSunset, BsTrash } from "react-icons/bs";
 import { FaBed, FaBrain, FaRunning, FaToilet } from "react-icons/fa";
 import {
   GiForkKnifeSpoon,
@@ -17,32 +17,40 @@ import {
 import { PiTelevisionThin } from "react-icons/pi";
 
 const iconOptions = [
-  { name: "Bed", icon: <BiBed /> },
-  { name: "Trash", icon: <BsTrash /> },
-  { name: "Bed", icon: <FaBed /> },
-  { name: "Brain", icon: <FaBrain /> },
-  { name: "Running", icon: <FaRunning /> },
-  { name: "Sunrise", icon: <BsSunrise /> },
-  { name: "Sunset", icon: <BsSunset /> },
-  { name: "Toilet", icon: <FaToilet /> },
-  { name: "Silverware", icon: <GiForkKnifeSpoon /> },
-  { name: "Grass", icon: <GiGrass /> },
-  { name: "TV", icon: <PiTelevisionThin /> },
-  { name: "Column", icon: <GiIonicColumn /> },
+  { name: "Bed", value: "BiBed", icon: <BiBed /> },
+  { name: "House", value: "BsHouse", icon: <BsHouse /> },
+  { name: "Trash", value: "BsTrash", icon: <BsTrash /> },
+  { name: "Bed", value: "FaBed", icon: <FaBed /> },
+  { name: "Brain", value: "FaBrain", icon: <FaBrain /> },
+  { name: "Running", value: "FaRunning", icon: <FaRunning /> },
+  { name: "Sunrise", value: "BsSunrise", icon: <BsSunrise /> },
+  { name: "Sunset", value: "BsSunset", icon: <BsSunset /> },
+  { name: "Toilet", value: "FaToilet", icon: <FaToilet /> },
+  { name: "Silverware", value: "GiForkKnifeSpoon", icon: <GiForkKnifeSpoon /> },
+  { name: "Grass", value: "GiGrass", icon: <GiGrass /> },
+  { name: "TV", value: "PiTelevisionThin", icon: <PiTelevisionThin /> },
+  { name: "Column", value: "GiIonicColumn", icon: <GiIonicColumn /> },
   {
     name: "Unknown",
+    value: "GiPerspectiveDiceSixFacesRandom",
     icon: <GiPerspectiveDiceSixFacesRandom />,
   },
-  { name: "Broom", icon: <MdOutlineCleaningServices /> },
+  {
+    name: "Broom",
+    value: "MdOutlineCleaningServices",
+    icon: <MdOutlineCleaningServices />,
+  },
   {
     name: "Laundry",
+    value: "MdOutlineLocalLaundryService",
     icon: <MdOutlineLocalLaundryService />,
   },
 ];
 
-export const retrieveIcon = (iconName: string) => {
-  const retrievedIcon = iconOptions.find((icon) => icon.name === iconName);
+export const retrieveIcon = (iconValue: string) => {
+  const retrievedIcon = iconOptions.find((icon) => icon.value === iconValue);
   if (!retrievedIcon) {
+    console.warn("Unable to find icon by value: ", iconValue);
     return <GrStatusUnknown />;
   }
   return retrievedIcon.icon;
@@ -68,10 +76,10 @@ export const retrieveColor = (colorName: string) => {
 };
 
 export const IconAvatar = ({
-  icon,
+  iconValue,
   color,
 }: {
-  icon: string;
+  iconValue: string;
   color: string;
 }) => {
   return (
@@ -79,7 +87,7 @@ export const IconAvatar = ({
       className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl ${retrieveColor(
         color
       )}`}>
-      {retrieveIcon(icon)}
+      {retrieveIcon(iconValue)}
     </span>
   );
 };
@@ -96,8 +104,8 @@ export const IconSearchModal = ({
 }) => {
   const [iconSearch, setIconSearch] = useState("");
 
-  const handleIconSelection = (selectedIconName: string) => {
-    setSelectedIcon(selectedIconName);
+  const handleIconSelection = (selectedIconValue: string) => {
+    setSelectedIcon(selectedIconValue);
     setIconSearchModalVisible(false);
   };
   return (
@@ -123,7 +131,7 @@ export const IconSearchModal = ({
                 <button
                   key={iconOption.name}
                   type="button"
-                  onClick={() => handleIconSelection(iconOption.name)}
+                  onClick={() => handleIconSelection(iconOption.value)}
                   className="flex h-[90px] w-[90px] flex-col items-center overflow-hidden rounded border border-white p-4 text-2xl hover:bg-slate-300/40">
                   {iconOption.icon}
                   <p className="mt-1 text-xs">{iconOption.name}</p>

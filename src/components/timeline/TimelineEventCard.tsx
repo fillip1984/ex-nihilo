@@ -38,7 +38,7 @@ const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
   return (
     <div className="flex flex-col">
       <div className="flex gap-3 rounded-t-lg bg-white/10 p-2 transition duration-300 ease-in-out hover:bg-white/20">
-        <IconAvatar icon={event.icon} color={event.color} />
+        <IconAvatar iconValue={event.icon} color={event.color} />
         <div className="flex flex-col">
           <b>{event.name}</b>
           <p className="flex items-center gap-2">
