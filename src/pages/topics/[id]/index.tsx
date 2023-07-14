@@ -129,7 +129,7 @@ const TopicDetails = () => {
         <div className="form-card rounded-lg bg-slate-300 p-2 text-slate-700">
           <div className="relative flex items-center justify-between">
             <div className="form-card-title flex items-center gap-2 py-2 text-2xl">
-              <span className="uppercase">Routine</span>
+              <span className="uppercase">Topic</span>
             </div>
             {!isNew && (
               <button

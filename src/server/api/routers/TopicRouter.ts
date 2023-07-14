@@ -52,6 +52,10 @@ export const TopicRouter = createTRPCRouter({
 
       return topic;
     }),
+  count: protectedProcedure.query(async ({ ctx }) => {
+    const result = await ctx.prisma.topic.count();
+    return result;
+  }),
   update: protectedProcedure
     .input(topicFormSchema)
     .mutation(async ({ ctx, input }) => {
