@@ -180,9 +180,9 @@ export const RoutineRouter = createTRPCRouter({
         });
       }
 
-      await ctx.prisma.activity.deleteMany({
-        where: { routineId: input.routine.id },
-      });
+      // await ctx.prisma.activity.deleteMany({
+      //   where: { routineId: input.routine.id },
+      // });
 
       //refetch since I can't figure out how to retrieve the results from a createMany
       const freshRoutine = await ctx.prisma.routine.findUnique({
@@ -194,9 +194,9 @@ export const RoutineRouter = createTRPCRouter({
           monthlyDaysSelected: true,
         },
       });
-      if (freshRoutine) {
-        await createActivitiesFromRoutine(freshRoutine, userId);
-      }
+      // if (freshRoutine) {
+      //   await createActivitiesFromRoutine(freshRoutine, userId);
+      // }
 
       return freshRoutine;
     }),
