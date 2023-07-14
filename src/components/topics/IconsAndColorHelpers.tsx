@@ -178,7 +178,7 @@ export const ColorSearchModal = ({
                   key={colorOption.name}
                   type="button"
                   onClick={() => handleColorSelection(colorOption.name)}
-                  className={`flex h-[90px] w-[90px] flex-col items-center overflow-hidden rounded border border-white p-4 text-2xl hover:opacity-90 ${colorOption.value}`}>
+                  className={`flex h-[90px] w-[90px] flex-col items-center justify-center rounded border border-white p-4 hover:opacity-90 ${colorOption.value}`}>
                   {colorOption.name}
                 </button>
               ))}
