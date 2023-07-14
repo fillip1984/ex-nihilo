@@ -101,7 +101,10 @@ export const IconSearchModal = ({
     setIconSearchModalVisible(false);
   };
   return (
-    <Dialog open={isOpen} onClose={() => setIconSearchModalVisible(false)}>
+    <Dialog
+      open={isOpen}
+      onClose={() => setIconSearchModalVisible(false)}
+      initialFocus={undefined}>
       <div className="modal-and-backdrop-container fixed inset-0">
         <div className="modal fixed inset-20 z-[999] rounded-lg bg-slate-900 p-2 text-white">
           <input
@@ -153,7 +156,10 @@ export const ColorSearchModal = ({
     setColorSearchModalVisible(false);
   };
   return (
-    <Dialog open={isOpen} onClose={() => setColorSearchModalVisible(false)}>
+    <Dialog
+      open={isOpen}
+      onClose={() => setColorSearchModalVisible(false)}
+      initialFocus={undefined}>
       {/* The backdrop, rendered as a fixed sibling to the panel container */}
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
 
