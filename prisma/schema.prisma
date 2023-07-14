@@ -106,7 +106,7 @@ model Routine {
     userId           String
     name             String
     description      String
-    onComplete       CompleteOptionType @default(SIMPLE)
+    onComplete       CompleteOptionType
     occurrenceType   OccurrenceType
     dailyEveryValue  Int?
     yearlyMonthValue Int?
