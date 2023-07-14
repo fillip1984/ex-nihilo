@@ -118,7 +118,7 @@ const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
         </div>
 
         {event.type === "Suninfo" && (
-          <div className="flex items-center justify-between rounded-b-lg bg-slate-700 p-2">
+          <div className="flex items-center justify-between rounded-b-lg bg-white/20 p-2">
             <p>
               Day time:{" "}
               {formatDuration(event.duration, {
@@ -142,51 +142,62 @@ const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
         )}
 
         {event.type !== "Suninfo" &&
-          event.complete !== null &&
-          event.skip !== null && (
-            <div className="flex rounded-b-lg bg-slate-700 text-3xl">
+          event.complete === false &&
+          event.skip === false && (
+            <div className="flex rounded-b-lg bg-white/20 text-3xl">
               <button
                 type="button"
                 onClick={() => handleComplete(event.id)}
-                className={`flex flex-1 items-center justify-center gap-2 text-green-400 transition-colors duration-300 hover:text-green-500 ${
-                  event.skip
-                    ? "border-b-lg hidden"
-                    : "rounded-bl-lg border-r-2 border-r-slate-500 py-1"
-                } `}
+                className="flex flex-1 items-center justify-center gap-2 border-r border-r-slate-500 text-green-400 transition-colors duration-300 hover:text-green-500"
                 disabled={event.complete || event.skip || isMutating}>
                 <MdCheck className={`${isCompleting ? "animate-pulse" : ""}`} />
-                {event.completedAt && (
-                  <span className="text-sm">
-                    Completed:{" "}
-                    {Intl.DateTimeFormat("en-US", {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    }).format(event.completedAt)}
-                  </span>
-                )}
               </button>
               <button
                 type="button"
                 onClick={() => handleSkip(event.id)}
-                className={`flex flex-1 items-center justify-center gap-2 py-1 text-red-400 transition-colors duration-300 hover:text-red-500 ${
-                  event.complete ? "border-b-lg hidden" : "rounded-br-lg"
-                }`}
+                className="flex flex-1 items-center justify-center gap-2 py-1 text-red-400 transition-colors duration-300 hover:text-red-500"
                 disabled={event.complete || event.skip || isMutating}>
                 <MdNotInterested
                   className={`${isSkipping ? "animate-pulse" : ""}`}
                 />
-                {event.skip && (
-                  <span className="text-sm">
-                    Skipped:{" "}
-                    {Intl.DateTimeFormat("en-US", {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    }).format(event.activity?.updatedAt)}
-                  </span>
-                )}
               </button>
             </div>
           )}
+
+        {event.type !== "Suninfo" && (event.complete || event.skip) && (
+          <div className="flex rounded-b-lg bg-white/20 text-3xl">
+            {event.completedAt && (
+              <button
+                type="button"
+                className="flex flex-1 items-center justify-center gap-2 text-green-400 transition-colors duration-300 hover:text-green-500"
+                disabled={event.complete || event.skip || isMutating}>
+                <MdCheck />
+                <span className="text-sm">
+                  Completed:{" "}
+                  {Intl.DateTimeFormat("en-US", {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  }).format(event.completedAt)}
+                </span>
+              </button>
+            )}
+            {event.skip && (
+              <button
+                type="button"
+                className="flex flex-1 items-center justify-center gap-2 py-1 text-red-400 transition-colors duration-300 hover:text-red-500"
+                disabled={event.complete || event.skip || isMutating}>
+                <MdNotInterested />
+                <span className="text-sm">
+                  Skipped:{" "}
+                  {Intl.DateTimeFormat("en-US", {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  }).format(event.activity?.updatedAt)}
+                </span>
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {showOnCompleteModal && (
