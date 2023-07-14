@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm, useWatch, type SubmitHandler } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import {
   BsArchive,
   BsBodyText,
@@ -14,7 +15,7 @@ import {
   BsRepeat,
   BsThreeDotsVertical,
 } from "react-icons/bs";
-import { FaTrashAlt } from "react-icons/fa";
+import { FaRedo, FaTrashAlt } from "react-icons/fa";
 import TextareaAutosize from "react-textarea-autosize";
 import { routineFormSchema, type RoutineFormSchemaType } from "~/types";
 
@@ -159,6 +160,9 @@ const RoutineDetails = () => {
     },
   });
 
+  const { mutateAsync: rebuildActivities } =
+    api.routines.rebuildActivities.useMutation();
+
   const onSubmit: SubmitHandler<RoutineFormSchemaType> = (formData) => {
     if (formData.routine.occurrenceType === "NEVER") {
       formData.routine.endDate = formData.routine.startDate;
@@ -174,9 +178,25 @@ const RoutineDetails = () => {
   const [routineMenuOpen, setRoutineMenuOpen] = useState(false);
   const routineMenuItems = [
     {
+      label: "Rebuild activites",
+      icon: <FaRedo />,
+      action: () => {
+        void toast.promise(rebuildActivities({ id: id as string }), {
+          loading: "Rebuilding activities",
+          success: "Activities rebuilt",
+          error: "Failed to rebuild activities",
+        });
+
+        setRoutineMenuOpen(false);
+      },
+    },
+    {
       label: "Delete",
       icon: <FaTrashAlt />,
-      action: () => deleteRoutine({ id: id as string }),
+      action: () => {
+        deleteRoutine({ id: id as string });
+        setRoutineMenuOpen(false);
+      },
     },
     {
       label: "Archive",
@@ -209,7 +229,7 @@ const RoutineDetails = () => {
             )}
             <div
               id="avatar-menu"
-              className={`bg- absolute right-0 top-12 z-[999] w-36 rounded bg-white/70 backdrop-blur transition duration-300 ease-in-out ${
+              className={`bg- absolute right-0 top-12 z-[999] w-48 rounded bg-white/70 backdrop-blur transition duration-300 ease-in-out ${
                 routineMenuOpen ? "" : "hidden"
               }`}>
               <div className="flex flex-col p-2">

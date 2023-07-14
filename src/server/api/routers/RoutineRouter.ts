@@ -86,10 +86,12 @@ export const RoutineRouter = createTRPCRouter({
           select: { activities: true },
         },
       },
-      orderBy: {
-        name: "asc",
-        createdAt: "asc",
-      },
+      orderBy: [
+        {
+          name: "asc",
+        },
+        { createdAt: "asc" },
+      ],
     });
     return result;
   }),
@@ -208,5 +210,27 @@ export const RoutineRouter = createTRPCRouter({
           id: input.id,
         },
       });
+    }),
+  rebuildActivities: protectedProcedure
+    .input(z.object({ id: z.string().cuid() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.activity.deleteMany({
+        where: { routineId: input.id },
+      });
+
+      //refetch since I can't figure out how to retrieve the results from a createMany
+      const freshRoutine = await ctx.prisma.routine.findUnique({
+        where: {
+          id: input.id,
+        },
+        include: {
+          weeklyDaysSelected: true,
+          monthlyDaysSelected: true,
+        },
+      });
+
+      if (freshRoutine) {
+        await createActivitiesFromRoutine(freshRoutine, ctx.session.user.id);
+      }
     }),
 });
