@@ -10,12 +10,12 @@ export default {
       },
       keyframes: {
         grow: {
-          from: { transform: "scale(0.75)", opacity: "0.25" },
+          from: { transform: "scale(0.25)", opacity: "0.25" },
           to: { transform: "scale(1)", opacity: "1" },
         },
         shrink: {
           from: { transform: "scale(1)", opacity: "1" },
-          to: { transform: "scale(0.75)", opacity: "0.25" },
+          to: { transform: "scale(0.25)", opacity: "0.25" },
         },
       },
     },
