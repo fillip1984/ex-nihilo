@@ -12,6 +12,8 @@ import { api } from "~/utils/api";
 import { yyyyMMddHyphenated } from "~/utils/date";
 import LoadingErrorAndRetry from "../shared/LoadingErrorAndRetry";
 import TimelineEventCard from "./TimelineEventCard";
+import OnCompleteModal from "./OnCompleteModal";
+import { type TimelineEvent } from "~/types";
 
 const TimelinePage = () => {
   const [timelineAnimations] = useAutoAnimate();
@@ -30,43 +32,65 @@ const TimelinePage = () => {
     filter,
   });
 
+  // on complete modal stuff
+  const [showOnCompleteModal, setShowOnCompleteModal] = useState(false);
+  const [completingEvent, setCompletingEvent] = useState<TimelineEvent | null>(
+    null
+  );
+  const handleOnComplete = (event: TimelineEvent) => {
+    setCompletingEvent(event);
+    setShowOnCompleteModal(true);
+  };
+
   return (
-    <div className="mx-auto my-4 flex w-full select-none flex-col overflow-hidden px-4 md:w-3/4 lg:w-2/3 xl:w-1/2">
-      <Header
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-        eventCount={events?.length}
-      />
-
-      <div className="mb-4 text-center">
-        <FiltersBar
-          filterOptions={filterOptions}
-          filter={filter}
-          setFilter={setFilter}
+    <>
+      <div className="mx-auto my-4 flex w-full select-none flex-col overflow-hidden px-4 md:w-3/4 lg:w-2/3 xl:w-1/2">
+        <Header
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          eventCount={events?.length}
         />
-      </div>
 
-      {(isLoading || isError) && (
-        <LoadingErrorAndRetry
-          isLoading={isLoading}
-          isError={isError}
-          retry={() => void refetch()}
-        />
-      )}
-
-      {!isLoading && !isError && (
-        <div
-          id="timeline-grid"
-          ref={timelineAnimations}
-          className="flex w-full flex-col gap-3">
-          {events?.map((event) => (
-            <TimelineEventCard key={event.id} event={event} />
-          ))}
+        <div className="mb-4 text-center">
+          <FiltersBar
+            filterOptions={filterOptions}
+            filter={filter}
+            setFilter={setFilter}
+          />
         </div>
-      )}
 
-      <FabSection />
-    </div>
+        {(isLoading || isError) && (
+          <LoadingErrorAndRetry
+            isLoading={isLoading}
+            isError={isError}
+            retry={() => void refetch()}
+          />
+        )}
+
+        {!isLoading && !isError && (
+          <div
+            id="timeline-grid"
+            ref={timelineAnimations}
+            className="flex w-full flex-col gap-3">
+            {events?.map((event) => (
+              <TimelineEventCard
+                key={event.id}
+                event={event}
+                handleOnComplete={handleOnComplete}
+              />
+            ))}
+          </div>
+        )}
+
+        <FabSection />
+      </div>
+      {completingEvent && showOnCompleteModal && (
+        <OnCompleteModal
+          event={completingEvent}
+          close={() => setShowOnCompleteModal(false)}
+        />
+      )}
+    </>
   );
 };
 
@@ -192,9 +216,9 @@ const FabSection = () => {
   ];
 
   return (
-    <div>
+    <>
       <div className="relative">
-        <div className="fixed bottom-28 right-8 z-[998]">
+        <div className="fixed bottom-28 right-8 z-[50]">
           <div className="flex flex-col items-end gap-6 text-xl font-bold">
             {fabOptions.map((fabOption) => (
               <Link
@@ -211,7 +235,7 @@ const FabSection = () => {
       </div>
       <button
         onClick={() => setFabOpen((prev) => !prev)}
-        className={`fixed bottom-8 right-8 z-[999] flex h-16 w-16 items-center justify-center rounded-full bg-slate-300 text-4xl text-slate-800 transition duration-300 ease-in-out hover:bg-slate-400 ${
+        className={`fixed bottom-8 right-8 z-[50] flex h-16 w-16 items-center justify-center rounded-full bg-slate-300 text-4xl text-slate-800 transition duration-300 ease-in-out hover:bg-slate-400 ${
           fabOpen ? "rotate-45" : ""
         }`}>
         <FaPlus />
@@ -219,10 +243,10 @@ const FabSection = () => {
       <div
         id="fab-backdrop"
         onClick={() => setFabOpen((prev) => !prev)}
-        className={`fixed bottom-0 left-0 right-0 top-0 z-[997] bg-slate-200/30 backdrop-blur-sm ${
+        className={`fixed bottom-0 left-0 right-0 top-0 z-[49] bg-slate-200/30 backdrop-blur-sm ${
           fabOpen ? "" : "hidden"
         }`}></div>
-    </div>
+    </>
   );
 };
 

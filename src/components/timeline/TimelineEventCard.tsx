@@ -10,15 +10,18 @@ import { type TimelineEvent } from "~/types";
 import { api } from "~/utils/api";
 import { HH_mm_aka24hr } from "~/utils/date";
 import { IconAvatar } from "../topics/IconsAndColorHelpers";
-import OnCompleteModal from "./OnCompleteModal";
 
-const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
+const TimelineEventCard = ({
+  event,
+  handleOnComplete,
+}: {
+  event: TimelineEvent;
+  handleOnComplete: (event: TimelineEvent) => void;
+}) => {
   const utils = api.useContext();
 
   const [cardAnimations] = useAutoAnimate();
   const [showDetails, setShowDetails] = useState(false);
-
-  const [showOnCompleteModal, setShowOnCompleteModal] = useState(false);
 
   const { mutate: completeAct, isLoading: isCompleting } =
     api.activities.complete.useMutation({
@@ -45,7 +48,7 @@ const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
       case "WEIGH_IN":
       case "RUNNERS_LOG":
       case "BLOOD_PRESSURE_READING":
-        setShowOnCompleteModal(true);
+        handleOnComplete(event);
         return;
       default:
         throw new Error(
@@ -199,13 +202,6 @@ const TimelineEventCard = ({ event }: { event: TimelineEvent }) => {
           </div>
         )}
       </div>
-
-      {showOnCompleteModal && (
-        <OnCompleteModal
-          event={event}
-          close={() => setShowOnCompleteModal(false)}
-        />
-      )}
     </>
   );
 };
