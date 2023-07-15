@@ -84,6 +84,7 @@ const TimelinePage = () => {
 
         <FabSection />
       </div>
+
       {completingEvent && showOnCompleteModal && (
         <OnCompleteModal
           event={completingEvent}

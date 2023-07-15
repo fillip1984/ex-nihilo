@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import {
   FaRegFaceDizzy,
@@ -40,23 +40,34 @@ const OnCompleteModal = ({
   const [selectedWeather, setSelectedWeather] = useState("");
   const [selectedMood, setSelectedMood] = useState("");
 
+  const [isClosing, setIsClosing] = useState(false);
+  useEffect(() => {
+    if (isClosing) {
+      setTimeout(() => close(), 150);
+    }
+  }, [isClosing, close]);
+
   return (
     <div className="relative">
       {/* Backdrop */}
       <div
         className="fixed inset-0 z-[998] bg-black/30 opacity-80 backdrop-blur"
         aria-hidden="true"
-        onClick={close}
+        onClick={() => setIsClosing(true)}
       />
 
       {/* Modal */}
-      <div className="fixed inset-10 z-[999] mx-auto w-3/4 rounded-lg border border-slate-100 bg-slate-800 transition-transform duration-300">
+      <div
+        className={clsx(
+          "fixed inset-2 z-[999] mx-auto w-[90%] animate-grow rounded-lg border border-slate-100 bg-slate-800 md:w-3/4 lg:w-1/2",
+          { "animate-shrink": isClosing }
+        )}>
         {/* title or headin */}
         <div className="flex items-center justify-between p-2">
-          <h3>{event.onComplete}</h3>
+          <h3>Running Log</h3>
           <button
             type="button"
-            onClick={close}
+            onClick={() => setIsClosing(true)}
             className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-400/30">
             <AiOutlineClose />
           </button>
