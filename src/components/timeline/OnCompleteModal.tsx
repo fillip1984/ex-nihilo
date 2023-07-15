@@ -2,7 +2,6 @@ import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import {
-  FaRegFaceDizzy,
   FaRegFaceFrownOpen,
   FaRegFaceGrinStars,
   FaRegFaceMeh,
@@ -30,8 +29,8 @@ const OnCompleteModal = ({
   ];
 
   const moodOptions = [
-    { label: "The worst", icon: <FaRegFaceDizzy /> },
-    { label: "Not great", icon: <FaRegFaceFrownOpen /> },
+    // { label: "The worst", icon: <FaRegFaceDizzy /> },
+    { label: "Bad", icon: <FaRegFaceFrownOpen /> },
     { label: "Okay", icon: <FaRegFaceMeh /> },
     { label: "Good", icon: <FaRegFaceSmile /> },
     { label: "Great", icon: <FaRegFaceGrinStars /> },
@@ -60,7 +59,7 @@ const OnCompleteModal = ({
       {event && (
         <div
           className={clsx(
-            "fixed inset-2 z-[999] mx-auto w-[90%] animate-grow rounded-lg border border-slate-100 bg-slate-800 md:w-3/4 lg:w-1/2",
+            "fixed inset-2 z-[999] mx-auto flex w-[90%] animate-grow flex-col rounded-lg border border-slate-100 bg-slate-800 md:w-3/4 lg:w-1/2",
             { "animate-shrink": isClosing }
           )}>
           {/* title or headin */}
@@ -75,53 +74,68 @@ const OnCompleteModal = ({
           </div>
 
           {/* body */}
-          <div className="h-[90%] overflow-hidden">
-            <div className="flex h-full flex-col gap-4 overflow-y-scroll p-4">
+          <div className="h-flex-1 overflow-hidden">
+            <div className="flex h-full flex-col gap-4 overflow-y-scroll p-4 pb-24">
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam
+                laboriosam voluptatibus nemo consequatur beatae consectetur,
+                iste velit magnam molestias obcaecati voluptas? Tempore
+                aspernatur voluptatibus dolores aliquid porro cupiditate modi
+                sed magnam nesciunt dolor alias aliquam corporis sint deserunt
+                laboriosam minima doloribus dignissimos impedit, in debitis
+                iusto. Amet delectus, hic aut placeat alias commodi labore
+                corrupti odio voluptatibus cum soluta nam maiores sunt
+                reprehenderit officia cumque tempora iste nostrum eveniet dolor
+                tempore aliquam voluptates consequatur? Itaque accusamus neque
+                amet placeat. Pariatur recusandae veniam dolores ad, sunt illo
+                possimus, mollitia qui non molestias modi porro ex. Voluptatum
+                ex consequuntur quos repellendus expedita?
+              </p>
               <div className="flex flex-col gap-3">
                 <h4>Run Details</h4>
                 <div>
                   <label>Date</label>
                   <input type="date" />
                 </div>
-                <div>
-                  <label>Distance</label>
-                  <input type="text" placeholder="3.8 miles" />
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label>Distance</label>
+                    <input type="text" placeholder="3.8 miles" />
+                  </div>
+                  <div className="flex-1">
+                    <label>Duration</label>
+                    <input type="text" placeholder="43:18" />
+                  </div>
                 </div>
-                <div>
-                  <label>Duration</label>
-                  <input type="text" placeholder="43:18" />
-                </div>
-                <div>
-                  <label>Pace</label>
-                  <input type="text" placeholder="12:23 min/mi" />
-                </div>
-                <div>
-                  <label>Heart rate average</label>
-                  <input type="text" placeholder="160 bpm" />
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label>Pace</label>
+                    <input type="text" placeholder="12:23 min/mi" />
+                  </div>
+                  <div className="flex-1">
+                    <label>Heart rate average</label>
+                    <input type="text" placeholder="160 bpm" />
+                  </div>
                 </div>
               </div>
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet
-                modi ducimus vitae saepe aliquid nesciunt magni voluptatum quo
-                iste! Optio magni earum perferendis tempora ipsam eum, culpa
-                dolorum est, laboriosam temporibus nulla! Omnis explicabo vero
-                provident animi deleniti cumque impedit qui tenetur excepturi
-                facilis alias modi obcaecati, illo dolorem delectus quidem ipsa
-                accusamus eveniet necessitatibus dolorum! Harum quod, a placeat
-                minus veniam iusto. Qui facere minima perferendis sequi eius
-                voluptatem nam rem autem suscipit, cumque temporibus doloremque
-                sed, deleniti laborum blanditiis aliquam architecto ea itaque
-                aspernatur iste assumenda quisquam sint consectetur. Explicabo
-                soluta ducimus error. Repellat natus quia distinctio harum!
-              </p>
+
               <div>
-                <h4>Weather</h4>
+                <div className="flex items-center gap-1">
+                  <h4>Weather</h4>
+                  <span className="text-sm font-thin">(optional)</span>
+                </div>
                 <div className="my-2 flex flex-wrap justify-center gap-2">
                   {weatherOptions.map((weather) => (
                     <button
                       key={weather.label}
                       type="button"
-                      onClick={() => setSelectedWeather(weather.label)}
+                      onClick={() => {
+                        if (selectedWeather === weather.label) {
+                          setSelectedWeather("");
+                        } else {
+                          setSelectedWeather(weather.label);
+                        }
+                      }}
                       className={clsx(
                         "flex h-16 w-20 flex-col items-center justify-center rounded-lg border border-slate-200 text-2xl transition-colors duration-200 ease-in-out",
                         {
@@ -136,13 +150,22 @@ const OnCompleteModal = ({
                 </div>
               </div>
               <div>
-                <h4>Mood</h4>
+                <div className="flex items-center gap-1">
+                  <h4>Mood</h4>
+                  <span className="text-sm font-thin">(optional)</span>
+                </div>
                 <div className="my-2 flex flex-wrap justify-center gap-2">
                   {moodOptions.map((mood) => (
                     <button
                       key={mood.label}
                       type="button"
-                      onClick={() => setSelectedMood(mood.label)}
+                      onClick={() => {
+                        if (selectedMood === mood.label) {
+                          setSelectedMood("");
+                        } else {
+                          setSelectedMood(mood.label);
+                        }
+                      }}
                       className={clsx(
                         "flex h-16 w-20 flex-col items-center justify-center rounded-lg border border-slate-200 text-2xl transition-colors duration-200 ease-in-out",
                         {
@@ -160,6 +183,9 @@ const OnCompleteModal = ({
           </div>
 
           {/* footer */}
+          <button className="w-full rounded-b-lg border bg-slate-400 p-4 text-2xl">
+            Save and Complete
+          </button>
         </div>
       )}
     </div>

@@ -1,6 +1,8 @@
 import {
   CompleteOptionType,
+  MoodType,
   OccurrenceType,
+  WeatherType,
   type Activity,
   type DaySelector,
   type Routine,
@@ -118,3 +120,13 @@ export type TimelineEvent = {
 };
 
 export type TimelineEventType = "Suninfo" | "Activity";
+
+export const runningLog = z.object({
+  date: z.date(),
+  distance: z.number(),
+  duration: z.string(),
+  pace: z.string().optional(),
+  heartRateAverage: z.number().optional(),
+  weather: z.nativeEnum(WeatherType).optional(),
+  mood: z.nativeEnum(MoodType).optional(),
+});

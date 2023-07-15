@@ -1,7 +1,7 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { addDays, format, parse } from "date-fns";
 import Link from "next/link";
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction, useEffect } from "react";
 import {
   FaCalendarAlt,
   FaChevronLeft,
@@ -41,6 +41,15 @@ const TimelinePage = () => {
     setCompletingEvent(event);
     setShowOnCompleteModal(true);
   };
+
+  // prevent scrolling of background
+  useEffect(() => {
+    if (showOnCompleteModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  }, [showOnCompleteModal]);
 
   return (
     <>
