@@ -125,11 +125,15 @@ export type TimelineEvent = {
 export type TimelineEventType = "Suninfo" | "Activity";
 
 export const runningLog = z.object({
+  activityId: z.string(),
   date: z.date().or(z.string()),
-  distance: z.number(),
-  duration: z.string(),
-  pace: z.string().optional(),
-  heartRateAverage: z.number().optional(),
+  distance: z.number({
+    required_error: "Required",
+    invalid_type_error: "Required",
+  }),
+  duration: z.string().min(1, { message: "Required" }),
+  pace: z.string().min(1, { message: "Required" }),
+  heartRateAverage: z.string().optional(),
   weather: z.nativeEnum(WeatherType).optional(),
   mood: z.nativeEnum(MoodType).optional(),
 });

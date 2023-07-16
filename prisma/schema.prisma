@@ -209,11 +209,12 @@ model Run {
     activityId String   @unique
 
     date             DateTime
-    distance         Decimal
-    pace             String?
+    distance         Decimal      @db.Decimal(4, 2)
+    duration         String
+    pace             String
     heartRageAverage Int?
     weather          WeatherType?
-    Mood             MoodType?
+    mood             MoodType?
 }
 
 enum WeatherType {

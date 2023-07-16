@@ -5,6 +5,7 @@ import { SunInfoRouter } from "./routers/SunInfoRouter";
 import { TimelineRouter } from "./routers/TimelineRouter";
 import { TopicRouter } from "./routers/TopicRouter";
 import { PreferencesRouter } from "./routers/PreferencesRouter";
+import { RunRouter } from "./routers/RunRouter";
 
 /**
  * This is the primary router for your server.
@@ -15,6 +16,7 @@ export const appRouter = createTRPCRouter({
   activities: ActivityRouter,
   preferences: PreferencesRouter,
   routines: RoutineRouter,
+  runs: RunRouter,
   sunInfo: SunInfoRouter,
   timeline: TimelineRouter,
   topics: TopicRouter,
