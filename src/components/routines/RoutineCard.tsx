@@ -47,7 +47,7 @@ const RoutineCard = ({ routine }: { routine: RoutineAndAll }) => {
         {/* // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
         <div className="factoid flex items-center gap-2">
           <TbTimelineEvent className="text-2xl" />
-          {routine._count.activities.toString()}
+          {routine._count?.activities.toString() ?? 0}
         </div>
       </div>
     </Link>

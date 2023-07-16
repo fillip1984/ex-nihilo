@@ -13,7 +13,7 @@ import { z } from "zod";
 export type RoutineAndAll = Routine & {
   weeklyDaysSelected: DaySelector[];
   monthlyDaysSelected: DaySelector[];
-  _count: {
+  _count?: {
     activities: number;
   };
 };
