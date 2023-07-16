@@ -27,10 +27,13 @@ const TimelinePage = () => {
     isLoading,
     isError,
     refetch,
-  } = api.timeline.buildAgenda.useQuery({
-    date: selectedDate,
-    filter,
-  });
+  } = api.timeline.buildAgenda.useQuery(
+    {
+      date: selectedDate,
+      filter,
+    },
+    { refetchOnWindowFocus: false }
+  );
 
   // on complete modal stuff
   const [showOnCompleteModal, setShowOnCompleteModal] = useState(false);

@@ -1,7 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import clsx from "clsx";
+import { format } from "date-fns";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { AiOutlineClose } from "react-icons/ai";
 import {
   FaRegFaceFrownOpen,
@@ -14,11 +15,8 @@ import {
   TiWeatherSnow,
   TiWeatherSunny,
 } from "react-icons/ti";
-import {
-  topicFormSchema,
-  type TimelineEvent,
-  type TopicFormSchemaType,
-} from "~/types";
+import { runningLog, type RunningLogType, type TimelineEvent } from "~/types";
+import { yyyyMMddHyphenated } from "~/utils/date";
 
 const OnCompleteModal = ({
   event,
@@ -86,13 +84,30 @@ const RunningLog = ({
   const [selectedWeather, setSelectedWeather] = useState("");
   const [selectedMood, setSelectedMood] = useState("");
 
-  const { register, reset, handleSubmit, setValue } =
-    useForm<TopicFormSchemaType>({
-      resolver: zodResolver(topicFormSchema),
-    });
+  const {
+    register,
+    reset,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<RunningLogType>({
+    resolver: zodResolver(runningLog),
+    defaultValues: {
+      date: format(new Date(), yyyyMMddHyphenated),
+    },
+  });
+
+  const onSubmit: SubmitHandler<RunningLogType> = (formData) => {
+    console.log(formData);
+  };
+
+  useEffect(() => {
+    console.log("errors", errors);
+  }, [errors]);
 
   return (
-    <>
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    <form className="flex h-full flex-col" onSubmit={handleSubmit(onSubmit)}>
       {/* title or heading */}
       <div className="flex items-center justify-between p-2">
         <h3>Running Log</h3>
@@ -105,47 +120,73 @@ const RunningLog = ({
       </div>
 
       {/* body */}
-      <div className="h-flex-1 overflow-hidden">
+      <div className="overflow-hidden">
         <div className="flex h-full flex-col gap-4 overflow-y-scroll p-4 pb-24">
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam
-            laboriosam voluptatibus nemo consequatur beatae consectetur, iste
-            velit magnam molestias obcaecati voluptas? Tempore aspernatur
-            voluptatibus dolores aliquid porro cupiditate modi sed magnam
-            nesciunt dolor alias aliquam corporis sint deserunt laboriosam
-            minima doloribus dignissimos impedit, in debitis iusto. Amet
-            delectus, hic aut placeat alias commodi labore corrupti odio
-            voluptatibus cum soluta nam maiores sunt reprehenderit officia
-            cumque tempora iste nostrum eveniet dolor tempore aliquam voluptates
-            consequatur? Itaque accusamus neque amet placeat. Pariatur
-            recusandae veniam dolores ad, sunt illo possimus, mollitia qui non
-            molestias modi porro ex. Voluptatum ex consequuntur quos repellendus
-            expedita?
-          </p>
           <div className="flex flex-col gap-3">
             <h4>Run Details</h4>
             <div>
               <label>Date</label>
-              <input type="date" />
+              <input type="date" {...register("date", { valueAsDate: true })} />
+              {errors.date && (
+                <span className="text-red-400">{errors.date.message}</span>
+              )}
             </div>
             <div className="flex gap-4">
               <div className="flex-1">
                 <label>Distance</label>
-                <input type="text" placeholder="3.8 miles" />
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="3.8 miles"
+                  {...register("distance", { valueAsNumber: true })}
+                />
+                {errors.distance && (
+                  <span className="text-red-400">
+                    {errors.distance.message}
+                  </span>
+                )}
               </div>
               <div className="flex-1">
                 <label>Duration</label>
-                <input type="text" placeholder="43:18" />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="43:18"
+                  {...register("duration")}
+                />
+                {errors.duration && (
+                  <span className="text-red-400">
+                    {errors.duration.message}
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex gap-4">
               <div className="flex-1">
                 <label>Pace</label>
-                <input type="text" placeholder="12:23 min/mi" />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="12:23 min/mi"
+                  {...register("pace")}
+                />
+                {errors.pace && (
+                  <span className="text-red-400">{errors.pace.message}</span>
+                )}
               </div>
               <div className="flex-1">
                 <label>Heart rate average</label>
-                <input type="text" placeholder="160 bpm" />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="160 bpm"
+                  {...register("heartRateAverage", { valueAsNumber: true })}
+                />
+                {errors.heartRateAverage && (
+                  <span className="text-red-400">
+                    {errors.heartRateAverage.message}
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -214,9 +255,11 @@ const RunningLog = ({
       </div>
 
       {/* footer */}
-      <button className="w-full rounded-b-lg border bg-slate-400 p-4 text-2xl">
+      <button
+        type="submit"
+        className="w-full rounded-b-lg border bg-slate-400 p-4 text-2xl">
         Save and Complete
       </button>
-    </>
+    </form>
   );
 };

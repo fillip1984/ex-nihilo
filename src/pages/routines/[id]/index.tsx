@@ -347,7 +347,7 @@ const RoutineDetails = () => {
             {occurrenceTypeWatch === "WEEKLY" && (
               <div className="flex flex-col items-center">
                 <span className="my-2">On (please select one or more)</span>
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-2">
                   {getValues("weeklyDaySelectorOptions")?.map((day, index) => (
                     <div key={day.label}>
                       <input
@@ -372,7 +372,7 @@ const RoutineDetails = () => {
                       />
                       <label
                         htmlFor={`daysOfWeek.${index}.selected`}
-                        className="flex h-9 w-9 cursor-pointer select-none items-center justify-center rounded-full bg-white text-xs text-slate-700 transition-colors duration-300 ease-in-out peer-checked:bg-slate-500 peer-checked:text-white">
+                        className="flex h-12 w-12 cursor-pointer select-none items-center justify-center rounded-full bg-white text-xs text-slate-700 transition-colors duration-300 ease-in-out peer-checked:bg-slate-500 peer-checked:text-white">
                         {day.abbreviatedLabel}
                       </label>
                     </div>
