@@ -61,19 +61,24 @@ model Session {
 
 // Necessary for Next auth
 model User {
-    id            String        @id @default(cuid())
-    name          String?
-    email         String?       @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    routines      Routine[]
-    daySelectors  DaySelector[]
-    topics        Topic[]
-    activities    Activity[]
-    Preferences   Preferences?
-    Run           Run[]
+    id                    String                 @id @default(cuid())
+    name                  String?
+    email                 String?                @unique
+    emailVerified         DateTime?
+    image                 String?
+    accounts              Account[]
+    sessions              Session[]
+    routines              Routine[]
+    daySelectors          DaySelector[]
+    topics                Topic[]
+    activities            Activity[]
+    runs                  Run[]
+    weighIns              WeighIn[]
+    bloodPressureReadings BloodPressureReading[]
+    notes                 Note[]
+
+    preferences Preferences?
+    weightGoal  WeightGoal?
 }
 
 model Preferences {
@@ -196,7 +201,14 @@ model Activity {
     complete    Boolean   @default(false)
     completedAt DateTime?
     skip        Boolean   @default(false)
-    run         Run?
+
+    //on complete outcomes
+    run                  Run?
+    weighIn              WeighIn?
+    bloodPressureReading BloodPressureReading?
+    note                 Note?
+
+    WeightGoal WeightGoal?
 }
 
 model Run {
@@ -205,7 +217,7 @@ model Run {
     updatedAt  DateTime @updatedAt
     user       User     @relation(fields: [userId], references: [id])
     userId     String
-    activity   Activity @relation(fields: [activityId], references: [id])
+    activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
     activityId String   @unique
 
     date             DateTime
@@ -229,4 +241,75 @@ enum MoodType {
     Okay
     Good
     Great
+}
+
+model WeighIn {
+    id         String   @id @default(cuid())
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    user       User     @relation(fields: [userId], references: [id])
+    userId     String
+    activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+    activityId String   @unique
+
+    date               DateTime @unique
+    weight             Decimal
+    weightProgress     Decimal
+    weightTotalChange  Decimal
+    weightToGoal       Decimal
+    bodyFatPercentage  Decimal?
+    bodyFatProgress    Decimal?
+    bodyFatTotalChange Decimal?
+    previousWeighInId  String?
+}
+
+model WeightGoal {
+    id         String   @id @default(cuid())
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    user       User     @relation(fields: [userId], references: [id])
+    userId     String   @unique
+    activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+    activityId String   @unique
+
+    weight Decimal
+}
+
+model BloodPressureReading {
+    id         String   @id @default(cuid())
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    user       User     @relation(fields: [userId], references: [id])
+    userId     String
+    activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+    activityId String   @unique
+
+    systolic        Int
+    diastolic       Int
+    pulse           Int?
+    systolicChange  Int
+    diastolicChange Int
+    pulseChange     Int?
+    category        BloodPressureCategory
+}
+
+enum BloodPressureCategory {
+    LOW
+    NORMAL
+    ELEVATED
+    HYPERTENSION_STAGE_1
+    HYPERTENSION_STAGE_2
+    HYPERTENSION_CRISIS
+}
+
+model Note {
+    id         String   @id @default(cuid())
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    user       User     @relation(fields: [userId], references: [id])
+    userId     String
+    activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+    activityId String   @unique
+
+    content String
 }

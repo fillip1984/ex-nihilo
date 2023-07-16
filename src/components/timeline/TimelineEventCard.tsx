@@ -1,7 +1,13 @@
 import { format, formatDuration, isEqual } from "date-fns";
 import { BiCategory } from "react-icons/bi";
 import { BsBodyText } from "react-icons/bs";
-import { FaChevronDown, FaRegClock, FaStopwatch } from "react-icons/fa";
+import {
+  FaChevronDown,
+  FaClock,
+  FaHeart,
+  FaRegClock,
+  FaStopwatch,
+} from "react-icons/fa";
 import { MdCheck, MdNotInterested } from "react-icons/md";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
@@ -10,6 +16,8 @@ import { type TimelineEvent } from "~/types";
 import { api } from "~/utils/api";
 import { HH_mm_aka24hr } from "~/utils/date";
 import { IconAvatar } from "../topics/IconsAndColorHelpers";
+import { FaFlagCheckered, FaHeartPulse } from "react-icons/fa6";
+import { GiPathDistance } from "react-icons/gi";
 
 const TimelineEventCard = ({
   event,
@@ -86,6 +94,31 @@ const TimelineEventCard = ({
                 ? " - " + format(event.end, HH_mm_aka24hr)
                 : ""}
             </p>
+
+            {event.complete && event.run && (
+              <div className="my-2 flex items-center gap-2">
+                <FaFlagCheckered />
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                  <span className="flex items-center gap-1">
+                    <GiPathDistance />
+                    {event.run.distance} mi
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <FaClock />
+                    {event.run.duration}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <FaStopwatch />
+                    {event.run.pace} mi/min
+                  </span>
+
+                  <span className="flex items-center gap-1">
+                    <FaHeartPulse />
+                    {event.run.heartRateAverage}
+                  </span>
+                </div>
+              </div>
+            )}
             {showDetails && (
               <div>
                 <div className="mt-2 flex flex-col gap-1 text-sm text-gray-400">

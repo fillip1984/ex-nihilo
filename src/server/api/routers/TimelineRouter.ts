@@ -2,7 +2,7 @@ import { endOfDay, intervalToDuration, startOfDay } from "date-fns";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { z } from "zod";
 import { prisma } from "~/server/db";
-import { type TimelineEvent } from "~/types";
+import { type RunningLogType, type TimelineEvent } from "~/types";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { getUserTimezone } from "./PreferencesRouter";
 import { fetchSunInfo } from "./SunInfoRouter";
@@ -86,10 +86,35 @@ const buildActivityInfo = async (
           topic: true,
         },
       },
+      run: {
+        select: {
+          activityId: true,
+          date: true,
+          distance: true,
+          duration: true,
+          pace: true,
+          heartRageAverage: true,
+          weather: true,
+          mood: true,
+        },
+      },
     },
   });
 
   const activitiesAsTLEvents = result.map((activity) => {
+    let run: RunningLogType | undefined = undefined;
+    if (activity.run) {
+      run = {
+        activityId: activity.id,
+        date: activity.run.date,
+        distance: activity.run.distance.toNumber(),
+        duration: activity.run.duration,
+        pace: activity.run.pace,
+        heartRateAverage: activity.run.heartRageAverage?.toString(),
+        weather: activity.run.weather ?? undefined,
+        mood: activity.run.mood ?? undefined,
+      };
+    }
     const event: TimelineEvent = {
       type: "Activity",
       id: activity.id,
@@ -111,6 +136,7 @@ const buildActivityInfo = async (
         end: activity.end,
       }),
       onComplete: activity.routine.onComplete,
+      run,
     };
     return event;
   });

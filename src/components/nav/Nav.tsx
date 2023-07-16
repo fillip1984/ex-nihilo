@@ -3,7 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { FaHourglassStart, FaSignOutAlt, FaSlidersH } from "react-icons/fa";
+import {
+  FaFlagCheckered,
+  FaHourglassStart,
+  FaSignOutAlt,
+  FaSlidersH,
+} from "react-icons/fa";
 
 const Nav = () => {
   return (
@@ -41,6 +46,11 @@ const AvatarAndMenu = () => {
       label: "Preferences",
       icon: <FaSlidersH />,
       action: () => void router.push("/preferences"),
+    },
+    {
+      label: "Outcomes",
+      icon: <FaFlagCheckered />,
+      action: () => void router.push("/outcomes"),
     },
     { label: "Sign out", icon: <FaSignOutAlt />, action: handleSignOut },
   ];

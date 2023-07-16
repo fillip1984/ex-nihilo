@@ -6,6 +6,7 @@ import {
   type Activity,
   type DaySelector,
   type Routine,
+  type Run,
 } from "@prisma/client";
 import { z } from "zod";
 
@@ -120,6 +121,7 @@ export type TimelineEvent = {
   duration: Duration;
 
   onComplete: CompleteOptionType;
+  run?: RunningLogType;
 };
 
 export type TimelineEventType = "Suninfo" | "Activity";

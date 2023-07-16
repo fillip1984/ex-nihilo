@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MoodType, WeatherType } from "@prisma/client";
+import { MoodType, WeatherType, WeighIn } from "@prisma/client";
 import clsx from "clsx";
 import { format } from "date-fns";
 import {
@@ -59,6 +59,10 @@ const OnCompleteModal = ({
           )}>
           {event.onComplete === "RUNNERS_LOG" && (
             <RunningLog event={event} close={() => setIsClosing(true)} />
+          )}
+
+          {event.onComplete === "WEIGH_IN" && (
+            <WeighIn event={event} close={() => setIsClosing(true)} />
           )}
         </div>
       )}
@@ -156,7 +160,8 @@ const RunningLog = ({
 
   const maskDurationField = (
     e: ChangeEvent<HTMLInputElement>,
-    setField: Dispatch<SetStateAction<string>>
+    setField: Dispatch<SetStateAction<string>>,
+    precision: number
   ) => {
     if (e.target.value.length === 0) {
       setField("");
@@ -165,48 +170,59 @@ const RunningLog = ({
     const stringVal = e.target.value.replaceAll(":", ""); //remove mask
     const numericVal = parseInt(stringVal); //remove leading zeros
     const stringRepOfNumeric = numericVal.toString();
+    let newVal = "";
     switch (stringRepOfNumeric.length) {
       case 1:
-        setField("00:00:0" + stringRepOfNumeric);
-        return;
+        newVal = "00:00:0" + stringRepOfNumeric;
+        break;
       case 2:
-        setField("00:00:" + stringRepOfNumeric);
-        return;
+        newVal = "00:00:" + stringRepOfNumeric;
+        break;
       case 3:
-        setField(
+        newVal =
           "00:0" +
-            stringRepOfNumeric.substring(0, 1) +
-            ":" +
-            stringRepOfNumeric.substring(1)
-        );
-        return;
+          stringRepOfNumeric.substring(0, 1) +
+          ":" +
+          stringRepOfNumeric.substring(1);
+        break;
       case 4:
-        setField(
+        newVal =
           "00:" +
-            stringRepOfNumeric.substring(0, 2) +
-            ":" +
-            stringRepOfNumeric.substring(2)
-        );
-        return;
-      case 5:
-        setField(
-          "0" +
-            stringRepOfNumeric.substring(0, 1) +
-            ":" +
-            stringRepOfNumeric.substring(1, 3) +
-            ":" +
-            stringRepOfNumeric.substring(3)
-        );
-        return;
-      case 6:
-        setField(
           stringRepOfNumeric.substring(0, 2) +
-            ":" +
-            stringRepOfNumeric.substring(2, 4) +
-            ":" +
-            stringRepOfNumeric.substring(4)
-        );
-        return;
+          ":" +
+          stringRepOfNumeric.substring(2);
+        break;
+      case 5:
+        if (precision === 4) {
+          return;
+        }
+        newVal =
+          "0" +
+          stringRepOfNumeric.substring(0, 1) +
+          ":" +
+          stringRepOfNumeric.substring(1, 3) +
+          ":" +
+          stringRepOfNumeric.substring(3);
+
+        break;
+      case 6:
+        if (precision === 4) {
+          return;
+        }
+        newVal =
+          stringRepOfNumeric.substring(0, 2) +
+          ":" +
+          stringRepOfNumeric.substring(2, 4) +
+          ":" +
+          stringRepOfNumeric.substring(4);
+
+        break;
+    }
+
+    if (precision === 4) {
+      setField(newVal.substring(3));
+    } else {
+      setField(newVal);
     }
   };
 
@@ -268,7 +284,7 @@ const RunningLog = ({
                       type="text"
                       inputMode="numeric"
                       placeholder="43:18"
-                      onChange={(e) => maskDurationField(e, setDuration)}
+                      onChange={(e) => maskDurationField(e, setDuration, 6)}
                       value={duration}
                     />
                     {errors.duration && (
@@ -285,7 +301,7 @@ const RunningLog = ({
                       type="text"
                       inputMode="numeric"
                       placeholder="12:23 min/mi"
-                      onChange={(e) => maskDurationField(e, setPace)}
+                      onChange={(e) => maskDurationField(e, setPace, 4)}
                       value={pace}
                     />
                     {errors.pace && (
@@ -369,6 +385,115 @@ const RunningLog = ({
                       <span className="mt-1 text-xs">{mood.label}</span>
                     </button>
                   ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* footer */}
+          <button
+            type="submit"
+            className="w-full rounded-b-lg border bg-slate-400 p-4 text-2xl">
+            Save and Complete
+          </button>
+        </form>
+      )}
+    </>
+  );
+};
+
+const WeighIn = ({
+  event,
+  close,
+}: {
+  event: TimelineEvent;
+  close: () => void;
+}) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<WeighIn>({
+    defaultValues: {
+      date: new Date(),
+    },
+  });
+
+  const utils = api.useContext();
+
+  const onSubmit: SubmitHandler<WeighIn> = (formData) => {
+    console.log(formData);
+  };
+
+  return (
+    <>
+      {/* {(isCreatingRun || isActivityCompleting) && <Mutating />} */}
+
+      {/* {!isCreatingRun && !isActivityCompleting && event && ( */}
+      {event && (
+        <form
+          className="flex h-full flex-col"
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate>
+          {/* title or heading */}
+          <div className="flex items-center justify-between p-2">
+            <h3>Weigh In</h3>
+            <button
+              type="button"
+              onClick={close}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-400/30">
+              <AiOutlineClose />
+            </button>
+          </div>
+
+          {/* body */}
+          <div className="flex-1 overflow-hidden">
+            <div className="flex h-full flex-col gap-4 overflow-y-scroll p-4 pb-24">
+              <div className="flex flex-col gap-3">
+                <h4>Weigh In</h4>
+
+                <div>
+                  <label>Date</label>
+                  <input
+                    type="date"
+                    {...register("date", { valueAsDate: true })}
+                  />
+                  {errors.date && (
+                    <span className="text-red-400">{errors.date.message}</span>
+                  )}
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label>Weight</label>
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      placeholder="192.3"
+                      {...register("weight", { valueAsNumber: true })}
+                    />
+                    {errors.weight && (
+                      <span className="text-red-400">
+                        {errors.weight.message}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <label>Body Fat % (optional)</label>
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      placeholder="17.3"
+                      {...register("bodyFatPercentage", {
+                        valueAsNumber: true,
+                      })}
+                    />
+                    {errors.bodyFatPercentage && (
+                      <span className="text-red-400">
+                        {errors.bodyFatPercentage.message}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
