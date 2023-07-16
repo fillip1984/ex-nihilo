@@ -122,7 +122,7 @@ const TimelineEventCard = ({
 
         {event.type === "Suninfo" && (
           <div className="flex items-center justify-between rounded-b-lg bg-white/20 p-2">
-            <p>
+            <p className="text-xs sm:text-sm">
               Day time:{" "}
               {formatDuration(event.duration, {
                 format: [
@@ -138,7 +138,7 @@ const TimelineEventCard = ({
             <a
               href="https://sunrise-sunset.org/"
               target="_blank"
-              className="rounded bg-gradient-to-r from-yellow-600 to-slate-400 px-2 py-1 text-sm">
+              className="rounded bg-gradient-to-r from-yellow-600 to-slate-400 px-2 py-1 text-xs sm:text-sm">
               sunrise-sunset.org
             </a>
           </div>

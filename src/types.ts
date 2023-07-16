@@ -13,6 +13,9 @@ import { z } from "zod";
 export type RoutineAndAll = Routine & {
   weeklyDaysSelected: DaySelector[];
   monthlyDaysSelected: DaySelector[];
+  _count: {
+    activities: number;
+  };
 };
 /////FORM STUFF
 // TODO: figure out how to allow undefined or null. Right now there is no way to reset or zero out these values

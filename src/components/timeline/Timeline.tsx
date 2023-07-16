@@ -200,7 +200,7 @@ const FiltersBar = ({
             <button
               key={filterOption}
               onClick={() => setFilter(filterOption)}
-              className={`flex w-full flex-col items-center justify-center py-3 text-sm ${
+              className={`flex w-full flex-col items-center justify-center py-3 text-xs sm:text-sm ${
                 filterOption === filter ? "font-bold" : ""
               }`}>
               {filterOption}
