@@ -24,7 +24,7 @@ const RoutineCard = ({ routine }: { routine: RoutineAndAll }) => {
               <span>Every {routine.dailyEveryValue} day(s)</span>
             )}
             {routine.occurrenceType === "WEEKLY" && (
-              <div className="text-xs text-slate-600 sm:text-sm">
+              <div className="text-slate-600">
                 <div className="flex gap-2 p-1">
                   {routine.weeklyDaysSelected.map((day) => (
                     <span

@@ -372,7 +372,7 @@ const RoutineDetails = () => {
                       />
                       <label
                         htmlFor={`daysOfWeek.${index}.selected`}
-                        className="flex cursor-pointer select-none items-center justify-center rounded-full bg-white px-1 py-2 text-xs text-slate-700 transition-colors duration-300 ease-in-out peer-checked:bg-slate-500 peer-checked:text-white">
+                        className="flex cursor-pointer select-none items-center justify-center rounded-full bg-white px-1 py-2 text-xs text-slate-700 transition-colors duration-200 ease-in-out peer-checked:bg-slate-500 peer-checked:text-white">
                         {day.abbreviatedLabel}
                       </label>
                     </div>
