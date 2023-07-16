@@ -221,7 +221,7 @@ model Run {
     activityId String   @unique
 
     date             DateTime
-    distance         Decimal      @db.Decimal(4, 2)
+    distance         Float
     duration         String
     pace             String
     heartRageAverage Int?
@@ -252,15 +252,15 @@ model WeighIn {
     activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
     activityId String   @unique
 
-    date               DateTime @unique
-    weight             Decimal
-    weightProgress     Decimal
-    weightTotalChange  Decimal
-    weightToGoal       Decimal
-    bodyFatPercentage  Decimal?
-    bodyFatProgress    Decimal?
-    bodyFatTotalChange Decimal?
-    previousWeighInId  String?
+    date              DateTime
+    weight            Float
+    // weightProgress     Float
+    // weightTotalChange  Float
+    // weightToGoal       Float
+    bodyFatPercentage Float?
+    // bodyFatProgress    Float?
+    // bodyFatTotalChange Float?
+    // previousWeighInId  String?
 }
 
 model WeightGoal {
@@ -272,7 +272,7 @@ model WeightGoal {
     activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
     activityId String   @unique
 
-    weight Decimal
+    weight Float
 }
 
 model BloodPressureReading {
@@ -284,13 +284,14 @@ model BloodPressureReading {
     activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
     activityId String   @unique
 
-    systolic        Int
-    diastolic       Int
-    pulse           Int?
-    systolicChange  Int
-    diastolicChange Int
-    pulseChange     Int?
-    category        BloodPressureCategory
+    date      DateTime
+    systolic  Int
+    diastolic Int
+    pulse     Int?
+    // systolicChange  Int
+    // diastolicChange Int
+    // pulseChange     Int?
+    category  BloodPressureCategory
 }
 
 enum BloodPressureCategory {
@@ -311,5 +312,6 @@ model Note {
     activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
     activityId String   @unique
 
+    date    DateTime
     content String
 }

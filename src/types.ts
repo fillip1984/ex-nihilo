@@ -6,7 +6,6 @@ import {
   type Activity,
   type DaySelector,
   type Routine,
-  type Run,
 } from "@prisma/client";
 import { z } from "zod";
 
@@ -122,6 +121,9 @@ export type TimelineEvent = {
 
   onComplete: CompleteOptionType;
   run?: RunningLogType;
+  weighIn?: WeighInFormSchemaType;
+  bloodPressureReading?: BloodPressureReadingFormSchemaType;
+  note?: NoteFormSchemaType;
 };
 
 export type TimelineEventType = "Suninfo" | "Activity";
@@ -141,3 +143,33 @@ export const runningLog = z.object({
 });
 
 export type RunningLogType = z.infer<typeof runningLog>;
+
+export const weighInFormSchema = z.object({
+  activityId: z.string(),
+  date: z.date().or(z.string()),
+  weight: z.number(),
+  bodyFatPercentage: z.string().optional(),
+});
+
+export type WeighInFormSchemaType = z.infer<typeof weighInFormSchema>;
+
+export const bloodPressureReadingFormSchema = z.object({
+  activityId: z.string(),
+  date: z.date().or(z.string()),
+  systolic: z.number(),
+  diastolic: z.number(),
+  pulse: z.string().optional(),
+  // category: z.nativeEnum(BloodPressureCategory),
+});
+
+export type BloodPressureReadingFormSchemaType = z.infer<
+  typeof bloodPressureReadingFormSchema
+>;
+
+export const noteFormSchema = z.object({
+  activityId: z.string(),
+  date: z.date().or(z.string()),
+  content: z.string().min(1),
+});
+
+export type NoteFormSchemaType = z.infer<typeof noteFormSchema>;

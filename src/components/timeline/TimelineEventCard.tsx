@@ -1,10 +1,9 @@
 import { format, formatDuration, isEqual } from "date-fns";
 import { BiCategory } from "react-icons/bi";
-import { BsBodyText } from "react-icons/bs";
+import { BsBodyText, BsHeartPulseFill } from "react-icons/bs";
 import {
   FaChevronDown,
   FaClock,
-  FaHeart,
   FaRegClock,
   FaStopwatch,
 } from "react-icons/fa";
@@ -12,12 +11,22 @@ import { MdCheck, MdNotInterested } from "react-icons/md";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useState } from "react";
+import {
+  FaFlagCheckered,
+  FaHeartPulse,
+  FaRegNoteSticky,
+} from "react-icons/fa6";
+import {
+  GiBiceps,
+  GiHearts,
+  GiNestedHearts,
+  GiPathDistance,
+} from "react-icons/gi";
+import { IoScaleOutline } from "react-icons/io5";
 import { type TimelineEvent } from "~/types";
 import { api } from "~/utils/api";
 import { HH_mm_aka24hr } from "~/utils/date";
 import { IconAvatar } from "../topics/IconsAndColorHelpers";
-import { FaFlagCheckered, FaHeartPulse } from "react-icons/fa6";
-import { GiPathDistance } from "react-icons/gi";
 
 const TimelineEventCard = ({
   event,
@@ -119,6 +128,57 @@ const TimelineEventCard = ({
                 </div>
               </div>
             )}
+
+            {event.complete && event.weighIn && (
+              <div className="my-2 flex items-center gap-2">
+                <FaFlagCheckered />
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                  <span className="flex items-center gap-1">
+                    <IoScaleOutline />
+                    {event.weighIn.weight} lbs
+                  </span>
+                  {event.weighIn.bodyFatPercentage && (
+                    <span className="flex items-center gap-1">
+                      <GiBiceps /> {event.weighIn.bodyFatPercentage} %
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {event.complete && event.bloodPressureReading && (
+              <div className="my-2 flex items-center gap-2">
+                <FaFlagCheckered />
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                  <span className="flex items-center gap-1">
+                    <GiHearts />
+                    {event.bloodPressureReading.systolic}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <GiNestedHearts />
+                    {event.bloodPressureReading.diastolic}
+                  </span>
+                  {event.bloodPressureReading.pulse && (
+                    <span className="flex items-center gap-1">
+                      <BsHeartPulseFill /> {event.bloodPressureReading.pulse}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {event.complete && event.note && (
+              <div className="my-2 flex items-center gap-2">
+                <FaFlagCheckered />
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                  <span className="flex items-center gap-1">
+                    <FaRegNoteSticky />
+                    {event.note.content}
+                  </span>
+                </div>
+              </div>
+            )}
+
             {showDetails && (
               <div>
                 <div className="mt-2 flex flex-col gap-1 text-sm text-gray-400">

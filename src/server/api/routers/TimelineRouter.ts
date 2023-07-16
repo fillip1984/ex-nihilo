@@ -2,7 +2,13 @@ import { endOfDay, intervalToDuration, startOfDay } from "date-fns";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { z } from "zod";
 import { prisma } from "~/server/db";
-import { type RunningLogType, type TimelineEvent } from "~/types";
+import {
+  type WeighInFormSchemaType,
+  type RunningLogType,
+  type TimelineEvent,
+  type BloodPressureReadingFormSchemaType,
+  type NoteFormSchemaType,
+} from "~/types";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { getUserTimezone } from "./PreferencesRouter";
 import { fetchSunInfo } from "./SunInfoRouter";
@@ -98,6 +104,30 @@ const buildActivityInfo = async (
           mood: true,
         },
       },
+      weighIn: {
+        select: {
+          activityId: true,
+          date: true,
+          weight: true,
+          bodyFatPercentage: true,
+        },
+      },
+      bloodPressureReading: {
+        select: {
+          activityId: true,
+          date: true,
+          systolic: true,
+          diastolic: true,
+          pulse: true,
+        },
+      },
+      note: {
+        select: {
+          activityId: true,
+          date: true,
+          content: true,
+        },
+      },
     },
   });
 
@@ -107,7 +137,7 @@ const buildActivityInfo = async (
       run = {
         activityId: activity.id,
         date: activity.run.date,
-        distance: activity.run.distance.toNumber(),
+        distance: activity.run.distance,
         duration: activity.run.duration,
         pace: activity.run.pace,
         heartRateAverage: activity.run.heartRageAverage?.toString(),
@@ -115,6 +145,38 @@ const buildActivityInfo = async (
         mood: activity.run.mood ?? undefined,
       };
     }
+
+    let weighIn: WeighInFormSchemaType | undefined = undefined;
+    if (activity.weighIn) {
+      weighIn = {
+        activityId: activity.weighIn.activityId,
+        date: activity.weighIn.date,
+        weight: activity.weighIn.weight,
+        bodyFatPercentage: activity.weighIn.bodyFatPercentage?.toString(),
+      };
+    }
+
+    let bloodPressureReading: BloodPressureReadingFormSchemaType | undefined =
+      undefined;
+    if (activity.bloodPressureReading) {
+      bloodPressureReading = {
+        activityId: activity.bloodPressureReading.activityId,
+        date: activity.bloodPressureReading.date,
+        systolic: activity.bloodPressureReading.systolic,
+        diastolic: activity.bloodPressureReading.diastolic,
+        pulse: activity.bloodPressureReading.pulse?.toString(),
+      };
+    }
+
+    let note: NoteFormSchemaType | undefined = undefined;
+    if (activity.note) {
+      note = {
+        activityId: activity.note.activityId,
+        date: activity.note.date,
+        content: activity.note.content,
+      };
+    }
+
     const event: TimelineEvent = {
       type: "Activity",
       id: activity.id,
@@ -137,6 +199,9 @@ const buildActivityInfo = async (
       }),
       onComplete: activity.routine.onComplete,
       run,
+      weighIn,
+      bloodPressureReading,
+      note,
     };
     return event;
   });
