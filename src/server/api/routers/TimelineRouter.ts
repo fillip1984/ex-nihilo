@@ -110,7 +110,7 @@ const buildActivityInfo = async (
           distance: true,
           duration: true,
           pace: true,
-          heartRageAverage: true,
+          heartRateAverage: true,
           weather: true,
           mood: true,
         },
@@ -151,7 +151,7 @@ const buildActivityInfo = async (
         distance: activity.run.distance,
         duration: activity.run.duration,
         pace: activity.run.pace,
-        heartRateAverage: activity.run.heartRageAverage?.toString(),
+        heartRateAverage: activity.run.heartRateAverage?.toString(),
         weather: activity.run.weather ?? undefined,
         mood: activity.run.mood ?? undefined,
       };

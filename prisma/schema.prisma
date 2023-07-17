@@ -224,7 +224,7 @@ model Run {
     distance         Float
     duration         String
     pace             String
-    heartRageAverage Int?
+    heartRateAverage Int?
     weather          WeatherType?
     mood             MoodType?
 }

@@ -13,7 +13,7 @@ export const RunRouter = createTRPCRouter({
           distance: input.distance,
           duration: input.duration,
           pace: input.pace,
-          heartRageAverage: input.heartRateAverage
+          heartRateAverage: input.heartRateAverage
             ? parseInt(input.heartRateAverage)
             : null,
           weather: input.weather,
@@ -22,4 +22,12 @@ export const RunRouter = createTRPCRouter({
       });
       return result;
     }),
+  readAll: protectedProcedure.query(async ({ ctx }) => {
+    const result = await ctx.prisma.run.findMany({
+      orderBy: {
+        date: "asc",
+      },
+    });
+    return result;
+  }),
 });

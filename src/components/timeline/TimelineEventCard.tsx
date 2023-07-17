@@ -120,7 +120,6 @@ const TimelineEventCard = ({
                     <FaStopwatch />
                     {event.run.pace} mi/min
                   </span>
-
                   <span className="flex items-center gap-1">
                     <FaHeartPulse />
                     {event.run.heartRateAverage}

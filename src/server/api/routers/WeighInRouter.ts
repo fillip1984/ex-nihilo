@@ -18,4 +18,12 @@ export const WeighInRouter = createTRPCRouter({
       });
       return result;
     }),
+  readAll: protectedProcedure.query(async ({ ctx }) => {
+    const result = await ctx.prisma.weighIn.findMany({
+      orderBy: {
+        date: "asc",
+      },
+    });
+    return result;
+  }),
 });

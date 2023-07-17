@@ -23,6 +23,14 @@ export const BloodPressureReadingRouter = createTRPCRouter({
       });
       return result;
     }),
+  readAll: protectedProcedure.query(async ({ ctx }) => {
+    const result = await ctx.prisma.bloodPressureReading.findMany({
+      orderBy: {
+        date: "asc",
+      },
+    });
+    return result;
+  }),
 });
 
 const determineCategory = (bpr: BloodPressureReadingFormSchemaType) => {

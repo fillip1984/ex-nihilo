@@ -668,7 +668,7 @@ const BloodPressureReading = ({
                   <input
                     type="number"
                     inputMode="numeric"
-                    placeholder="17.3"
+                    placeholder="80"
                     {...register("pulse")}
                   />
                   {errors.pulse && (
