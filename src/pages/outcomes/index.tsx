@@ -1,5 +1,7 @@
+import clsx from "clsx";
 import { format } from "date-fns";
 import Link from "next/link";
+import { useState } from "react";
 import { BsHeartPulseFill } from "react-icons/bs";
 import { FaArrowRight, FaClock, FaStopwatch } from "react-icons/fa";
 import { FaHeartPulse } from "react-icons/fa6";
@@ -14,10 +16,40 @@ import { api } from "~/utils/api";
 import { yyyyMMddHyphenated } from "~/utils/date";
 
 const Outcomes = () => {
-  const { data: weighIns } = api.weighIns.readAll.useQuery();
-  const { data: runs } = api.runs.readAll.useQuery();
+  const weighInsFilters = [{ label: "This week" }, { label: "Last 10" }];
+  const [weighInsFilter, setWeighInsFilter] = useState(
+    weighInsFilters[0]?.label
+  );
+
+  const runsFilters = [{ label: "This week" }, { label: "Last 10" }];
+  const [runsFilter, setRunsFilter] = useState(runsFilters[0]?.label);
+
+  const bloodPressureReadingsFilters = [
+    { label: "This week" },
+    { label: "Last 10" },
+  ];
+  const [bloodPressureReadingsFilter, setBloodPressureReadingsFilter] =
+    useState(bloodPressureReadingsFilters[0]?.label);
+
+  const { data: weighIns } = api.weighIns.readAll.useQuery(
+    {
+      filter: weighInsFilter ?? "",
+    },
+    { enabled: !!weighInsFilter }
+  );
+  const { data: runs } = api.runs.readAll.useQuery(
+    {
+      filter: runsFilter ?? "",
+    },
+    { enabled: !!runsFilter }
+  );
   const { data: bloodPressureReadings } =
-    api.bloodPressureReadings.readAll.useQuery();
+    api.bloodPressureReadings.readAll.useQuery(
+      {
+        filter: bloodPressureReadingsFilter ?? "",
+      },
+      { enabled: !!bloodPressureReadingsFilter }
+    );
 
   return (
     <div className="mx-auto w-full px-4 md:w-2/3 lg:w-1/2 xl:w-1/3">
@@ -42,9 +74,28 @@ const Outcomes = () => {
       <div className="flex flex-col gap-4">
         <div>
           <h3>Weigh ins</h3>
+          <div className="my-2 flex gap-2">
+            {weighInsFilters.map((weighInFilterOption) => (
+              <button
+                key={weighInFilterOption.label}
+                type="button"
+                onClick={() => setWeighInsFilter(weighInFilterOption.label)}
+                className={clsx("rounded px-4 py-2", {
+                  "bg-slate-400 text-slate-800":
+                    weighInFilterOption.label === weighInsFilter,
+                  "border border-slate-400 text-slate-400":
+                    weighInFilterOption.label !== weighInsFilter,
+                })}>
+                {weighInFilterOption.label}
+              </button>
+            ))}
+          </div>
           <div className="flex flex-col gap-2">
+            {weighIns?.length === 0 && (
+              <p className="text-center">No results</p>
+            )}
             {weighIns?.map((weighIn) => (
-              <div key={weighIn.id} className="rounded border px-2">
+              <div key={weighIn.id} className="rounded border p-2">
                 <span className="flex items-center gap-2">
                   {/* <FaClock /> */}
                   <h4>{format(weighIn.date, yyyyMMddHyphenated)}</h4>
@@ -64,9 +115,26 @@ const Outcomes = () => {
 
         <div>
           <h3>Runs</h3>
+          <div className="my-2 flex gap-2">
+            {runsFilters.map((runFilterOption) => (
+              <button
+                key={runFilterOption.label}
+                type="button"
+                onClick={() => setRunsFilter(runFilterOption.label)}
+                className={clsx("rounded px-4 py-2", {
+                  "bg-slate-400 text-slate-800":
+                    runFilterOption.label === runsFilter,
+                  "border border-slate-400 text-slate-400":
+                    runFilterOption.label !== runsFilter,
+                })}>
+                {runFilterOption.label}
+              </button>
+            ))}
+          </div>
           <div className="flex flex-col gap-2">
+            {runs?.length === 0 && <p className="text-center">No results</p>}
             {runs?.map((run) => (
-              <div key={run.id} className="rounded border px-2">
+              <div key={run.id} className="rounded border p-2">
                 <span className="flex items-center gap-2">
                   {/* <FaClock /> */}
                   <h4>{format(run.date, yyyyMMddHyphenated)}</h4>
@@ -94,11 +162,36 @@ const Outcomes = () => {
 
         <div>
           <h3>Blood Pressure Readings</h3>
+          <div className="my-2 flex gap-2">
+            {bloodPressureReadingsFilters.map(
+              (bloodPressureReadingsFilterOption) => (
+                <button
+                  key={bloodPressureReadingsFilterOption.label}
+                  type="button"
+                  onClick={() =>
+                    setBloodPressureReadingsFilter(
+                      bloodPressureReadingsFilterOption.label
+                    )
+                  }
+                  className={clsx("rounded px-4 py-2", {
+                    "bg-slate-400 text-slate-800":
+                      bloodPressureReadingsFilterOption.label ===
+                      bloodPressureReadingsFilter,
+                    "border border-slate-400 text-slate-400":
+                      bloodPressureReadingsFilterOption.label !==
+                      bloodPressureReadingsFilter,
+                  })}>
+                  {bloodPressureReadingsFilterOption.label}
+                </button>
+              )
+            )}
+          </div>
           <div className="flex flex-col gap-2">
+            {bloodPressureReadings?.length === 0 && (
+              <p className="text-center">No results</p>
+            )}
             {bloodPressureReadings?.map((bloodPressureReading) => (
-              <div
-                key={bloodPressureReading.id}
-                className="rounded border px-2">
+              <div key={bloodPressureReading.id} className="rounded border p-2">
                 <span className="flex items-center gap-2">
                   {/* <FaClock /> */}
                   <h4>
