@@ -42,74 +42,84 @@ const Outcomes = () => {
       <div className="flex flex-col gap-4">
         <div>
           <h3>Weigh ins</h3>
-          {weighIns?.map((weighIn) => (
-            <div key={weighIn.id} className="rounded border px-2">
-              <span className="flex items-center gap-2">
-                {/* <FaClock /> */}
-                <h4>{format(weighIn.date, yyyyMMddHyphenated)}</h4>
-              </span>
-              <span className="flex items-center gap-2">
-                <IoScaleOutline />
-                {weighIn.weight}
-              </span>
-              <span className="flex items-center gap-2">
-                <GiBiceps />
-                {weighIn.bodyFatPercentage}
-              </span>
-            </div>
-          ))}
+          <div className="flex flex-col gap-2">
+            {weighIns?.map((weighIn) => (
+              <div key={weighIn.id} className="rounded border px-2">
+                <span className="flex items-center gap-2">
+                  {/* <FaClock /> */}
+                  <h4>{format(weighIn.date, yyyyMMddHyphenated)}</h4>
+                </span>
+                <span className="flex items-center gap-2">
+                  <IoScaleOutline />
+                  {weighIn.weight}
+                </span>
+                <span className="flex items-center gap-2">
+                  <GiBiceps />
+                  {weighIn.bodyFatPercentage}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div>
           <h3>Runs</h3>
-          {runs?.map((run) => (
-            <div key={run.id} className="rounded border px-2">
-              <span className="flex items-center gap-2">
-                {/* <FaClock /> */}
-                <h4>{format(run.date, yyyyMMddHyphenated)}</h4>
-              </span>
-              <span className="flex items-center gap-1">
-                <GiPathDistance />
-                {run.distance} mi
-              </span>
-              <span className="flex items-center gap-1">
-                <FaClock />
-                {run.duration}
-              </span>
-              <span className="flex items-center gap-1">
-                <FaStopwatch />
-                {run.pace} mi/min
-              </span>
-              <span className="flex items-center gap-1">
-                <FaHeartPulse />
-                {run.heartRateAverage}
-              </span>
-            </div>
-          ))}
+          <div className="flex flex-col gap-2">
+            {runs?.map((run) => (
+              <div key={run.id} className="rounded border px-2">
+                <span className="flex items-center gap-2">
+                  {/* <FaClock /> */}
+                  <h4>{format(run.date, yyyyMMddHyphenated)}</h4>
+                </span>
+                <span className="flex items-center gap-1">
+                  <GiPathDistance />
+                  {run.distance} mi
+                </span>
+                <span className="flex items-center gap-1">
+                  <FaClock />
+                  {run.duration}
+                </span>
+                <span className="flex items-center gap-1">
+                  <FaStopwatch />
+                  {run.pace} mi/min
+                </span>
+                <span className="flex items-center gap-1">
+                  <FaHeartPulse />
+                  {run.heartRateAverage}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div>
-          <h3>Blood Pressure Reading</h3>
-          {bloodPressureReadings?.map((bloodPressureReading) => (
-            <div key={bloodPressureReading.id} className="rounded border px-2">
-              <span className="flex items-center gap-2">
-                {/* <FaClock /> */}
-                <h4>{format(bloodPressureReading.date, yyyyMMddHyphenated)}</h4>
-              </span>
-              <span className="flex items-center gap-2">
-                <GiHearts />
-                {bloodPressureReading.systolic}
-              </span>
-              <span className="flex items-center gap-1">
-                <GiNestedHearts />
-                {bloodPressureReading.diastolic}
-              </span>
-              <span className="flex items-center gap-2">
-                <BsHeartPulseFill />
-                {bloodPressureReading.pulse}
-              </span>
-            </div>
-          ))}
+          <h3>Blood Pressure Readings</h3>
+          <div className="flex flex-col gap-2">
+            {bloodPressureReadings?.map((bloodPressureReading) => (
+              <div
+                key={bloodPressureReading.id}
+                className="rounded border px-2">
+                <span className="flex items-center gap-2">
+                  {/* <FaClock /> */}
+                  <h4>
+                    {format(bloodPressureReading.date, yyyyMMddHyphenated)}
+                  </h4>
+                </span>
+                <span className="flex items-center gap-2">
+                  <GiHearts />
+                  {bloodPressureReading.systolic}
+                </span>
+                <span className="flex items-center gap-1">
+                  <GiNestedHearts />
+                  {bloodPressureReading.diastolic}
+                </span>
+                <span className="flex items-center gap-2">
+                  <BsHeartPulseFill />
+                  {bloodPressureReading.pulse}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

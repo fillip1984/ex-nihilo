@@ -25,6 +25,9 @@ export const BloodPressureReadingRouter = createTRPCRouter({
     }),
   readAll: protectedProcedure.query(async ({ ctx }) => {
     const result = await ctx.prisma.bloodPressureReading.findMany({
+      where: {
+        userId: ctx.session.user.id,
+      },
       orderBy: {
         date: "asc",
       },

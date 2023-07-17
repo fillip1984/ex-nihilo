@@ -24,6 +24,9 @@ export const RunRouter = createTRPCRouter({
     }),
   readAll: protectedProcedure.query(async ({ ctx }) => {
     const result = await ctx.prisma.run.findMany({
+      where: {
+        userId: ctx.session.user.id,
+      },
       orderBy: {
         date: "asc",
       },
