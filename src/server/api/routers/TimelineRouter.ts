@@ -1,4 +1,4 @@
-import { endOfDay, intervalToDuration, startOfDay } from "date-fns";
+import { endOfDay, format, intervalToDuration, startOfDay } from "date-fns";
 import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 import { z } from "zod";
 import { prisma } from "~/server/db";
@@ -12,25 +12,26 @@ import {
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { getUserTimezone } from "./PreferencesRouter";
 import { fetchSunInfo } from "./SunInfoRouter";
+import { HH_mm_aka24hr } from "~/utils/date";
 
 export const TimelineRouter = createTRPCRouter({
   buildAgenda: protectedProcedure
     .input(z.object({ date: z.date(), filter: z.string().nullish() }))
     .query(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
-      const userTimeZone = await getUserTimezone(userId);
+      const userTimezone = await getUserTimezone(userId);
 
       const convertedBackToUserTimezone = utcToZonedTime(
         input.date,
-        userTimeZone
+        userTimezone
       );
 
       const start = startOfDay(convertedBackToUserTimezone);
       const end = endOfDay(convertedBackToUserTimezone);
 
       const searchIntervalUTC = {
-        start: zonedTimeToUtc(start, userTimeZone),
-        end: zonedTimeToUtc(end, userTimeZone),
+        start: zonedTimeToUtc(start, userTimezone),
+        end: zonedTimeToUtc(end, userTimezone),
       };
       console.log(
         "building agenda for interval:",
@@ -60,6 +61,7 @@ export const TimelineRouter = createTRPCRouter({
         if (preferences?.latitude && preferences?.longitude) {
           const { sunrise, sunset } = await buildSunInfo(
             searchIntervalUTC.start,
+            userTimezone,
             preferences.latitude,
             preferences.longitude
           );
@@ -220,6 +222,7 @@ const buildActivityInfo = async (
 
 const buildSunInfo = async (
   date: Date,
+  userTimezone: string,
   latitude: number,
   longitude: number
 ) => {
@@ -230,10 +233,13 @@ const buildSunInfo = async (
     sunrise = {
       type: "Suninfo",
       id: date.toISOString() + "sunrise",
-      name: "Sunrise",
-      description: "Nature stuff",
-      start: sunInfo.sunrise,
-      end: sunInfo.sunrise,
+      name: "Sunrise (first light)",
+      description: `Sunrise is at ${format(
+        utcToZonedTime(sunInfo.sunrise, userTimezone),
+        HH_mm_aka24hr
+      )}`,
+      start: sunInfo.firstLight,
+      end: sunInfo.firstLight,
       complete: null,
       completedAt: null,
       skip: null,
@@ -249,10 +255,13 @@ const buildSunInfo = async (
     sunset = {
       type: "Suninfo",
       id: date.toISOString() + "sunset",
-      name: "Sunset",
-      description: "Nature stuff",
-      start: sunInfo.sunset,
-      end: sunInfo.sunset,
+      name: "Sunset (last light)",
+      description: `Sunset is at ${format(
+        utcToZonedTime(sunInfo.sunset, userTimezone),
+        HH_mm_aka24hr
+      )}`,
+      start: sunInfo.lastLight,
+      end: sunInfo.lastLight,
       complete: null,
       completedAt: null,
       skip: null,

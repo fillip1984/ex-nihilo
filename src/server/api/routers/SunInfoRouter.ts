@@ -22,6 +22,8 @@ export type SunInfoResponse = {
 export type SunInfo = {
   sunrise: Date;
   sunset: Date;
+  firstLight: Date;
+  lastLight: Date;
   dayLength: Duration;
 };
 
@@ -50,7 +52,9 @@ export const fetchSunInfo = async (
   const sunInfoResponseData = (await sunInfoResponse.json()) as SunInfoResponse;
 
   const sunrise = parseISO(sunInfoResponseData.results.sunrise);
+  const firstLight = parseISO(sunInfoResponseData.results.civil_twilight_begin);
   const sunset = parseISO(sunInfoResponseData.results.sunset);
+  const lastLight = parseISO(sunInfoResponseData.results.civil_twilight_end);
   // See: https://stackoverflow.com/questions/48776140/format-a-duration-from-seconds-using-date-fns
   const dayLength = intervalToDuration({
     start: 0,
@@ -60,6 +64,8 @@ export const fetchSunInfo = async (
   const sunInfo: SunInfo = {
     sunrise,
     sunset,
+    firstLight,
+    lastLight,
     dayLength,
   };
 
