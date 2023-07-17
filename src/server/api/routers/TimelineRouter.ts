@@ -1,13 +1,13 @@
 import { endOfDay, intervalToDuration, startOfDay } from "date-fns";
-import { zonedTimeToUtc } from "date-fns-tz";
+import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 import { z } from "zod";
 import { prisma } from "~/server/db";
 import {
-  type WeighInFormSchemaType,
-  type RunningLogType,
-  type TimelineEvent,
   type BloodPressureReadingFormSchemaType,
   type NoteFormSchemaType,
+  type RunningLogType,
+  type TimelineEvent,
+  type WeighInFormSchemaType,
 } from "~/types";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { getUserTimezone } from "./PreferencesRouter";
@@ -19,9 +19,18 @@ export const TimelineRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
       const userTimeZone = await getUserTimezone(userId);
+
+      const convertedBackToUserTimezone = utcToZonedTime(
+        input.date,
+        userTimeZone
+      );
+
+      const start = startOfDay(convertedBackToUserTimezone);
+      const end = endOfDay(convertedBackToUserTimezone);
+
       const searchIntervalUTC = {
-        start: zonedTimeToUtc(startOfDay(input.date), userTimeZone),
-        end: zonedTimeToUtc(endOfDay(input.date), userTimeZone),
+        start: zonedTimeToUtc(start, userTimeZone),
+        end: zonedTimeToUtc(end, userTimeZone),
       };
       console.log(
         "building agenda for interval:",
