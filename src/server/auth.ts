@@ -154,6 +154,7 @@ export const authOptions: NextAuthOptions = {
     }),
   },
   adapter: PrismaAdapter(prisma),
+  pages: { signIn: "/", signOut: "/", error: "/" },
   providers: [
     GithubProvider({
       clientId: env.NEXTAUTH_GITHUB_CLIENT_ID,

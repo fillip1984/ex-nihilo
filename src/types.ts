@@ -101,6 +101,31 @@ export const topicSummary = z.object({
 
 export type TopicSummaryType = z.infer<typeof topicSummary>;
 
+export const routineSummary = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+});
+
+export type RoutineSummaryType = z.infer<typeof routineSummary>;
+
+export const activitySummary = z.object({
+  id: z.string(),
+  complete: z.boolean(),
+  skip: z.boolean(),
+});
+
+export type ActivitySummaryType = z.infer<typeof activitySummary>;
+
+export const routineOutcome = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  activities: z.array(activitySummary),
+});
+
+export type RoutineOutcomeType = z.infer<typeof routineOutcome>;
+
 export type TimelineEvent = {
   type: TimelineEventType;
   id: string;

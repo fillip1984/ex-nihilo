@@ -17,7 +17,12 @@ import {
 } from "date-fns";
 import { z } from "zod";
 import { prisma } from "~/server/db";
-import { type RoutineAndAll } from "~/types";
+import {
+  type ActivitySummaryType,
+  type RoutineAndAll,
+  type RoutineOutcomeType,
+  type RoutineSummaryType,
+} from "~/types";
 import { combineDateAndTime, yyyyMMddHyphenated } from "~/utils/date";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { getUserTimezone } from "./PreferencesRouter";
@@ -377,39 +382,90 @@ export const ActivityRouter = createTRPCRouter({
     }
     console.log("Rebuilt activities for user: ", userId);
   }),
-  // readAll: protectedProcedure
-  //   .input(z.object({ date: z.date(), filter: z.string().nullish() }))
-  //   .query(async ({ ctx, input }) => {
-  //     const start = startOfDay(input.date);
-  //     const end = endOfDay(input.date);
+  readAll: protectedProcedure
+    .input(z.object({ start: z.date(), end: z.date() }))
+    .query(async ({ ctx, input }) => {
+      // const userPreferences = await ctx.prisma.preferences.findUnique({
+      //   where: {
+      //     userId: ctx.session.user.id,
+      //   },
+      // });
+      // if (!userPreferences) {
+      //   throw new Error("Unable to read all for user, timezone not found");
+      // }
 
-  //     const userId = ctx.session.user.id;
+      const userId = ctx.session.user.id;
 
-  //     const result = ctx.prisma.activity.findMany({
-  //       where: {
-  //         userId,
-  //         start: {
-  //           gte: start,
-  //           lte: end,
-  //         },
-  //         ...(input.filter === "Available"
-  //           ? { skip: false, complete: false }
-  //           : {}),
-  //         ...(input.filter === "Complete" ? { complete: true } : {}),
-  //         ...(input.filter === "Skipped" ? { skip: true } : {}),
-  //         // wide open so not necessary ...(input.filter === "All" ? {} : {}),
-  //       },
-  //       include: {
-  //         routine: {
-  //           include: {
-  //             topic: true,
-  //           },
-  //         },
-  //       },
-  //     });
+      console.log(
+        "Finding all activities between start:",
+        input.start,
+        "and end:",
+        input.end
+      );
 
-  //     return result;
-  //   }),
+      const activities = await ctx.prisma.activity.findMany({
+        where: {
+          userId,
+          start: {
+            gte: input.start,
+            lte: input.end,
+          },
+          // ...(input.filter === "Available"
+          //   ? { skip: false, complete: false }
+          //   : {}),
+          // ...(input.filter === "Complete" ? { complete: true } : {}),
+          // ...(input.filter === "Skipped" ? { skip: true } : {}),
+          // wide open so not necessary ...(input.filter === "All" ? {} : {}),
+        },
+        include: {
+          routine: {
+            include: {
+              topic: true,
+            },
+          },
+        },
+      });
+
+      const routineActivityOutcomes: RoutineOutcomeType[] = [];
+      const routines = activities.map((activity) => {
+        return {
+          id: activity.routine.id,
+          name: activity.routine.name,
+          description: activity.routine.description,
+        };
+      });
+      const uniqueRoutines = Array.from(new Set(routines.map((r) => r.id))).map(
+        (id) => {
+          return routines.find((r) => r.id === id);
+        }
+      ) as RoutineSummaryType[];
+
+      // console.log("routines", routines.length);
+      // console.log("unique routines", uniqueRoutines.length);
+
+      uniqueRoutines.forEach((routine) => {
+        const actsForRoutine = activities.filter(
+          (activity) => activity.routine.id === routine.id
+        );
+        const routineOutcome: RoutineOutcomeType = {
+          id: routine.id,
+          name: routine.name,
+          description: routine.description,
+          activities: actsForRoutine.map((act) => {
+            return {
+              id: act.id,
+              complete: act.complete,
+              skip: act.skip,
+            } as ActivitySummaryType;
+          }),
+        };
+        routineActivityOutcomes.push(routineOutcome);
+      });
+
+      // console.log(routineActivityOutcomes);
+
+      return routineActivityOutcomes;
+    }),
   complete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {

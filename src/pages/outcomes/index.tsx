@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { format } from "date-fns";
+import { endOfWeek, format, startOfWeek } from "date-fns";
 import Link from "next/link";
 import { useState } from "react";
 import { BsHeartPulseFill } from "react-icons/bs";
@@ -12,6 +12,7 @@ import {
   GiPathDistance,
 } from "react-icons/gi";
 import { IoScaleOutline } from "react-icons/io5";
+import LoadingErrorAndRetry from "~/components/shared/LoadingErrorAndRetry";
 import { api } from "~/utils/api";
 import { yyyyMMddHyphenated } from "~/utils/date";
 
@@ -51,6 +52,19 @@ const Outcomes = () => {
       { enabled: !!bloodPressureReadingsFilter }
     );
 
+  const [start] = useState(startOfWeek(new Date()));
+  const [end] = useState(endOfWeek(new Date()));
+
+  const {
+    data: routineOutcomes,
+    isLoading,
+    isError,
+    refetch,
+  } = api.activities.readAll.useQuery({
+    start,
+    end,
+  });
+
   return (
     <div className="mx-auto w-full px-4 md:w-2/3 lg:w-1/2 xl:w-1/3">
       <div className="flex flex-col gap-2 p-4">
@@ -70,6 +84,72 @@ const Outcomes = () => {
           </Link>
         </div>
       </div>
+
+      {(isLoading || isError) && (
+        <LoadingErrorAndRetry
+          isLoading={isLoading}
+          isError={isError}
+          retry={() => void refetch()}
+        />
+      )}
+
+      {!isLoading && !isError && routineOutcomes && (
+        <div className="mb-6">
+          <div className="mb-4">
+            <h3>Routine Outcomes</h3>
+            <p className="text-sm">
+              For week: {format(start, yyyyMMddHyphenated)} to{" "}
+              {format(end, yyyyMMddHyphenated)}
+            </p>
+          </div>
+          <div className="flex flex-col gap-3">
+            {routineOutcomes.map((routineOutcome) => (
+              <div
+                key={routineOutcome.id}
+                className="rounded-lg bg-white/10 p-2">
+                <h4>{routineOutcome.name}</h4>
+                <p className="text-sm">{routineOutcome.description}</p>
+                <div className="my-2 flex w-full justify-around gap-2">
+                  <div className="flex w-1/4 flex-col items-center rounded bg-slate-400 p-4">
+                    <span>Pending</span>
+                    <span className="text-4xl">
+                      {
+                        routineOutcome.activities.filter(
+                          (act) => !act.skip && !act.complete
+                        ).length
+                      }
+                    </span>
+                  </div>
+                  <div className="flex w-1/4 flex-col items-center rounded bg-green-500/70 p-4">
+                    <span>Complete</span>
+                    <span className="text-4xl">
+                      {
+                        routineOutcome.activities.filter((act) => act.complete)
+                          .length
+                      }
+                    </span>
+                  </div>
+                  <div className="flex w-1/4 flex-col items-center rounded bg-red-500/70 p-4">
+                    <span>Skipped</span>
+                    <span className="text-4xl">
+                      {
+                        routineOutcome.activities.filter((act) => act.skip)
+                          .length
+                      }
+                    </span>
+                  </div>
+                  <div className="flex w-1/4 flex-col items-center rounded bg-black p-4">
+                    <span>Total</span>
+                    <span className="text-4xl">
+                      {routineOutcome.activities.length}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col gap-4">
         <div>
@@ -112,7 +192,6 @@ const Outcomes = () => {
             ))}
           </div>
         </div>
-
         <div>
           <h3>Runs</h3>
           <div className="my-2 flex gap-2">
@@ -159,7 +238,6 @@ const Outcomes = () => {
             ))}
           </div>
         </div>
-
         <div>
           <h3>Blood Pressure Readings</h3>
           <div className="my-2 flex gap-2">
