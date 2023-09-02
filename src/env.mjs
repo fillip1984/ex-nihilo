@@ -25,6 +25,7 @@ export const env = createEnv({
     NEXTAUTH_GITHUB_CLIENT_SECRET: z.string().min(1),
     NEXTAUTH_GOOGLE_CLIENT_ID: z.string().min(1),
     NEXTAUTH_GOOGLE_CLIENT_SECRET: z.string().min(1),
+    TZ: z.string().min(1)
   },
 
   /**
@@ -49,6 +50,7 @@ export const env = createEnv({
     NEXTAUTH_GITHUB_CLIENT_SECRET: process.env.NEXTAUTH_GITHUB_CLIENT_SECRET,
     NEXTAUTH_GOOGLE_CLIENT_ID: process.env.NEXTAUTH_GOOGLE_CLIENT_ID,
     NEXTAUTH_GOOGLE_CLIENT_SECRET: process.env.NEXTAUTH_GOOGLE_CLIENT_SECRET,
+    TZ: process.env.TZ
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
