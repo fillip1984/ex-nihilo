@@ -25,7 +25,11 @@ export const env = createEnv({
     NEXTAUTH_GITHUB_CLIENT_SECRET: z.string().min(1),
     NEXTAUTH_GOOGLE_CLIENT_ID: z.string().min(1),
     NEXTAUTH_GOOGLE_CLIENT_SECRET: z.string().min(1),
-    TZ: z.string().min(1)
+    // TZ should be set to UTC in prod, setting as optional for prod. In test we want to force it to be UTC so require input
+    TZ:
+      process.env.NODE_ENV === "production"
+        ? z.string().min(1).optional()
+        : z.string().min(1),
   },
 
   /**
