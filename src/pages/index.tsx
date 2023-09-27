@@ -9,7 +9,7 @@ const Home: NextPage = () => {
     <>
       <Head>
         <title>ex-nihilo</title>
-        <meta name="description" content="Agenda and time tracker" />
+        <meta name="description" content="Agenda and time tracker...it's great" />
         {/* <link rel="icon" href="/favicon.ico" /> */}
         <link
           rel="apple-touch-icon"
